@@ -44,9 +44,47 @@ def parse_tree(tree_str):
             else:
                 branches.append(ref)
         commits.append((change, parents, branches, tags))
-    checkout = commits[-1][0]
+
+    head = commits[-1][0]
+
     del commits[-1]
-    return commits, checkout
+
+    level = {
+        'branches': {},
+        'commits': {},
+        'HEAD': {},
+    }
+
+    all_branches = []
+    all_tags = []
+    for name, parents, branches_here, tags_here in commits:
+        level['commits'][name] = {
+            'parents': parents,
+            'id': name
+        }
+        if not parents:
+            level['commits'][name]['rootCommit'] = True
+        all_branches.extend(branches_here)
+        all_tags.extend(tags_here)
+
+    for branch, target in branches:
+        level['branches'][branch] = {
+            'target': target,
+            'id': branch
+        }
+
+    for tag, target in tags:
+        level['tags'][tag] = {
+            'target': branch,
+            'id': tag
+        }
+
+    level['HEAD'] = {
+        'target': head,
+        'id': 'HEAD'
+    }
+
+    return commits, head
 
 
 def main():
