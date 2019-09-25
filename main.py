@@ -90,6 +90,14 @@ def parse_tree(tree_str):
     return commits, head
 
 
+# TODO Commit
+# TODO Test
+# TODO Save
+# TODO Load
+# TODO Instructions
+# TODO convert commit tree into spec format
+# TODO convert spec format into commit tree
+
 def main():
     with open('spec.spec') as spec_file:
         a = parse_tree(spec_file.read())
