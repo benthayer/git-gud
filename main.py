@@ -1,5 +1,7 @@
 from argparse import ArgumentParser
 
+from git import Repo
+
 
 def parse_tree(tree_str):
     # The purpose of this method is to get a more computer-readable commit tree
@@ -51,6 +53,7 @@ def parse_tree(tree_str):
 
     level = {
         'branches': {},
+        'tags': {},
         'commits': {},
         'HEAD': {},
     }
