@@ -6,7 +6,7 @@ from git import Repo
 def parse_tree(tree_str):
     # The purpose of this method is to get a more computer-readable commit tree
 
-    commits = []  # List of  (change, [parents], [branches], [tags])
+    commits = []  # List of  (commit_name, [parents], [branches], [tags])
     for line in tree_str.split('\n'):
         line = line.replace('  ', '')
 
@@ -23,21 +23,27 @@ def parse_tree(tree_str):
                 parents = []
             else:
                 parents = [commits[len(commits)-1][0]]
-            change = commit_str
+            commit_name = commit_str
         else:
             # Find parent
-            change, parent = commit_str.split(':')
-            change = change.strip()
-            parent = parent.strip()
+            commit_name, parent_str = commit_str.split(':')
+            commit_name = commit_name.strip()
+            parent_str = parent_str.strip()
 
-            parents = parent.split(' ')
+            if parent_str:
+                parents = parent_str.split(' ')
+            else:
+                parents = []
 
-        # We should have parents now
+        # We know the commit name and parents now
 
-        assert ' ' not in change  # There should never be more than one change
+        assert ' ' not in commit_name  # There should never be more than one change or a space in a name
 
-        # Process ref_str
-        refs = ref_str.split(',')
+        # Process references
+        if ref_str:
+            refs = ref_str.split(',')
+        else:
+            refs = []
         branches = []
         tags = []
         for ref in refs:
@@ -45,11 +51,12 @@ def parse_tree(tree_str):
                 tags.append(ref[4:])
             else:
                 branches.append(ref)
-        commits.append((change, parents, branches, tags))
+        commits.append((commit_name, parents, branches, tags))
 
     head = commits[-1][0]
 
     del commits[-1]
+    # We've formally replicated the input string in memory
 
     level = {
         'branches': {},
@@ -60,34 +67,34 @@ def parse_tree(tree_str):
 
     all_branches = []
     all_tags = []
-    for name, parents, branches_here, tags_here in commits:
-        level['commits'][name] = {
+    for commit_name, parents, branches_here, tags_here in commits:
+        level['commits'][commit_name] = {
             'parents': parents,
-            'id': name
+            'id': commit_name
         }
         if not parents:
-            level['commits'][name]['rootCommit'] = True
+            level['commits'][commit_name]['rootCommit'] = True
         all_branches.extend(branches_here)
         all_tags.extend(tags_here)
 
-    for branch, target in branches:
-        level['branches'][branch] = {
-            'target': target,
-            'id': branch
-        }
+        for branch in branches_here:
+            level['branches'][branch] = {
+                'target': commit_name,
+                'id': branch
+            }
 
-    for tag, target in tags:
-        level['tags'][tag] = {
-            'target': branch,
-            'id': tag
-        }
+        for tag in tags_here:
+            level['tags'][tag] = {
+                'target': commit_name,
+                'id': tag
+            }
 
     level['HEAD'] = {
         'target': head,
         'id': 'HEAD'
     }
 
-    return commits, head
+    return level, commits, head
 
 
 # TODO Commit
