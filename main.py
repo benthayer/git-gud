@@ -141,7 +141,7 @@ def get_branching_tree(tree):
     return commits
 
 
-def create_tree(commits, head):
+def create_tree(commit_info, head):
     # tree['commits']
     # First, find the initial commit
     # Should I go depth first or breadth first?
@@ -153,7 +153,7 @@ def create_tree(commits, head):
 
     commits = {}
 
-    for name, parents, branches, tags in commits:
+    for name, parents, branches, tags in commit_info:
         # commit = (name, parents, branches, tags)
         # TODO Test whether the branches are created properly
         # TODO Figure out how to handle merges
