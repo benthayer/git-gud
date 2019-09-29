@@ -1,9 +1,6 @@
 from argparse import ArgumentParser
 
-import os
-
 from git import Repo
-from git import IndexFile
 from git import Actor
 
 
@@ -15,6 +12,8 @@ def parse_tree(tree_str):
     all_tags = set()
 
     for line in tree_str.split('\n'):
+        if line[0] == '#':
+            continue
         line = line.replace('  ', '')
 
         if '(' in line:
