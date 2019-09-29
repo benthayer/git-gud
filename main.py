@@ -1,12 +1,19 @@
 from argparse import ArgumentParser
 
+import os
+
 from git import Repo
+from git import IndexFile
+from git import Actor
 
 
 def parse_tree(tree_str):
     # The purpose of this method is to get a more computer-readable commit tree
 
     commits = []  # List of  (commit_name, [parents], [branches], [tags])
+    all_branches = set()
+    all_tags = set()
+
     for line in tree_str.split('\n'):
         line = line.replace('  ', '')
 
@@ -48,17 +55,28 @@ def parse_tree(tree_str):
         tags = []
         for ref in refs:
             if ref[:4] == 'tag:':
-                tags.append(ref[4:])
+                tag = ref[4:]
+                assert tag not in all_tags
+                tags.append(tag)
+                all_tags.add(tag)
             else:
-                branches.append(ref)
+                branch = ref
+                assert branch not in all_branches
+                branches.append(branch)
+                all_branches.add(branch)
         commits.append((commit_name, parents, branches, tags))
 
     head = commits[-1][0]
-
     del commits[-1]
+
+    return commits, head
+
+
+def level_json(commits, head):
     # We've formally replicated the input string in memory
 
     level = {
+        'topology': [],
         'branches': {},
         'tags': {},
         'commits': {},
@@ -68,6 +86,7 @@ def parse_tree(tree_str):
     all_branches = []
     all_tags = []
     for commit_name, parents, branches_here, tags_here in commits:
+        level['topology'].append(commits)
         level['commits'][commit_name] = {
             'parents': parents,
             'id': commit_name
@@ -94,7 +113,69 @@ def parse_tree(tree_str):
         'id': 'HEAD'
     }
 
-    return level, commits, head
+    return level
+
+
+def add_file_to_index(index, filename):
+    # TODO Want to do this in the working directory
+    # TODO Use tree only when in dev-mode
+    open(f'tree/{filename}', 'w+').close()
+    index.add([filename])
+
+
+class Commit:
+    def __init__(self, name):
+        self.name = name
+        self.children = []
+
+
+def get_branching_tree(tree):
+    # TODO Delete this function and Commit class
+    commits = {}
+
+    for commit in tree['commits']:
+        for parent in commit['parents']:
+            if parent not in commits:
+                commits[parent] = Commit(parent)
+            commits[parent].children.append(commit)
+
+    return commits
+
+
+def create_tree(commits, head):
+    # tree['commits']
+    # First, find the initial commit
+    # Should I go depth first or breadth first?
+    # TODO Clear tree
+    repo = Repo('tree') # TODO Only use tree in dev-mode
+    index = repo.index
+
+    author = Actor("Git Gud", "git-gud@example.com")
+
+    commits = {}
+
+    for name, parents, branches, tags in commits:
+        # commit = (name, parents, branches, tags)
+        # TODO Test whether the branches are created properly
+        # TODO Figure out how to handle merges
+        add_file_to_index(index, name) # TODO Files don't need diffs, consider just committing
+        parents = [commits[parent] for parent in parents]
+        if parents:
+            repo.active_branch.set_commit(parents[0])
+        commit = index.commit(name, author=author, committer=author, head=True, parent_commits=parents)
+        commits[name] = commit
+
+        for branch in branches:
+            repo.create_head(branch, commit)
+
+        for tag in tags:
+            repo.create_tag(tag, commit)
+
+    for branch in repo.branches:
+        if branch.name == head:
+            branch.checkout()
+    # TODO use single branch for all commits then delete branch at the end
+    # TODO How do we change the commit of a branch
 
 
 # TODO Commit
@@ -107,8 +188,9 @@ def parse_tree(tree_str):
 
 def main():
     with open('spec.spec') as spec_file:
-        a = parse_tree(spec_file.read())
-        print(a)
+        commits, head = parse_tree(spec_file.read())
+        create_tree(commits, head)
+
     pass
 
 
