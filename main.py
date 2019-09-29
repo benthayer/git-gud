@@ -6,6 +6,7 @@ import shutil
 from git import Repo
 from git import Head
 from git import Actor
+from git.exc import NoSuchPathError
 from git.exc import GitCommandError
 
 
@@ -146,31 +147,58 @@ def get_branching_tree(tree):
     return commits
 
 
-def delete_all():
+def delete_files():
     # TODO Only use tree in dev-mode
-    for the_file in os.listdir('tree'):
-        file_path = os.path.join('tree', the_file)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
-        except Exception as e:
-            print(e)
+    for file in os.listdir('tree'):
+        file_path = os.path.join('tree', file)
+        if file == '.git':
+            continue
+        if os.path.isfile(file_path):
+            os.unlink(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
 
 
 def create_tree(commits, head):
 
-    repo = Repo('tree') # TODO Only use tree in dev-mode
-    repo.init()
+    try:
+        repo = Repo('tree')
+    except NoSuchPathError:
+        repo = Repo.init('tree') # TODO Only use tree in dev-mode
+        repo.init()
+
+    index = repo.index
+    delete_files()
+    index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
+
+
+    # Switch to temp first in case git-gud-construction exists
+    if repo.head.reference.name != 'temp':
+        repo.head.reference = Head(repo, 'refs/heads/temp')
+
+    # Delete git-gud-construction so we can guarantee it's an orphan
+    try:
+        repo.delete_head('git-gud-construction')
+    except GitCommandError:
+        pass  # Branch doesn't exist
+
     repo.head.reference = Head(repo, 'refs/heads/git-gud-construction')
+    try:
+        repo.delete_head('temp')
+    except GitCommandError:
+        pass # If temp didn't exist, we only checked it out as an orphan, so it already disappeared
+
+    for branch in repo.branches:
+        if branch.name != 'git-gud-construction':
+            repo.delete_head(branch, force=True)
+    repo.delete_tag(*repo.tags)
+
     index = repo.index
     author = Actor("Git Gud", "git-gud@example.com")
     commit_objects = {}
 
     for name, parents, branches, tags in commits:
         # commit = (name, parents, branches, tags)
-        # TODO Figure out how to handle merges
         parents = [commit_objects[parent] for parent in parents]
         if parents:
             repo.active_branch.set_commit(parents[0])
@@ -187,13 +215,12 @@ def create_tree(commits, head):
             repo.create_tag(tag, commit)
         # TODO Log commit hash and info
 
+    # TODO Checkout using name
     for branch in repo.branches:
         if branch.name == head:
             branch.checkout()
-    # TODO use single branch for all commits then delete branch at the end
-    # TODO How do we change the commit of a branch
     pass
-    # TODO Delete old head
+    # TODO delete git-gud-construction
 
 
 # TODO Commit
@@ -207,7 +234,6 @@ def create_tree(commits, head):
 def main():
     with open('spec.spec') as spec_file:
         commits, head = parse_tree(spec_file.read())
-        delete_all()
         create_tree(commits, head)
 
     pass
