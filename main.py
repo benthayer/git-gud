@@ -1,7 +1,12 @@
 from argparse import ArgumentParser
 
+import os
+import shutil
+
 from git import Repo
+from git import Head
 from git import Actor
+from git.exc import GitCommandError
 
 
 def parse_tree(tree_str):
@@ -141,40 +146,54 @@ def get_branching_tree(tree):
     return commits
 
 
-def create_tree(commit_info, head):
-    # tree['commits']
-    # First, find the initial commit
-    # Should I go depth first or breadth first?
-    # TODO Clear tree
+def delete_all():
+    # TODO Only use tree in dev-mode
+    for the_file in os.listdir('tree'):
+        file_path = os.path.join('tree', the_file)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print(e)
+
+
+def create_tree(commits, head):
+
     repo = Repo('tree') # TODO Only use tree in dev-mode
+    repo.init()
+    repo.head.reference = Head(repo, 'refs/heads/git-gud-construction')
     index = repo.index
-
     author = Actor("Git Gud", "git-gud@example.com")
+    commit_objects = {}
 
-    commits = {}
-
-    for name, parents, branches, tags in commit_info:
+    for name, parents, branches, tags in commits:
         # commit = (name, parents, branches, tags)
-        # TODO Test whether the branches are created properly
         # TODO Figure out how to handle merges
-        add_file_to_index(index, name) # TODO Files don't need diffs, consider just committing
-        parents = [commits[parent] for parent in parents]
+        parents = [commit_objects[parent] for parent in parents]
         if parents:
             repo.active_branch.set_commit(parents[0])
-        commit = index.commit(name, author=author, committer=author, head=True, parent_commits=parents)
-        commits[name] = commit
+        if len(parents) < 2:
+            # Not a merge
+            add_file_to_index(index, name)
+        commit = index.commit(name, author=author, committer=author, parent_commits=parents)
+        commit_objects[name] = commit
 
         for branch in branches:
             repo.create_head(branch, commit)
 
         for tag in tags:
             repo.create_tag(tag, commit)
+        # TODO Log commit hash and info
 
     for branch in repo.branches:
         if branch.name == head:
             branch.checkout()
     # TODO use single branch for all commits then delete branch at the end
     # TODO How do we change the commit of a branch
+    pass
+    # TODO Delete old head
 
 
 # TODO Commit
@@ -188,6 +207,7 @@ def create_tree(commit_info, head):
 def main():
     with open('spec.spec') as spec_file:
         commits, head = parse_tree(spec_file.read())
+        delete_all()
         create_tree(commits, head)
 
     pass
