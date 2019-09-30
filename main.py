@@ -219,8 +219,8 @@ def create_tree(commits, head):
     for branch in repo.branches:
         if branch.name == head:
             branch.checkout()
-    pass
-    # TODO delete git-gud-construction
+
+    repo.delete_head('git-gud-construction')
 
 
 # TODO Commit

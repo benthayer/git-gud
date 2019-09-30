@@ -11,7 +11,7 @@ def create_tree():
     # TODO Find changes in commit
     # TODO What does a merge commit look like - just has multiple parents
 
-    repo = Repo('.')
+    repo = Repo('test')
 
     commit_queue = deque()
 
