@@ -1,5 +1,26 @@
 from operations import create_tree
 
+
+def get_current_tree():
+    # Return a json object with the same structure as in level_json
+
+    tree = {
+        'branches': {},
+        'tags': {},
+        'commits': {},
+        'HEAD': {},
+    }
+
+    #
+
+    raise NotImplementedError
+
+    return tree
+
+def get_topology(tree):
+    tree['topology'] = None
+    raise NotImplementedError
+
 def parse_tree(tree_spec_file_name):
     # The purpose of this method is to get a more computer-readable commit tree
     with open(tree_spec_file_name) as tree_spec_file:
