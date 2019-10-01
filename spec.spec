@@ -1,9 +1,9 @@
-A (tag:root)
-B
-C
-D : A
-E
-F (feature)
-G : A (feature2)
-M1 : C F G (master)
+1 (tag:root)
+2
+3
+4 : 1
+5
+6 (feature)
+7 : 1 (feature2)
+8 : 3 6 7 (master)
 master
