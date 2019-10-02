@@ -4,19 +4,14 @@ import os
 
 from gitgud.operations import add_and_commit
 
-# TODO Start - install git gud into the current .git folder
-# TODO Commit
-# TODO Test
-# TODO Save
-# TODO Load
-# TODO Instructions
-# TODO convert commit tree into spec format
-# TODO convert spec format into commit tree
 # TODO Add test suite so testing can be separate from main code
+
 
 def handle_start():
     # TODO Use path separators to join paths
     # TODO Be smarter about where I'm getting paths in general
+
+    # TODO Add alias so command can be run as `git gud`
     gg_folder = 'tree/.git/gud/'
     commit_file_name = 'tree/.git/gud/last_commit'
     level_file_name = 'tree/.git/gud/level'
@@ -44,21 +39,36 @@ def handle_commit():
 
     return add_and_commit(commit_name)
 
+
 def handle_load(level_name):
     pass
+
 
 def handle_instructions(level_name):
     pass
 
+
 def handle_test(level_name):
     pass
 
+
+def handle_save():
+
+    pass
+
+
 def main():
-    parser = ArgumentParser()
-    parser.add_argument('load')
+    parser = ArgumentParser(description="A tool for learning git concepts.")
+    parser.add_argument('load', )
     parser.add_argument('instructions')
     parser.add_argument('test')
     args = parser.parse_args()
+    # git gud load level1
+    #
+    handle_start()
+    handle_load()
+    handle_instructions()
+    handle_test()
 
     pass
 

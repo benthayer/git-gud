@@ -16,7 +16,8 @@ def add_file_to_index(index, filename):
 
 
 def add_and_commit(name):
-    repo = Repo('tree') # TODO Use tree only whe in dev mode
+    # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
+    repo = Repo('tree')  # TODO Use tree only whe in dev mode
     index = repo.index
     add_file_to_index(index, name)
     author = Actor("Git Gud", "git-gud@example.com")
@@ -66,7 +67,6 @@ def create_tree(commits, head):
     delete_files()
     index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
 
-
     # Switch to temp first in case git-gud-construction exists
     if repo.head.reference.name != 'temp':
         repo.head.reference = Head(repo, 'refs/heads/temp')
@@ -81,7 +81,7 @@ def create_tree(commits, head):
     try:
         repo.delete_head('temp')
     except GitCommandError:
-        pass # If temp didn't exist, we only checked it out as an orphan, so it already disappeared
+        pass  # If temp didn't exist, we only checked it out as an orphan, so it already disappeared
 
     for branch in repo.branches:
         if branch.name != 'git-gud-construction':
