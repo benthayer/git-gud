@@ -1,4 +1,4 @@
-from operations import create_tree
+from gitgud.operations import create_tree
 
 
 def get_current_tree():

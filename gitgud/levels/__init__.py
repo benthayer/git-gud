@@ -1,4 +1,4 @@
-from levels.levels import Sequence
+from gitgud.levels.levels import Sequence
 
 sequences = [
     Sequence('merging'),
