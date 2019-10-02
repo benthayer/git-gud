@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 
 import os
 
+from gitgud.operations import add_and_commit
 
 # TODO Start - install git gud into the current .git folder
 # TODO Commit
