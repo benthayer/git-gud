@@ -1,5 +1,6 @@
 import os
-import sys
+
+import argparse
 
 from gitgud.operations import add_and_commit
 
@@ -79,31 +80,32 @@ def default(args):
 
 
 def main():
-    args = sys.argv[1:]
-    print(args)
+    parser = argparse.ArgumentParser(prog='git gud')
 
-    if args[1] == 'start':
-        handler = handle_start
-    elif args[1] == 'progress':
-        handler = handle_progress
-    elif args[1] == 'levels':
-        handler = handle_levels
-    elif args[1] == 'load':
-        handler = handle_load
-    elif args[1] == 'commit':
-        handler = handle_commit
-    elif args[1] == 'instructions':
-        handler = handle_instructions
-    elif args[1] == 'goal':
-        handler = handle_goal
-    elif args[1] == 'test':
-        handler = handle_test
-    elif args[1] == 'save':
-        handler = handle_save
-    else:
-        handler = default
+    subparsers = parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
-    handler(args[2:])
+    # TODO Add git gud help <command>, which would return the same output as git gud <command> -- help
+
+    start_parser = subparsers.add_parser('start', help='Git started!')
+    progress_parser = subparsers.add_parser('progress', help='Continue to the next level')
+    levels_parser = subparsers.add_parser('levels', help='List levels')
+    challenges_parser = subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified')
+    load_parser = subparsers.add_parser('load', help='Load a specific level or challenge')
+    commit_parser = subparsers.add_parser('commit', help='Quickly create and commit a file')
+    instructions_parser = subparsers.add_parser('instructions', help='Show the instructions for the current level')
+    goal_parser = subparsers.add_parser('goal', help='Show a description of the current goal')
+    test_parser = subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level')
+    show_tree_parser = subparsers.add_parser('show-tree', help='Show the current state of the branching tree')
+
+    challenges_parser.add_argument('level', nargs='?')
+
+    load_parser.add_argument('level', help='Level to load')
+    load_parser.add_argument('challenge', nargs='?', help='Challenge to load')
+
+    commit_parser.add_argument('file', nargs='?')
+
+    args = parser.parse_args()
+
 
 
 if __name__ == '__main__':
