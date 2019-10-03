@@ -32,6 +32,10 @@ def handle_levels(args):
     pass
 
 
+def handle_challenges(args):
+    pass
+
+
 def handle_load(args):
     # git gud load level1
     # git gud load challenge1
@@ -71,11 +75,7 @@ def handle_test(args):
     pass
 
 
-def handle_save(args):
-    pass
-
-
-def default(args):
+def handle_show_tree(args):
     pass
 
 
@@ -87,7 +87,7 @@ def main():
     # TODO Add git gud help <command>, which would return the same output as git gud <command> -- help
 
     # TODO Display help message for subcommand when it fails.
-    #   TODO ie `git gud load level1 challenge1 random-input` should have output similar to `git gud load --help`
+    # ie `git gud load level1 challenge1 random-input` should have output similar to `git gud load --help`
 
     start_parser = subparsers.add_parser('start', help='Git started!')
     progress_parser = subparsers.add_parser('progress', help='Continue to the next level')
@@ -100,6 +100,8 @@ def main():
     test_parser = subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level')
     show_tree_parser = subparsers.add_parser('show-tree', help='Show the current state of the branching tree')
 
+    start_parser.add_argument('--force')
+
     challenges_parser.add_argument('level', nargs='?')
 
     load_parser.add_argument('level', help='Level to load')
@@ -108,6 +110,22 @@ def main():
     commit_parser.add_argument('file', nargs='?')
 
     args = parser.parse_args()
+
+    command_dict = {
+        'start': handle_start,
+        'progress': handle_progress,
+        'levels': handle_levels,
+        'challenges': handle_challenges,
+        'load': handle_load,
+        'commit': handle_commit,
+        'instructions': handle_instructions,
+        'goal': handle_goal,
+        'test': handle_test,
+        'show_tree': handle_show_tree,
+
+    }
+
+    command_dict[args.command](args)
 
 
 
