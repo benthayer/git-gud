@@ -86,6 +86,9 @@ def main():
 
     # TODO Add git gud help <command>, which would return the same output as git gud <command> -- help
 
+    # TODO Display help message for subcommand when it fails.
+    #   TODO ie `git gud load level1 challenge1 random-input` should have output similar to `git gud load --help`
+
     start_parser = subparsers.add_parser('start', help='Git started!')
     progress_parser = subparsers.add_parser('progress', help='Continue to the next level')
     levels_parser = subparsers.add_parser('levels', help='List levels')
