@@ -1,5 +1,7 @@
-from gitgud.levels.levels import BasicLevel
+from gitgud.levels.util import BasicChallenge
 
-levels = [
-    BasicLevel('octopus')
+octopus = BasicChallenge('octopus')
+
+all_challenges = [
+    octopus
 ]

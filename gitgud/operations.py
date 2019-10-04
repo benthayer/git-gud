@@ -3,9 +3,11 @@ import shutil
 
 from git import Repo
 from git import Head
-from git import Actor
+
 from git.exc import NoSuchPathError
 from git.exc import GitCommandError
+
+from gitgud import actor
 
 
 def add_file_to_index(index, filename):
@@ -20,8 +22,7 @@ def add_and_commit(name):
     repo = Repo('tree')  # TODO Use tree only whe in dev mode
     index = repo.index
     add_file_to_index(index, name)
-    author = Actor("Git Gud", "git-gud@example.com")
-    return index.commit(name, author=author, committer=author)
+    return index.commit(name, author=actor, committer=actor)
 
 
 class Commit:
@@ -56,7 +57,6 @@ def delete_files():
 
 
 def create_tree(commits, head):
-
     try:
         repo = Repo('tree')
     except NoSuchPathError:
@@ -89,7 +89,6 @@ def create_tree(commits, head):
     repo.delete_tag(*repo.tags)
 
     index = repo.index
-    author = Actor("Git Gud", "git-gud@example.com")
     commit_objects = {}
 
     for name, parents, branches, tags in commits:
@@ -100,7 +99,7 @@ def create_tree(commits, head):
         if len(parents) < 2:
             # Not a merge
             add_file_to_index(index, name)
-        commit = index.commit(name, author=author, committer=author, parent_commits=parents)
+        commit = index.commit(name, author=actor, committer=actor, parent_commits=parents)
         commit_objects[name] = commit
 
         for branch in branches:
@@ -116,3 +115,138 @@ def create_tree(commits, head):
             branch.checkout()
 
     repo.delete_head('git-gud-construction')
+
+
+def get_current_tree():
+    # Return a json object with the same structure as in level_json
+
+    tree = {
+        'branches': {},
+        'tags': {},
+        'commits': {},
+        'HEAD': {},
+    }
+
+    #
+
+    raise NotImplementedError
+
+    return tree
+
+
+def get_topology(tree):
+    tree['topology'] = None
+    raise NotImplementedError
+
+
+def parse_tree(tree_spec_file_name):
+    # The purpose of this method is to get a more computer-readable commit tree
+    with open(tree_spec_file_name) as tree_spec_file:
+        tree_str = tree_spec_file.read()
+
+    commits = []  # List of  (commit_name, [parents], [branches], [tags])
+    all_branches = set()
+    all_tags = set()
+
+    for line in tree_str.split('\n'):
+        if line[0] == '#':
+            continue
+        line = line.replace('  ', '')
+
+        if '(' in line:
+            commit_str = line[:line.find('(')].strip()
+            ref_str = line[line.find('(')+1:-1].strip().replace(' ', '')
+        else:
+            commit_str = line.strip()
+            ref_str = ''
+
+        if ':' not in commit_str:
+            # Implicit parent, use previous commit
+            if len(commits) == 0:
+                parents = []
+            else:
+                parents = [commits[len(commits)-1][0]]
+            commit_name = commit_str
+        else:
+            # Find parent
+            commit_name, parent_str = commit_str.split(':')
+            commit_name = commit_name.strip()
+            parent_str = parent_str.strip()
+
+            if parent_str:
+                parents = parent_str.split(' ')
+            else:
+                parents = []
+
+        # We know the commit name and parents now
+
+        assert ' ' not in commit_name  # There should never be more than one change or a space in a name
+
+        # Process references
+        if ref_str:
+            refs = ref_str.split(',')
+        else:
+            refs = []
+        branches = []
+        tags = []
+        for ref in refs:
+            if ref[:4] == 'tag:':
+                tag = ref[4:]
+                assert tag not in all_tags
+                tags.append(tag)
+                all_tags.add(tag)
+            else:
+                branch = ref
+                assert branch not in all_branches
+                branches.append(branch)
+                all_branches.add(branch)
+        commits.append((commit_name, parents, branches, tags))
+
+    head = commits[-1][0]
+    del commits[-1]
+
+    return commits, head
+
+
+def level_json(commits, head):
+    # We've formally replicated the input string in memory
+
+    level = {
+        'topology': [],
+        'branches': {},
+        'tags': {},
+        'commits': {},
+        'HEAD': {},
+    }
+
+    all_branches = []
+    all_tags = []
+    for commit_name, parents, branches_here, tags_here in commits:
+        level['topology'].append(commits)
+        level['commits'][commit_name] = {
+            'parents': parents,
+            'id': commit_name
+        }
+        if not parents:
+            level['commits'][commit_name]['rootCommit'] = True
+        all_branches.extend(branches_here)
+        all_tags.extend(tags_here)
+
+        for branch in branches_here:
+            level['branches'][branch] = {
+                'target': commit_name,
+                'id': branch
+            }
+
+        for tag in tags_here:
+            level['tags'][tag] = {
+                'target': commit_name,
+                'id': tag
+            }
+
+    level['HEAD'] = {
+        'target': head,
+        'id': 'HEAD'
+    }
+
+    return level
