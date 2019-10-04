@@ -1,3 +1,5 @@
+import os
+
 from gitgud.operations import parse_tree
 from gitgud.operations import level_json
 from gitgud.operations import get_current_tree
@@ -54,16 +56,15 @@ class Level:
 
 
 class BasicChallenge:
-    def __init__(self, name):
-        self.name = name
-        self.path = f'{name}/'
+    def __init__(self, path):
+        self.path = path
 
     def setup(self):
-        commits, head = parse_tree(self.path + 'setup.spec')
+        commits, head = parse_tree(os.path.join(self.path, 'setup.spec'))
         create_tree(commits, head)
 
     def test(self):
-        commits, head = parse_tree(self.path + 'test.spec')
+        commits, head = parse_tree(os.path.join(self.path, 'setup.spec'))
         test_tree = level_json(commits, head)
         level_tree = get_current_tree()
         return test_level(level_tree, test_tree)

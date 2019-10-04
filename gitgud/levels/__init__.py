@@ -8,3 +8,5 @@ levels = [
     Level('Intro', intro_challenges),
     Level('Merging', merging_challenges),
 ]
+
+del Level

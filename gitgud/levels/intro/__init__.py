@@ -2,11 +2,11 @@ import pkg_resources
 
 from gitgud.levels.util import BasicChallenge
 
-print(__file__)
-DIR = pkg_resources.resource_filename('gitgud.levels.intro', 'commits/')
-
-commits = BasicChallenge('commits')
+commits = BasicChallenge(pkg_resources.resource_filename(__name__, '_commits/'))
 
 all_challenges = [
     commits
 ]
+
+del pkg_resources
+del BasicChallenge
