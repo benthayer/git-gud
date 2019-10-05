@@ -5,6 +5,8 @@ import argparse
 from gitgud.operations import add_and_commit
 from git import Repo
 
+from git.exc import NoSuchPathError
+
 # TODO Add test suite so testing can be separate from main code
 
 class GitGud:
@@ -57,24 +59,37 @@ class GitGud:
 
     def handle_start(self, args):
         # TODO Warn if there is already a git tree so we don't try to overwrite history
-        # TODO Use path separators to join paths
-        # TODO Be smarter about where I'm getting paths in general
 
-        # TODO Add alias so command can be run as `git gud`
+        if not args.force:
+            # We aren't forcing
+            if os.path.exists(self.git_path):
+                # Current directory is a git repo
+                print('Currently in a git repo. Use --force to force initialize here.')
+                return
+            if len(os.listdir(self.path)) != 0:
+                print('Current directory is nonempty. Use --force to force initialize here.')
+                return
+        else:
+            print('Force initializing git gud.')
 
-        repo = Repo('')
+        # After here, we initialize everything
+        try:
+            repo = Repo(self.path)
+        except NoSuchPathError:
+            repo = Repo.init(self.path)
+
         git_exec = repo.GitCommandWrapperType()
         git_exec.execute(['config', 'alias.gud', '"! python -m gitgud"'])
 
-        gg_folder = '.git/gud/'
-        commit_file_name = 'tree/.git/gud/last_commit'
-        level_file_name = 'tree/.git/gud/level'
-        if not os.path.exists(gg_folder):
-            os.mkdir(gg_folder)
+        commit_file_name = os.path.join(self.gg_path, 'last_commit')
+        level_file_name = os.path.join(self.gg_path, 'level')
+
+        if not os.path.exists(self.gg_path):
+            os.mkdir(self.gg_path)
         with open(commit_file_name, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
         with open(level_file_name, 'w+') as level_file:
-            level_file.write('welcome')  # TODO Add welcome level that gives instructions for git gud
+            level_file.write('intro commits')
 
     def handle_progress(self, args):
         pass
@@ -92,10 +107,7 @@ class GitGud:
         pass
 
     def handle_commit(self, args):
-        # git gud commit
-        # git gud commit A
-
-        file_path = 'tree/.git/gud/last_commit'
+        file_path = os.path.join(self.gg_path, 'last_commit')
 
         if os.path.exists(file_path):
             with open('tree/.git/gud/last_commit') as last_commit_file:
@@ -103,10 +115,22 @@ class GitGud:
         else:
             last_commit = '1'
 
-        commit_name = str(int(last_commit) + 1)
+        try:
+            commit_name = args.file
+        except AttributeError:
+            commit_name = str(int(last_commit) + 1)
 
-        with open(file_path, 'w+') as last_commit_file:
-            last_commit_file.write(commit_name)
+        should_write = False
+        try:
+            if int(args.file) > int(last_commit):
+                should_write = True
+        except ValueError:
+            # args.file is not a number
+            pass
+
+        if should_write:
+            with open(file_path, 'w+') as last_commit_file:
+                last_commit_file.write(commit_name)
 
         return add_and_commit(commit_name)
 
