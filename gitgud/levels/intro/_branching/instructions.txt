@@ -1,0 +1,16 @@
+This practice level will familiarize you with the concept of git branching!
+Hit enter to advance.
+>>>
+Great! You just advanced through the first part of the first set of instructions!
+>>>
+Branching in git allows teammates to create separate "branching" commit nodes that are useful when teammates are working on separate portions of a project. Branching allows teammates to commit their changes on their portion of the project with needing to coordinate pulling new commits from others.
+>>>
+Let's start by creating a branch:
+Use "git branch <branch_name>" to create a branch at the current commit node.
+>>>
+Great! Try creating a new commit using this branch. Type "git commit."
+>>>
+Notice, the new commit node was created using the master branch! To create commits on the new branch we created, make sure to "checkout" the branch first. This can be done using "git checkout <branch_name>". Creating a branch and checking it out can be done using one command "git checkout -b <branch_name>".
+>>>
+Now that you understand the basics, let's start using git!
+
