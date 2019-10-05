@@ -170,8 +170,6 @@ def get_current_tree():
     # commits have parents, which is [parent1, parent2], id
     # HEAD is branch_id
 
-    raise NotImplementedError
-
     return tree
 
 
