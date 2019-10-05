@@ -119,15 +119,56 @@ def create_tree(commits, head):
 
 def get_current_tree():
     # Return a json object with the same structure as in level_json
+    repo = Repo('tree')
 
     tree = {
         'branches': {},
         'tags': {},
-        'commits': {},
-        'HEAD': {},
+        'commits': {},  # 'a': {'parents': ['B'], 'id': 'c'},'b':
+        'HEAD': {}
     }
-
-    #
+    for branch in repo.branches:
+        commit_name = branch.commit.message.strip('\n')
+        if commit_name in tree['commits']:
+            continue
+        else:
+            tree['commits'][commit_name] = {
+                'parents': str([y.message.strip('\n') for y in branch.commit.parents]),
+                'id': commit_name
+            }
+        for x in branch.commit.traverse():
+            commit_name = x.message.strip('\n')
+            if commit_name in tree['commits']:
+                continue
+            else:
+                tree['commits'][commit_name] = {
+                    'parents': str([y.message.strip('\n') for y in x.parents]),
+                    'id': commit_name
+                }
+        # TODO this is bad python, update to a nice data structure
+        tree['branches'][branch.name] = {
+            "target": branch.commit.message.strip('\n'),
+            "id": branch.name
+        }
+    for tag in repo.tags:
+        commit_name = tag.commit.message.strip('\n')
+        tag_name = tag.name
+        tree['tags'][tag_name] = {
+            'target': commit_name,
+            'id': tag_name
+        }
+    if repo.head.is_detached:
+        target = repo.commit('HEAD').message.strip('\n')
+    else:
+        target = repo.head.ref.name
+    tree['HEAD'] = {
+        'target': target,
+        'id': 'HEAD'
+    }
+    # branches have target, id
+    # tags have target, id
+    # commits have parents, which is [parent1, parent2], id
+    # HEAD is branch_id
 
     raise NotImplementedError
 
