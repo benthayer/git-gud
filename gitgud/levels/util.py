@@ -1,5 +1,7 @@
 import os
 
+from collections import OrderedDict
+
 from gitgud.operations import parse_tree
 from gitgud.operations import level_json
 from gitgud.operations import get_current_tree
@@ -51,17 +53,38 @@ def test_level(level, test):
 class Level:
     def __init__(self, name, challenges):
         self.name = name
-        self.challenges = challenges
+        self.challenges = OrderedDict()
+        for challenge in challenges:
+            challenges[challenge.name] = challenge
+
+
+class Challenge:
+    def __init__(self, name):
+        self.name = name
+        self.level_name = None
+
+    def setup(self):
+        pass
+
+    def instructions(self):
+        pass
+
+    def test(self):
         pass
 
 
-class BasicChallenge:
-    def __init__(self, path):
+class BasicChallenge(Challenge):
+    def __init__(self, name, path):
+        super(BasicChallenge).__init__(name)
         self.path = path
 
     def setup(self):
         commits, head = parse_tree(os.path.join(self.path, 'setup.spec'))
         create_tree(commits, head)
+
+    def instructions(self):
+        # TODO Go through instructions
+        pass
 
     def test(self):
         commits, head = parse_tree(os.path.join(self.path, 'setup.spec'))

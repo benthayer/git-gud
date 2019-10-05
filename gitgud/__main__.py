@@ -2,10 +2,11 @@ import os
 
 import argparse
 
-from gitgud.operations import add_and_commit
 from git import Repo
-
 from git.exc import NoSuchPathError
+
+from gitgud.operations import add_and_commit
+from gitgud.levels import all_levels
 
 # TODO Add test suite so testing can be separate from main code
 
@@ -14,6 +15,8 @@ class GitGud:
         self.path = os.getcwd()
         self.git_path = os.path.join(self.path, '.git')
         self.gg_path = os.path.join(self.git_path, 'gud')
+        self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
+        self.level_path = os.path.join(self.gg_path, 'level')
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
@@ -26,6 +29,7 @@ class GitGud:
 
         start_parser = subparsers.add_parser('start', help='Git started!')
         progress_parser = subparsers.add_parser('progress', help='Continue to the next level')
+        reset_parser = subparsers.add_parser('reset', help='Reset the current level')
         levels_parser = subparsers.add_parser('levels', help='List levels')
         challenges_parser = subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified')
         load_parser = subparsers.add_parser('load', help='Load a specific level or challenge')
@@ -47,6 +51,7 @@ class GitGud:
         self.command_dict = {
             'start': self.handle_start,
             'progress': self.handle_progress,
+            'reset': self.handle_reset,
             'levels': self.handle_levels,
             'challenges': self.handle_challenges,
             'load': self.handle_load,
@@ -81,36 +86,60 @@ class GitGud:
         git_exec = repo.GitCommandWrapperType()
         git_exec.execute(['config', 'alias.gud', '"! python -m gitgud"'])
 
-        commit_file_name = os.path.join(self.gg_path, 'last_commit')
-        level_file_name = os.path.join(self.gg_path, 'level')
 
         if not os.path.exists(self.gg_path):
             os.mkdir(self.gg_path)
-        with open(commit_file_name, 'w+') as commit_file:
+        with open(self.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
-        with open(level_file_name, 'w+') as level_file:
+        with open(self.level_path, 'w+') as level_file:
             level_file.write('intro commits')
 
     def handle_progress(self, args):
-        pass
+        with open(self.level_path) as level_file:
+            current_level, current_challenge = level_file.read().split()
+
+        all_levels[current_level].challenges[current_challenge].next_level.setup()
+
+    def handle_reset(self, args):
+        with open(self.level_path) as level_file:
+            current_level, current_challenge = level_file.read().split()
+
+        all_levels[current_level].challenges[current_challenge].setup()
 
     def handle_levels(self, args):
-        pass
+        for level in all_levels:
+            # TODO Make pretty
+            # TODO Add description
+            print(level.name)
 
     def handle_challenges(self, args):
-        pass
+        with open(self.level_path) as level_file:
+            current_level, current_challenge = level_file.read().split()
+
+        try:
+            current_level = args.level
+        except NameError:
+            pass
+
+        for challenge in all_levels[current_level].challenges:
+            # TODO Make pretty
+            # TODO Add description
+            print(challenge.name)
 
     def handle_load(self, args):
-        # git gud load level1
-        # git gud load challenge1
-        # git gud load level1 challenge1
-        pass
+        # git gud load level
+        # git gud load level challenge
+
+        level = all_levels[args.level]
+        try:
+            level.challenges[args.challenge].setup()
+        except NameError:
+            level.challenges[0].setup()
+
 
     def handle_commit(self, args):
-        file_path = os.path.join(self.gg_path, 'last_commit')
-
-        if os.path.exists(file_path):
-            with open('tree/.git/gud/last_commit') as last_commit_file:
+        if os.path.exists(self.last_commit_path):
+            with open(self.last_commit_path) as last_commit_file:
                 last_commit = last_commit_file.read()
         else:
             last_commit = '1'
@@ -129,22 +158,27 @@ class GitGud:
             pass
 
         if should_write:
-            with open(file_path, 'w+') as last_commit_file:
+            with open(self.last_commit_path, 'w+') as last_commit_file:
                 last_commit_file.write(commit_name)
 
         return add_and_commit(commit_name)
 
     def handle_instructions(self, args):
-        pass
+        raise NotImplementedError
 
     def handle_goal(self, args):
-        pass
+        raise NotImplementedError
 
     def handle_test(self, args):
-        pass
+        with open(self.level_path) as level_file:
+            level, challenge = level_file.read().split()
+        if all_levels[level].challenges[challenge].test():
+            print("Level complete! `git gud progress` to advance to the next level")
+        else:
+            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
 
     def handle_show_tree(self, args):
-        pass
+        raise NotImplementedError
 
     def parse(self):
         args = self.parser.parse_args()
