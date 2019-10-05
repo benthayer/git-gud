@@ -25,25 +25,6 @@ def add_and_commit(name):
     return index.commit(name, author=actor, committer=actor)
 
 
-class Commit:
-    def __init__(self, name):
-        self.name = name
-        self.children = []
-
-
-def get_branching_tree(tree):
-    # TODO Delete this function and Commit class
-    commits = {}
-
-    for commit in tree['commits']:
-        for parent in commit['parents']:
-            if parent not in commits:
-                commits[parent] = Commit(parent)
-            commits[parent].children.append(commit)
-
-    return commits
-
-
 def delete_files():
     # TODO Only use tree in dev-mode
     for file in os.listdir('tree'):
