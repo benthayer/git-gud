@@ -1,4 +1,5 @@
 import os
+import sys
 
 import argparse
 
@@ -39,7 +40,7 @@ class GitGud:
         test_parser = subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level')
         show_tree_parser = subparsers.add_parser('show-tree', help='Show the current state of the branching tree')
 
-        start_parser.add_argument('--force')
+        start_parser.add_argument('--force', action='store_true')
 
         challenges_parser.add_argument('level', nargs='?')
 
@@ -71,6 +72,10 @@ class GitGud:
                 # Current directory is a git repo
                 print('Currently in a git repo. Use --force to force initialize here.')
                 return
+            if os.path.exists(self.gg_path):
+                # Current directory is a git repo
+                print('Git gud has already initialized. Use --force to force initialize again.')
+                return
             if len(os.listdir(self.path)) != 0:
                 print('Current directory is nonempty. Use --force to force initialize here.')
                 return
@@ -83,9 +88,11 @@ class GitGud:
         except NoSuchPathError:
             repo = Repo.init(self.path)
 
-        git_exec = repo.GitCommandWrapperType()
-        git_exec.execute(['config', 'alias.gud', '"! python -m gitgud"'])
+        python = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
+        config_writer = repo.config_writer()
+        config_writer.remove_option('alias', 'gud')
+        config_writer.add_value('alias', 'gud', f'"! {python} -m gitgud"')
 
         if not os.path.exists(self.gg_path):
             os.mkdir(self.gg_path)
@@ -182,7 +189,10 @@ class GitGud:
 
     def parse(self):
         args = self.parser.parse_args()
-        self.command_dict[args.command](args)
+        if args.command is None:
+            self.parser.print_help()
+        else:
+            self.command_dict[args.command](args)
 
 
 if __name__ == '__main__':

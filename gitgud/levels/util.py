@@ -54,8 +54,8 @@ class Level:
     def __init__(self, name, challenges):
         self.name = name
         self.challenges = OrderedDict()
-        for challenge in challenges:
-            challenges[challenge.name] = challenge
+        for challenge in challenges.values():
+            self.challenges[challenge.name] = challenge
 
 
 class Challenge:
@@ -75,7 +75,7 @@ class Challenge:
 
 class BasicChallenge(Challenge):
     def __init__(self, name, path):
-        super(BasicChallenge).__init__(name)
+        super().__init__(name)
         self.path = path
 
     def setup(self):

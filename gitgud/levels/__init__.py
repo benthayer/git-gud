@@ -12,8 +12,8 @@ all_levels['intro'] = Level('intro', intro_challenges)
 all_levels['merging'] = Level('merging', merging_challenges)
 
 last_challenge = None
-for level in all_levels[1:]:
-    for challenge in level.challenges:
+for level in all_levels.values():
+    for challenge in level.challenges.values():
         if last_challenge is not None:
             last_challenge.next_challenge = challenge
         last_challenge = challenge
