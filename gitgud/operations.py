@@ -10,148 +10,148 @@ from git.exc import GitCommandError
 from gitgud import actor
 
 
-def add_file_to_index(index, filename):
-    # TODO Want to do this in the working directory
-    # TODO Use tree only when in dev-mode
-    open(f'tree/{filename}', 'w+').close()
-    index.add([filename])
+class FileOperator:
+    def __init__(self, path):
+        self.path = path
 
+    def add_file_to_index(self, index, filename):
+        # TODO Want to do this in the working directory
+        # TODO Use tree only when in dev-mode
+        open(f'tree/{filename}', 'w+').close()
+        index.add([filename])
 
-def add_and_commit(name):
-    # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
-    repo = Repo('tree')  # TODO Use tree only whe in dev mode
-    index = repo.index
-    add_file_to_index(index, name)
-    return index.commit(name, author=actor, committer=actor)
+    def add_and_commit(self, name):
+        # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
+        repo = Repo('tree')  # TODO Use tree only whe in dev mode
+        index = repo.index
+        self.add_file_to_index(index, name)
+        return index.commit(name, author=actor, committer=actor)
 
+    def delete_files(self):
+        # TODO Only use tree in dev-mode
+        for file in os.listdir('tree'):
+            file_path = os.path.join('tree', file)
+            if file == '.git':
+                continue
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
 
-def delete_files():
-    # TODO Only use tree in dev-mode
-    for file in os.listdir('tree'):
-        file_path = os.path.join('tree', file)
-        if file == '.git':
-            continue
-        if os.path.isfile(file_path):
-            os.unlink(file_path)
-        elif os.path.isdir(file_path):
-            shutil.rmtree(file_path)
+    def create_tree(self, commits, head):
+        try:
+            repo = Repo('tree')
+        except NoSuchPathError:
+            repo = Repo.init('tree') # TODO Only use tree in dev-mode
+            repo.init()
 
+        index = repo.index
+        self.delete_files()
+        index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
 
-def create_tree(commits, head):
-    try:
-        repo = Repo('tree')
-    except NoSuchPathError:
-        repo = Repo.init('tree') # TODO Only use tree in dev-mode
-        repo.init()
+        # Switch to temp first in case git-gud-construction exists
+        if repo.head.reference.name != 'temp':
+            repo.head.reference = Head(repo, 'refs/heads/temp')
 
-    index = repo.index
-    delete_files()
-    index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
+        # Delete git-gud-construction so we can guarantee it's an orphan
+        try:
+            repo.delete_head('git-gud-construction')
+        except GitCommandError:
+            pass  # Branch doesn't exist
 
-    # Switch to temp first in case git-gud-construction exists
-    if repo.head.reference.name != 'temp':
-        repo.head.reference = Head(repo, 'refs/heads/temp')
+        repo.head.reference = Head(repo, 'refs/heads/git-gud-construction')
+        try:
+            repo.delete_head('temp')
+        except GitCommandError:
+            pass  # If temp didn't exist, we only checked it out as an orphan, so it already disappeared
 
-    # Delete git-gud-construction so we can guarantee it's an orphan
-    try:
+        for branch in repo.branches:
+            if branch.name != 'git-gud-construction':
+                repo.delete_head(branch, force=True)
+        repo.delete_tag(*repo.tags)
+
+        index = repo.index
+        commit_objects = {}
+
+        for name, parents, branches, tags in commits:
+            # commit = (name, parents, branches, tags)
+            parents = [commit_objects[parent] for parent in parents]
+            if parents:
+                repo.active_branch.set_commit(parents[0])
+            if len(parents) < 2:
+                # Not a merge
+                self.add_file_to_index(index, name)
+            commit = index.commit(name, author=actor, committer=actor, parent_commits=parents)
+            commit_objects[name] = commit
+
+            for branch in branches:
+                repo.create_head(branch, commit)
+
+            for tag in tags:
+                repo.create_tag(tag, commit)
+            # TODO Log commit hash and info
+
+        # TODO Checkout using name
+        for branch in repo.branches:
+            if branch.name == head:
+                branch.checkout()
+
         repo.delete_head('git-gud-construction')
-    except GitCommandError:
-        pass  # Branch doesn't exist
 
-    repo.head.reference = Head(repo, 'refs/heads/git-gud-construction')
-    try:
-        repo.delete_head('temp')
-    except GitCommandError:
-        pass  # If temp didn't exist, we only checked it out as an orphan, so it already disappeared
+    def get_current_tree(self):
+        # Return a json object with the same structure as in level_json
+        repo = Repo('tree')
 
-    for branch in repo.branches:
-        if branch.name != 'git-gud-construction':
-            repo.delete_head(branch, force=True)
-    repo.delete_tag(*repo.tags)
-
-    index = repo.index
-    commit_objects = {}
-
-    for name, parents, branches, tags in commits:
-        # commit = (name, parents, branches, tags)
-        parents = [commit_objects[parent] for parent in parents]
-        if parents:
-            repo.active_branch.set_commit(parents[0])
-        if len(parents) < 2:
-            # Not a merge
-            add_file_to_index(index, name)
-        commit = index.commit(name, author=actor, committer=actor, parent_commits=parents)
-        commit_objects[name] = commit
-
-        for branch in branches:
-            repo.create_head(branch, commit)
-
-        for tag in tags:
-            repo.create_tag(tag, commit)
-        # TODO Log commit hash and info
-
-    # TODO Checkout using name
-    for branch in repo.branches:
-        if branch.name == head:
-            branch.checkout()
-
-    repo.delete_head('git-gud-construction')
-
-
-def get_current_tree():
-    # Return a json object with the same structure as in level_json
-    repo = Repo('tree')
-
-    tree = {
-        'branches': {},
-        'tags': {},
-        'commits': {},  # 'a': {'parents': ['B'], 'id': 'c'},'b':
-        'HEAD': {}
-    }
-    for branch in repo.branches:
-        commit_name = branch.commit.message.strip('\n')
-        if commit_name in tree['commits']:
-            continue
-        else:
-            tree['commits'][commit_name] = {
-                'parents': str([y.message.strip('\n') for y in branch.commit.parents]),
-                'id': commit_name
-            }
-        for x in branch.commit.traverse():
-            commit_name = x.message.strip('\n')
+        tree = {
+            'branches': {},
+            'tags': {},
+            'commits': {},  # 'a': {'parents': ['B'], 'id': 'c'},'b':
+            'HEAD': {}
+        }
+        for branch in repo.branches:
+            commit_name = branch.commit.message.strip('\n')
             if commit_name in tree['commits']:
                 continue
             else:
                 tree['commits'][commit_name] = {
-                    'parents': str([y.message.strip('\n') for y in x.parents]),
+                    'parents': str([y.message.strip('\n') for y in branch.commit.parents]),
                     'id': commit_name
                 }
-        # TODO this is bad python, update to a nice data structure
-        tree['branches'][branch.name] = {
-            "target": branch.commit.message.strip('\n'),
-            "id": branch.name
+            for x in branch.commit.traverse():
+                commit_name = x.message.strip('\n')
+                if commit_name in tree['commits']:
+                    continue
+                else:
+                    tree['commits'][commit_name] = {
+                        'parents': str([y.message.strip('\n') for y in x.parents]),
+                        'id': commit_name
+                    }
+            # TODO this is bad python, update to a nice data structure
+            tree['branches'][branch.name] = {
+                "target": branch.commit.message.strip('\n'),
+                "id": branch.name
+            }
+        for tag in repo.tags:
+            commit_name = tag.commit.message.strip('\n')
+            tag_name = tag.name
+            tree['tags'][tag_name] = {
+                'target': commit_name,
+                'id': tag_name
+            }
+        if repo.head.is_detached:
+            target = repo.commit('HEAD').message.strip('\n')
+        else:
+            target = repo.head.ref.name
+        tree['HEAD'] = {
+            'target': target,
+            'id': 'HEAD'
         }
-    for tag in repo.tags:
-        commit_name = tag.commit.message.strip('\n')
-        tag_name = tag.name
-        tree['tags'][tag_name] = {
-            'target': commit_name,
-            'id': tag_name
-        }
-    if repo.head.is_detached:
-        target = repo.commit('HEAD').message.strip('\n')
-    else:
-        target = repo.head.ref.name
-    tree['HEAD'] = {
-        'target': target,
-        'id': 'HEAD'
-    }
-    # branches have target, id
-    # tags have target, id
-    # commits have parents, which is [parent1, parent2], id
-    # HEAD is branch_id
+        # branches have target, id
+        # tags have target, id
+        # commits have parents, which is [parent1, parent2], id
+        # HEAD is branch_id
 
-    return tree
+        return tree
 
 
 def get_topology(tree):

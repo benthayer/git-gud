@@ -6,18 +6,21 @@ import argparse
 from git import Repo
 from git.exc import NoSuchPathError
 
-from gitgud.operations import add_and_commit
+from gitgud.operations import FileOperator
 from gitgud.levels import all_levels
 
 # TODO Add test suite so testing can be separate from main code
 
+
+class InitializationError(Exception):
+    pass
+
+
 class GitGud:
     def __init__(self):
         self.path = os.getcwd()
-        self.git_path = os.path.join(self.path, '.git')
-        self.gg_path = os.path.join(self.git_path, 'gud')
-        self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
-        self.level_path = os.path.join(self.gg_path, 'level')
+
+        self.file_operator = FileOperator(self.path)
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
@@ -63,6 +66,10 @@ class GitGud:
             'show_tree': self.handle_show_tree,
         }
 
+    def assert_initialized(self):
+        if not self.file_operator:
+            raise InitializationError()
+
     def handle_start(self, args):
         # TODO Warn if there is already a git tree so we don't try to overwrite history
 
@@ -102,6 +109,7 @@ class GitGud:
             level_file.write('intro commits')
 
     def handle_progress(self, args):
+        self.
         with open(self.level_path) as level_file:
             current_level, current_challenge = level_file.read().split()
 
@@ -140,9 +148,9 @@ class GitGud:
         level = all_levels[args.level]
         try:
             level.challenges[args.challenge].setup()
-        except NameError:
-            level.challenges[0].setup()
-
+        except KeyError:
+            first_level = next(iter(level.challenges.values()))
+            first_level.setup()
 
     def handle_commit(self, args):
         if os.path.exists(self.last_commit_path):
@@ -192,7 +200,11 @@ class GitGud:
         if args.command is None:
             self.parser.print_help()
         else:
-            self.command_dict[args.command](args)
+            try:
+                self.command_dict[args.command](args)
+            except InitializationError:
+                print("Git gud has not been initialized. Initialize using \"git gud start\"")
+                pass
 
 
 if __name__ == '__main__':
