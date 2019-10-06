@@ -13,24 +13,23 @@ from gitgud import actor
 class FileOperator:
     def __init__(self, path):
         self.path = path
+        self.repo = Repo(self.path)
 
-    def add_file_to_index(self, index, filename):
+    def add_file_to_index(self, filename):
         # TODO Want to do this in the working directory
         # TODO Use tree only when in dev-mode
-        open(f'tree/{filename}', 'w+').close()
-        index.add([filename])
+        open(f'{self.path}/{filename}', 'w+').close()
+        self.index.add([filename])
 
     def add_and_commit(self, name):
         # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
-        repo = Repo('tree')  # TODO Use tree only whe in dev mode
-        index = repo.index
-        self.add_file_to_index(index, name)
-        return index.commit(name, author=actor, committer=actor)
+        self.add_file_to_index(self.repo.index, name)
+        return self.repo.index.commit(name, author=actor, committer=actor)
 
     def delete_files(self):
         # TODO Only use tree in dev-mode
-        for file in os.listdir('tree'):
-            file_path = os.path.join('tree', file)
+        for file in os.listdir(self.path):
+            file_path = os.path.join(self.path, file)
             if file == '.git':
                 continue
             if os.path.isfile(file_path):
@@ -39,13 +38,7 @@ class FileOperator:
                 shutil.rmtree(file_path)
 
     def create_tree(self, commits, head):
-        try:
-            repo = Repo('tree')
-        except NoSuchPathError:
-            repo = Repo.init('tree') # TODO Only use tree in dev-mode
-            repo.init()
-
-        index = repo.index
+        index = self.repo.index
         self.delete_files()
         index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
 
@@ -152,6 +145,14 @@ class FileOperator:
         # HEAD is branch_id
 
         return tree
+
+
+def get_operator():
+    # TODO Check if .git/gud exists in any of the folders
+    path = os.getcwd().split(os.path.sep)
+
+    FileOperator()
+    pass
 
 
 def get_topology(tree):

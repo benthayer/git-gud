@@ -20,7 +20,7 @@ class GitGud:
     def __init__(self):
         self.path = os.getcwd()
 
-        self.file_operator = FileOperator(self.path)
+        self.file_operator = None
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
