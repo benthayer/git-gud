@@ -2,10 +2,8 @@ import os
 
 from collections import OrderedDict
 
-from gitgud.operations import parse_tree
+from gitgud.operations import parse_spec
 from gitgud.operations import level_json
-from gitgud.operations import get_current_tree
-from gitgud.operations import create_tree
 
 
 def test_level(level, test):
@@ -78,16 +76,16 @@ class BasicChallenge(Challenge):
         super().__init__(name)
         self.path = path
 
-    def setup(self):
-        commits, head = parse_tree(os.path.join(self.path, 'setup.spec'))
-        create_tree(commits, head)
+    def setup(self, file_operator):
+        commits, head = parse_spec(os.path.join(self.path, 'setup.spec'))
+        file_operator.create_tree(commits, head)
 
     def instructions(self):
         # TODO Go through instructions
         pass
 
-    def test(self):
-        commits, head = parse_tree(os.path.join(self.path, 'setup.spec'))
+    def test(self, file_operator):
+        commits, head = parse_spec(os.path.join(self.path, 'test.spec'))
         test_tree = level_json(commits, head)
-        level_tree = get_current_tree()
+        level_tree = file_operator.get_current_tree()
         return test_level(level_tree, test_tree)

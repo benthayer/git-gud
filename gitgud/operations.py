@@ -4,30 +4,40 @@ import shutil
 from git import Repo
 from git import Head
 
-from git.exc import NoSuchPathError
 from git.exc import GitCommandError
+from git.exc import NoSuchPathError
 
 from gitgud import actor
 
 
-class FileOperator:
+class Operator:
     def __init__(self, path):
         self.path = path
-        self.repo = Repo(self.path)
+        try:
+            self.repo = Repo(self.path)
+        except NoSuchPathError:
+            self.repo = Repo.init(self.path)
+
+        self.git_path = os.path.join(self.path, '.git')
+        self.gg_path = os.path.join(self.git_path, 'gud')
+        self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
+        self.level_path = os.path.join(self.gg_path, 'level')
 
     def add_file_to_index(self, filename):
-        # TODO Want to do this in the working directory
-        # TODO Use tree only when in dev-mode
         open(f'{self.path}/{filename}', 'w+').close()
-        self.index.add([filename])
+        self.repo.index.add([filename])
 
     def add_and_commit(self, name):
         # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
-        self.add_file_to_index(self.repo.index, name)
-        return self.repo.index.commit(name, author=actor, committer=actor)
+        self.add_file_to_index(name)
+        commit = self.repo.index.commit(name, author=actor, committer=actor)
+
+        with open(self.last_commit_path, 'w+') as last_commit_file:
+            last_commit_file.write(name)
+
+        return commit
 
     def delete_files(self):
-        # TODO Only use tree in dev-mode
         for file in os.listdir(self.path):
             file_path = os.path.join(self.path, file)
             if file == '.git':
@@ -38,7 +48,9 @@ class FileOperator:
                 shutil.rmtree(file_path)
 
     def create_tree(self, commits, head):
-        index = self.repo.index
+        repo = self.repo
+        index = repo.index
+
         self.delete_files()
         index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
 
@@ -73,7 +85,7 @@ class FileOperator:
                 repo.active_branch.set_commit(parents[0])
             if len(parents) < 2:
                 # Not a merge
-                self.add_file_to_index(index, name)
+                self.add_file_to_index(name)
             commit = index.commit(name, author=actor, committer=actor, parent_commits=parents)
             commit_objects[name] = commit
 
@@ -93,14 +105,16 @@ class FileOperator:
 
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json
-        repo = Repo('tree')
+
+        repo = self.repo
 
         tree = {
-            'branches': {},
-            'tags': {},
-            'commits': {},  # 'a': {'parents': ['B'], 'id': 'c'},'b':
-            'HEAD': {}
+            'branches': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
+            'tags': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
+            'commits': {},  # '2': {'parents': ['1'], 'id': '1'}
+            'HEAD': {}  # 'target': 'branch_name', 'id': 'HEAD'
         }
+
         for branch in repo.branches:
             commit_name = branch.commit.message.strip('\n')
             if commit_name in tree['commits']:
@@ -110,7 +124,7 @@ class FileOperator:
                     'parents': str([y.message.strip('\n') for y in branch.commit.parents]),
                     'id': commit_name
                 }
-            for x in branch.commit.traverse():
+            for x in branch.commit.traverse(): # TODO We don't need to completely traverse every branch every time
                 commit_name = x.message.strip('\n')
                 if commit_name in tree['commits']:
                     continue
@@ -119,7 +133,6 @@ class FileOperator:
                         'parents': str([y.message.strip('\n') for y in x.parents]),
                         'id': commit_name
                     }
-            # TODO this is bad python, update to a nice data structure
             tree['branches'][branch.name] = {
                 "target": branch.commit.message.strip('\n'),
                 "id": branch.name
@@ -146,13 +159,29 @@ class FileOperator:
 
         return tree
 
+    def get_challenge(self):
+        with open(self.level_path) as level_file:
+            current_level, current_challenge = level_file.read().split()
+        return current_level, current_challenge
+
+    def write_challenge(self, level, challenge):
+        with open(self.level_path, 'w+') as level_file:
+            level_file.write(' '.join([level, challenge]))
+
+    def get_last_commit(self):
+        with open(self.last_commit_path) as last_commit_file:
+            return last_commit_file.read()
+
 
 def get_operator():
-    # TODO Check if .git/gud exists in any of the folders
-    path = os.getcwd().split(os.path.sep)
+    cwd = os.getcwd().split(os.path.sep)
 
-    FileOperator()
-    pass
+    for i in reversed(range(len(cwd))):
+        path = os.path.sep.join(cwd[:i+1])
+        gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
+        if os.path.isdir(gg_path):
+            return Operator(path)
+    return None
 
 
 def get_topology(tree):
@@ -160,16 +189,16 @@ def get_topology(tree):
     raise NotImplementedError
 
 
-def parse_tree(tree_spec_file_name):
+def parse_spec(file_name):
     # The purpose of this method is to get a more computer-readable commit tree
-    with open(tree_spec_file_name) as tree_spec_file:
-        tree_str = tree_spec_file.read()
+    with open(file_name) as spec_file:
+        spec = spec_file.read()
 
     commits = []  # List of  (commit_name, [parents], [branches], [tags])
     all_branches = set()
     all_tags = set()
 
-    for line in tree_str.split('\n'):
+    for line in spec.split('\n'):
         if line[0] == '#':
             continue
         line = line.replace('  ', '')

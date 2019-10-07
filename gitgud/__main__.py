@@ -6,7 +6,8 @@ import argparse
 from git import Repo
 from git.exc import NoSuchPathError
 
-from gitgud.operations import FileOperator
+from gitgud.operations import get_operator
+from gitgud.operations import Operator
 from gitgud.levels import all_levels
 
 # TODO Add test suite so testing can be separate from main code
@@ -18,9 +19,7 @@ class InitializationError(Exception):
 
 class GitGud:
     def __init__(self):
-        self.path = os.getcwd()
-
-        self.file_operator = None
+        self.file_operator = get_operator()  # Only gets operator if in a valid gitgud repo
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
@@ -73,17 +72,19 @@ class GitGud:
     def handle_start(self, args):
         # TODO Warn if there is already a git tree so we don't try to overwrite history
 
+        self.file_operator = Operator(os.getcwd())
+
         if not args.force:
             # We aren't forcing
-            if os.path.exists(self.git_path):
+            if os.path.exists(self.file_operator.git_path):
                 # Current directory is a git repo
                 print('Currently in a git repo. Use --force to force initialize here.')
                 return
-            if os.path.exists(self.gg_path):
+            if os.path.exists(self.file_operator.gg_path):
                 # Current directory is a git repo
                 print('Git gud has already initialized. Use --force to force initialize again.')
                 return
-            if len(os.listdir(self.path)) != 0:
+            if len(os.listdir(self.file_operator.path)) != 0:
                 print('Current directory is nonempty. Use --force to force initialize here.')
                 return
         else:
@@ -91,9 +92,9 @@ class GitGud:
 
         # After here, we initialize everything
         try:
-            repo = Repo(self.path)
+            repo = Repo(os.getcwd())
         except NoSuchPathError:
-            repo = Repo.init(self.path)
+            repo = Repo.init(os.getcwd())
 
         python = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
@@ -101,25 +102,26 @@ class GitGud:
         config_writer.remove_option('alias', 'gud')
         config_writer.add_value('alias', 'gud', f'"! {python} -m gitgud"')
 
-        if not os.path.exists(self.gg_path):
-            os.mkdir(self.gg_path)
-        with open(self.last_commit_path, 'w+') as commit_file:
+        if not os.path.exists(self.file_operator.gg_path):
+            os.mkdir(self.file_operator.gg_path)
+        with open(self.file_operator.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
-        with open(self.level_path, 'w+') as level_file:
+        with open(self.file_operator.level_path, 'w+') as level_file:
             level_file.write('intro commits')
 
     def handle_progress(self, args):
-        self.
-        with open(self.level_path) as level_file:
-            current_level, current_challenge = level_file.read().split()
+        self.assert_initialized()
 
-        all_levels[current_level].challenges[current_challenge].next_level.setup()
+        level, challenge = self.file_operator.get_challenge()
+
+        all_levels[level].challenges[challenge].next_level.setup(self.file_operator)
 
     def handle_reset(self, args):
-        with open(self.level_path) as level_file:
-            current_level, current_challenge = level_file.read().split()
+        self.assert_initialized()
 
-        all_levels[current_level].challenges[current_challenge].setup()
+        level, challenge = self.file_operator.get_challenge()
+
+        all_levels[level].challenges[challenge].setup(self.file_operator)
 
     def handle_levels(self, args):
         for level in all_levels:
@@ -128,66 +130,56 @@ class GitGud:
             print(level.name)
 
     def handle_challenges(self, args):
-        with open(self.level_path) as level_file:
-            current_level, current_challenge = level_file.read().split()
+        level, challenge = self.file_operator.get_challenge()
 
         try:
-            current_level = args.level
+            level = args.level
         except NameError:
             pass
 
-        for challenge in all_levels[current_level].challenges:
+        for challenge in all_levels[level].challenges:
             # TODO Make pretty
             # TODO Add description
             print(challenge.name)
 
     def handle_load(self, args):
-        # git gud load level
-        # git gud load level challenge
+        self.assert_initialized()
 
         level = all_levels[args.level]
         try:
-            level.challenges[args.challenge].setup()
+            level.challenges[args.challenge].setup(self.file_operator)
         except KeyError:
             first_level = next(iter(level.challenges.values()))
-            first_level.setup()
+            first_level.setup(self.file_operator)
 
     def handle_commit(self, args):
-        if os.path.exists(self.last_commit_path):
-            with open(self.last_commit_path) as last_commit_file:
-                last_commit = last_commit_file.read()
-        else:
-            last_commit = '1'
+        self.assert_initialized()
 
-        try:
-            commit_name = args.file
-        except AttributeError:
-            commit_name = str(int(last_commit) + 1)
+        last_commit = self.file_operator.get_last_commit()
+        commit_name = str(int(last_commit) + 1)
 
-        should_write = False
-        try:
-            if int(args.file) > int(last_commit):
-                should_write = True
-        except ValueError:
-            # args.file is not a number
-            pass
+        if args.file is not None:
+            try:
+                int(args.file)
+                commit_name = args.file
+            except ValueError:
+                pass
 
-        if should_write:
-            with open(self.last_commit_path, 'w+') as last_commit_file:
-                last_commit_file.write(commit_name)
-
-        return add_and_commit(commit_name)
+        return self.file_operator.add_and_commit(commit_name)
 
     def handle_instructions(self, args):
+        self.assert_initialized()
         raise NotImplementedError
 
     def handle_goal(self, args):
+        self.assert_initialized()
         raise NotImplementedError
 
     def handle_test(self, args):
-        with open(self.level_path) as level_file:
-            level, challenge = level_file.read().split()
-        if all_levels[level].challenges[challenge].test():
+        self.assert_initialized()
+        level, challenge = self.file_operator.get_challenge()
+
+        if all_levels[level].challenges[challenge].test(self.file_operator):
             print("Level complete! `git gud progress` to advance to the next level")
         else:
             print("Level not complete, keep trying. `git gud reset` to start from scratch.")
