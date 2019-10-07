@@ -133,7 +133,6 @@ class Operator:
         while len(commits) > 0:
             cur_commit = commits.pop()
             if cur_commit not in visited:
-                # print(curCommit.message)
                 for parent in cur_commit.parents:
                     commits.add(parent)
             visited.add(cur_commit)
@@ -150,6 +149,7 @@ class Operator:
             target = repo.commit('HEAD').message.strip()
         else:
             target = repo.head.ref.name
+
         tree['HEAD'] = {
             'target': target,
             'id': 'HEAD'
