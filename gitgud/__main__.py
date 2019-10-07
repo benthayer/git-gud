@@ -165,7 +165,12 @@ class GitGud:
             except ValueError:
                 pass
 
-        return self.file_operator.add_and_commit(commit_name)
+        self.file_operator.add_and_commit(commit_name)
+
+        # Check if the newest commit is greater than the last_commit, if yes, then write
+
+        if int(commit_name) > int(last_commit):
+            self.file_operator.write_last_commit(commit_name)
 
     def handle_instructions(self, args):
         self.assert_initialized()

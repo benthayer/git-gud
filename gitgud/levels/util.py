@@ -80,6 +80,13 @@ class BasicChallenge(Challenge):
         commits, head = parse_spec(os.path.join(self.path, 'setup.spec'))
         file_operator.create_tree(commits, head)
 
+        latest_commit = '0'
+        for commit_name, _, _, _ in commits:
+            if int(commit_name) > int(latest_commit):
+                latest_commit = commit_name
+
+        file_operator.write_last_commit(latest_commit)
+
     def instructions(self):
         # TODO Go through instructions
         pass

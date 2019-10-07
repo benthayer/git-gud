@@ -32,9 +32,6 @@ class Operator:
         self.add_file_to_index(name)
         commit = self.repo.index.commit(name, author=actor, committer=actor)
 
-        with open(self.last_commit_path, 'w+') as last_commit_file:
-            last_commit_file.write(name)
-
         return commit
 
     def delete_files(self):
@@ -172,6 +169,10 @@ class Operator:
         with open(self.last_commit_path) as last_commit_file:
             return last_commit_file.read()
 
+    def write_last_commit(self, name):
+        with open(self.last_commit_path, 'w+') as last_commit_file:
+            last_commit_file.write(name)
+
 
 def get_operator():
     cwd = os.getcwd().split(os.path.sep)
@@ -194,7 +195,7 @@ def parse_spec(file_name):
     with open(file_name) as spec_file:
         spec = spec_file.read()
 
-    commits = []  # List of  (commit_name, [parents], [branches], [tags])
+    commits = []  # List of (commit_name, [parents], [branches], [tags])
     all_branches = set()
     all_tags = set()
 
