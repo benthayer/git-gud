@@ -112,47 +112,48 @@ class Operator:
             'HEAD': {}  # 'target': 'branch_name', 'id': 'HEAD'
         }
 
+        commits = set()
+        visited = set()
+
         for branch in repo.branches:
-            commit_name = branch.commit.message.strip('\n')
-            if commit_name in tree['commits']:
-                continue
-            else:
-                tree['commits'][commit_name] = {
-                    'parents': str([y.message.strip('\n') for y in branch.commit.parents]),
-                    'id': commit_name
-                }
-            for x in branch.commit.traverse(): # TODO We don't need to completely traverse every branch every time
-                commit_name = x.message.strip('\n')
-                if commit_name in tree['commits']:
-                    continue
-                else:
-                    tree['commits'][commit_name] = {
-                        'parents': str([y.message.strip('\n') for y in x.parents]),
-                        'id': commit_name
-                    }
+            commits.add(branch.commit)
+            commit_name = branch.commit.message.strip()
             tree['branches'][branch.name] = {
-                "target": branch.commit.message.strip('\n'),
+                "target": commit_name,
                 "id": branch.name
             }
+
         for tag in repo.tags:
-            commit_name = tag.commit.message.strip('\n')
-            tag_name = tag.name
-            tree['tags'][tag_name] = {
+            commit_name = tag.commit.message.strip()
+            tree['tags'][tag.name] = {
                 'target': commit_name,
-                'id': tag_name
+                'id': tag.name
             }
+
+        while len(commits) > 0:
+            cur_commit = commits.pop()
+            if cur_commit not in visited:
+                # print(curCommit.message)
+                for parent in cur_commit.parents:
+                    commits.add(parent)
+            visited.add(cur_commit)
+
+        while len(visited) > 0:
+            cur_commit = visited.pop()
+            commit_name = cur_commit.message.strip()
+            tree['commits'][commit_name] = {
+                'parents': [parent.message.strip() for parent in cur_commit.parents],
+                'id': commit_name
+            }
+
         if repo.head.is_detached:
-            target = repo.commit('HEAD').message.strip('\n')
+            target = repo.commit('HEAD').message.strip()
         else:
             target = repo.head.ref.name
         tree['HEAD'] = {
             'target': target,
             'id': 'HEAD'
         }
-        # branches have target, id
-        # tags have target, id
-        # commits have parents, which is [parent1, parent2], id
-        # HEAD is branch_id
 
         return tree
 
