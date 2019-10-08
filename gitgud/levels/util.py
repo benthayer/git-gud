@@ -42,7 +42,7 @@ def test_level(level, test):
             return False
 
     # Check HEAD
-    if level['HEAD']['target'] == test['HEAD']['target']:
+    if level['HEAD']['target'] != test['HEAD']['target']:
         return False
 
     return True
@@ -60,14 +60,15 @@ class Challenge:
     def __init__(self, name):
         self.name = name
         self.level_name = None
+        self.next_challenge = None
 
-    def setup(self):
+    def setup(self, file_operator):
         pass
 
     def instructions(self):
         pass
 
-    def test(self):
+    def test(self, file_operator):
         pass
 
 

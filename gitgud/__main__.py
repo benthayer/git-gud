@@ -3,6 +3,8 @@ import sys
 
 import argparse
 
+from configparser import NoSectionError
+
 from git import Repo
 from git.exc import NoSuchPathError
 
@@ -72,10 +74,15 @@ class GitGud:
     def handle_start(self, args):
         # TODO Warn if there is already a git tree so we don't try to overwrite history
 
-        self.file_operator = Operator(os.getcwd())
-
         if not args.force:
             # We aren't forcing
+            if self.file_operator:
+                print(f'Repo {self.file_operator.path} already initialized for git gud.')
+                print(f'Use --force to initialize {os.getcwd()}.')
+                return
+
+            self.file_operator = Operator(os.getcwd())
+
             if os.path.exists(self.file_operator.git_path):
                 # Current directory is a git repo
                 print('Currently in a git repo. Use --force to force initialize here.')
@@ -91,15 +98,15 @@ class GitGud:
             print('Force initializing git gud.')
 
         # After here, we initialize everything
-        try:
-            repo = Repo(os.getcwd())
-        except NoSuchPathError:
-            repo = Repo.init(os.getcwd())
+        self.file_operator.initialize()
 
         python = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
-        config_writer = repo.config_writer()
-        config_writer.remove_option('alias', 'gud')
+        config_writer = self.file_operator.repo.config_writer()
+        try:
+            config_writer.remove_option('alias', 'gud')
+        except NoSectionError:
+            pass
         config_writer.add_value('alias', 'gud', f'"! {python} -m gitgud"')
 
         if not os.path.exists(self.file_operator.gg_path):
@@ -114,7 +121,14 @@ class GitGud:
 
         level, challenge = self.file_operator.get_challenge()
 
-        all_levels[level].challenges[challenge].next_level.setup(self.file_operator)
+        next_challenge = all_levels[level].challenges[challenge].next_challenge
+        if next_challenge is not None:
+            next_challenge.setup(self.file_operator)
+        else:
+            print("Wow! You've complete every challenge, congratulations!")
+            print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
+            print("We're always looking for a contributions and are more than happy to suggest both pull requests and suggestions!")
+
 
     def handle_reset(self, args):
         self.assert_initialized()

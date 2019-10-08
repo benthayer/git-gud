@@ -5,23 +5,29 @@ from git import Repo
 from git import Head
 
 from git.exc import GitCommandError
-from git.exc import NoSuchPathError
+from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
 
 
 class Operator:
-    def __init__(self, path):
+    def __init__(self, path, initialize=False):
         self.path = path
-        try:
-            self.repo = Repo(self.path)
-        except NoSuchPathError:
-            self.repo = Repo.init(self.path)
+        self.repo = None
+
+        if initialize:
+            self.initialize()
 
         self.git_path = os.path.join(self.path, '.git')
         self.gg_path = os.path.join(self.git_path, 'gud')
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
         self.level_path = os.path.join(self.gg_path, 'level')
+
+    def initialize(self):
+        try:
+            self.repo = Repo(os.getcwd())
+        except InvalidGitRepositoryError:
+            self.repo = Repo.init(os.getcwd())
 
     def add_file_to_index(self, filename):
         open(f'{self.path}/{filename}', 'w+').close()
@@ -182,7 +188,9 @@ def get_operator():
         path = os.path.sep.join(cwd[:i+1])
         gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
         if os.path.isdir(gg_path):
-            return Operator(path)
+            operator = Operator(path)
+            operator.initialize()
+            return operator
     return None
 
 
@@ -201,7 +209,8 @@ def parse_spec(file_name):
     all_tags = set()
 
     for line in spec.split('\n'):
-        if line[0] == '#':
+        if len(line) == 0 or line[0] == '#':
+            # Last line or comment
             continue
         line = line.replace('  ', '')
 
@@ -274,13 +283,12 @@ def level_json(commits, head):
     all_branches = []
     all_tags = []
     for commit_name, parents, branches_here, tags_here in commits:
-        level['topology'].append(commits)
+        level['topology'].append(commit_name)
         level['commits'][commit_name] = {
             'parents': parents,
             'id': commit_name
         }
-        if not parents:
-            level['commits'][commit_name]['rootCommit'] = True
+
         all_branches.extend(branches_here)
         all_tags.extend(tags_here)
 
