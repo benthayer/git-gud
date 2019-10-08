@@ -1,5 +1,6 @@
 import os
 import shutil
+from glob import glob
 
 from git import Repo
 from git import Head
@@ -40,22 +41,22 @@ class Operator:
 
         return commit
 
-    def delete_files(self):
-        for file in os.listdir(self.path):
-            file_path = os.path.join(self.path, file)
-            if file == '.git':
-                continue
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                shutil.rmtree(file_path)
+    def clear_tree_and_index(self):
+
+        for x in [('**', '.*'), ('**',)]:
+            path_spec = os.path.join(self.path, *x)
+            for file_path in glob(path_spec, recursive=True):
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                    self.repo.index.remove([file_path])
+        self.repo.index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
+
 
     def create_tree(self, commits, head):
         repo = self.repo
         index = repo.index
 
-        self.delete_files()
-        index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
+        self.clear_tree_and_index()
 
         # Switch to temp first in case git-gud-construction exists
         if repo.head.reference.name != 'temp':
