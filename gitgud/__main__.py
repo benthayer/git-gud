@@ -5,8 +5,6 @@ import argparse
 
 from configparser import NoSectionError
 
-from git import Repo
-from git.exc import NoSuchPathError
 
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
@@ -69,7 +67,7 @@ class GitGud:
 
     def assert_initialized(self):
         if not self.file_operator:
-            raise InitializationError()
+            raise InitializationError("Git gud not initialized. Use \"git gud start\" to initialize")
 
     def handle_start(self, args):
         # TODO Warn if there is already a git tree so we don't try to overwrite history
