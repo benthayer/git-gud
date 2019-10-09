@@ -76,9 +76,12 @@ class BasicChallenge(Challenge):
     def __init__(self, name, path):
         super().__init__(name)
         self.path = path
+        self.setup_spec_path = os.path.join(self.path, 'setup.spec')
+        self.instructions_path = os.path.join(self.path, 'instructions.txt')
+        self.test_spec_path = os.path.join(self.path, 'test.spec')
 
     def setup(self, file_operator):
-        commits, head = parse_spec(os.path.join(self.path, 'setup.spec'))
+        commits, head = parse_spec(self.setup_spec_path)
         file_operator.create_tree(commits, head)
 
         latest_commit = '0'
@@ -89,11 +92,15 @@ class BasicChallenge(Challenge):
         file_operator.write_last_commit(latest_commit)
 
     def instructions(self):
-        # TODO Go through instructions
-        pass
+        with open(self.instructions_path) as instructions_file:
+            for line in instructions_file:
+                if line[:3] == '>>>':
+                    input(">>>")
+                else:
+                    print(line.strip())
 
     def test(self, file_operator):
-        commits, head = parse_spec(os.path.join(self.path, 'test.spec'))
+        commits, head = parse_spec(self.test_spec_path)
         test_tree = level_json(commits, head)
         level_tree = file_operator.get_current_tree()
         return test_level(level_tree, test_tree)

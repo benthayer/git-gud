@@ -186,7 +186,8 @@ class GitGud:
 
     def handle_instructions(self, args):
         self.assert_initialized()
-        raise NotImplementedError
+        level, challenge = self.file_operator.get_challenge()
+        all_levels[level].challenges[challenge].instructions()
 
     def handle_goal(self, args):
         self.assert_initialized()
