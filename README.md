@@ -8,31 +8,35 @@ The goal is to make this project contributor-friendly and able to support
 This repository is very much under development, and we want your help! One of the best ways to learn about git is to
 actually contribute to a project, and what better project than this one!
 
+Development install (Currently only option):
+From the top level directory (with README.md and setup.py), run pip install -e .
+This will install git gud as a python module.
+In general, to run a python module, we run `python -m <module>`
+For us, this will be `python -m gitgud`, but that will just 
+
 Some commands you'll want to learn and what they do:
-* git gud start
-  * Gives you a blank canvas (or repository) you can work on
-  * Welcome to git gud
-  * Starts you on the first challenge
+* python -m gitgud start 
+  * Creates a git repoitory and gets you started on the first challenge!
+  * Lets you use `git gud <command>` instead of `python -m gitgud <command>`
+* git gud status
+  * Shows the challenge you are currently working on
+* git gud instructions
+  * This the very helpful command that will make you git gud! It displays the instructions for the current challenge, which will show you how to commit, branch and everything else!
+* git gud reset
+  * Will reset the current challenge in case you mess up
+* git gud test
+  * Tests to see if the current challenge is complete. If it congratulates you, you've successfully completed the challenge and you can move on! (You can also move on anyways)
 * git gud progress
   * Takes you to the next challenge
-  
-^These are the only 2 commands you'll need if you want to complete the training in order!
-
-* git gud help
-  * Displays commands
 * git gud levels
   * Displays all levels
-* git gud load challenge1
-  * Begin your first challenge
-* git gud load level1
-  * Begin challenge 1 on level 1
+* git gud load <level_name>
+  * Begin the first challenge of the specified level
+* git gud load <level_name> <challenge_name>
+  * Begin the specified challenge
 
 There will be several challenges within each level. Complete all of them to complete the level, or feel free to skip ahead!
 
 * git gud load challenge 2 level2
-* git gud commit
-* git gud commit A
-* git gud instructions
-* git gud goal
-* git gud test
-* git gud save
+* git gud commit <commit_name>
+  * Simulate a commit (used in many of the challenges)
