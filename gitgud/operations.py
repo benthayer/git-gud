@@ -9,6 +9,7 @@ from git.exc import GitCommandError
 from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
+from gitgud.levels import all_levels
 
 
 class Operator:
@@ -175,8 +176,8 @@ class Operator:
 
     def get_challenge(self):
         with open(self.level_path) as level_file:
-            current_level, current_challenge = level_file.read().split()
-        return current_level, current_challenge
+            level_name, challenge_name = level_file.read().split()
+        return all_levels[level_name].challenges[challenge_name]
 
     def write_challenge(self, level, challenge):
         with open(self.level_path, 'w+') as level_file:

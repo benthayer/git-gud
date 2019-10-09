@@ -46,7 +46,7 @@ class GitGud:
 
         challenges_parser.add_argument('level', nargs='?')
 
-        load_parser.add_argument('level', help='Level to load')
+        load_parser.add_argument('level', metavar='level_name', help='Level to load')
         load_parser.add_argument('challenge', nargs='?', help='Challenge to load')
 
         commit_parser.add_argument('file', nargs='?')
@@ -117,9 +117,9 @@ class GitGud:
     def handle_progress(self, args):
         self.assert_initialized()
 
-        level, challenge = self.file_operator.get_challenge()
+        challenge = self.file_operator.get_challenge()
 
-        next_challenge = all_levels[level].challenges[challenge].next_challenge
+        next_challenge = challenge.next_challenge
         if next_challenge is not None:
             next_challenge.setup(self.file_operator)
         else:
@@ -127,13 +127,13 @@ class GitGud:
             print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
             print("We're always looking for a contributions and are more than happy to suggest both pull requests and suggestions!")
 
+        self.file_operator.write_challenge(challenge)
+
 
     def handle_reset(self, args):
         self.assert_initialized()
 
-        level, challenge = self.file_operator.get_challenge()
-
-        all_levels[level].challenges[challenge].setup(self.file_operator)
+        self.file_operator.get_challenge().setup(self.file_operator)
 
     def handle_levels(self, args):
         for level in all_levels:
@@ -142,22 +142,18 @@ class GitGud:
             print(level.name)
 
     def handle_challenges(self, args):
-        level, challenge = self.file_operator.get_challenge()
+        if args.level_name is None:
+            level = self.file_operator.get_challenge().level
+        else:
+            level = all_levels[args.level_name]
 
-        try:
-            level = args.level
-        except NameError:
-            pass
-
-        for challenge in all_levels[level].challenges:
-            # TODO Make pretty
-            # TODO Add description
+        for challenge in level.challenges:
             print(challenge.name)
 
     def handle_load(self, args):
         self.assert_initialized()
 
-        level = all_levels[args.level]
+        level = all_levels[args.level_name]
         try:
             level.challenges[args.challenge].setup(self.file_operator)
         except KeyError:
@@ -186,8 +182,7 @@ class GitGud:
 
     def handle_instructions(self, args):
         self.assert_initialized()
-        level, challenge = self.file_operator.get_challenge()
-        all_levels[level].challenges[challenge].instructions()
+        self.file_operator.get_challenge().instructions()
 
     def handle_goal(self, args):
         self.assert_initialized()
@@ -195,9 +190,9 @@ class GitGud:
 
     def handle_test(self, args):
         self.assert_initialized()
-        level, challenge = self.file_operator.get_challenge()
+        challenge = self.file_operator.get_challenge()
 
-        if all_levels[level].challenges[challenge].test(self.file_operator):
+        if challenge.test(self.file_operator):
             print("Level complete! `git gud progress` to advance to the next level")
         else:
             print("Level not complete, keep trying. `git gud reset` to start from scratch.")
