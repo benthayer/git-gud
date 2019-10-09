@@ -2,8 +2,124 @@ import os
 
 from collections import OrderedDict
 
-from gitgud.operations import parse_spec
-from gitgud.operations import level_json
+
+
+def get_topology(tree):
+    tree['topology'] = None
+    raise NotImplementedError
+
+
+def parse_spec(file_name):
+    # The purpose of this method is to get a more computer-readable commit tree
+    with open(file_name) as spec_file:
+        spec = spec_file.read()
+
+    commits = []  # List of (commit_name, [parents], [branches], [tags])
+    all_branches = set()
+    all_tags = set()
+
+    for line in spec.split('\n'):
+        if len(line) == 0 or line[0] == '#':
+            # Last line or comment
+            continue
+        line = line.replace('  ', '')
+
+        if '(' in line:
+            commit_str = line[:line.find('(')].strip()
+            ref_str = line[line.find('(')+1:-1].strip().replace(' ', '')
+        else:
+            commit_str = line.strip()
+            ref_str = ''
+
+        if ':' not in commit_str:
+            # Implicit parent, use previous commit
+            if len(commits) == 0:
+                parents = []
+            else:
+                parents = [commits[len(commits)-1][0]]
+            commit_name = commit_str
+        else:
+            # Find parent
+            commit_name, parent_str = commit_str.split(':')
+            commit_name = commit_name.strip()
+            parent_str = parent_str.strip()
+
+            if parent_str:
+                parents = parent_str.split(' ')
+            else:
+                parents = []
+
+        # We know the commit name and parents now
+
+        assert ' ' not in commit_name  # There should never be more than one change or a space in a name
+
+        # Process references
+        if ref_str:
+            refs = ref_str.split(',')
+        else:
+            refs = []
+        branches = []
+        tags = []
+        for ref in refs:
+            if ref[:4] == 'tag:':
+                tag = ref[4:]
+                assert tag not in all_tags
+                tags.append(tag)
+                all_tags.add(tag)
+            else:
+                branch = ref
+                assert branch not in all_branches
+                branches.append(branch)
+                all_branches.add(branch)
+        commits.append((commit_name, parents, branches, tags))
+
+    head = commits[-1][0]
+    del commits[-1]
+
+    return commits, head
+
+
+def level_json(commits, head):
+    # We've formally replicated the input string in memory
+
+    level = {
+        'topology': [],
+        'branches': {},
+        'tags': {},
+        'commits': {},
+        'HEAD': {},
+    }
+
+    all_branches = []
+    all_tags = []
+    for commit_name, parents, branches_here, tags_here in commits:
+        level['topology'].append(commit_name)
+        level['commits'][commit_name] = {
+            'parents': parents,
+            'id': commit_name
+        }
+
+        all_branches.extend(branches_here)
+        all_tags.extend(tags_here)
+
+        for branch in branches_here:
+            level['branches'][branch] = {
+                'target': commit_name,
+                'id': branch
+            }
+
+        for tag in tags_here:
+            level['tags'][tag] = {
+                'target': commit_name,
+                'id': tag
+            }
+
+    level['HEAD'] = {
+        'target': head,
+        'id': 'HEAD'
+    }
+
+    return level
 
 
 def test_level(level, test):
@@ -53,13 +169,14 @@ class Level:
         self.name = name
         self.challenges = OrderedDict()
         for challenge in challenges.values():
+            challenge.level = self
             self.challenges[challenge.name] = challenge
 
 
 class Challenge:
     def __init__(self, name):
         self.name = name
-        self.level_name = None
+        self.level = None
         self.next_challenge = None
 
     def setup(self, file_operator):

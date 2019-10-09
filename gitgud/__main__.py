@@ -46,8 +46,8 @@ class GitGud:
 
         challenges_parser.add_argument('level', nargs='?')
 
-        load_parser.add_argument('level', metavar='level_name', help='Level to load')
-        load_parser.add_argument('challenge', nargs='?', help='Challenge to load')
+        load_parser.add_argument('level_name', metavar='level', help='Level to load')
+        load_parser.add_argument('challenge_name', metavar='challenge', nargs='?', help='Challenge to load')
 
         commit_parser.add_argument('file', nargs='?')
 
@@ -154,9 +154,10 @@ class GitGud:
         self.assert_initialized()
 
         level = all_levels[args.level_name]
-        try:
-            level.challenges[args.challenge].setup(self.file_operator)
-        except KeyError:
+
+        if args.challenge_name is not None:
+            level.challenges[args.challenge_name].setup(self.file_operator)
+        else:
             first_level = next(iter(level.challenges.values()))
             first_level.setup(self.file_operator)
 
