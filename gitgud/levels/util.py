@@ -179,6 +179,9 @@ class Challenge:
         self.level = None
         self.next_challenge = None
 
+    def full_name(self):
+        return f'{self.level.name} {self.name}'
+
     def setup(self, file_operator):
         pass
 
@@ -198,6 +201,7 @@ class BasicChallenge(Challenge):
         self.test_spec_path = os.path.join(self.path, 'test.spec')
 
     def setup(self, file_operator):
+        print(f'Setting up challenge: "{self.full_name()}"')
         commits, head = parse_spec(self.setup_spec_path)
         file_operator.create_tree(commits, head)
 
@@ -207,8 +211,11 @@ class BasicChallenge(Challenge):
                 latest_commit = commit_name
 
         file_operator.write_last_commit(latest_commit)
+        print("Setup complete")
+        print("Type \"git gud instructions\" to view instructions")
 
     def instructions(self):
+        print(f'Printing instructions for challenge: "{self.full_name()}"')
         with open(self.instructions_path) as instructions_file:
             for line in instructions_file:
                 if line[:3] == '>>>':
@@ -217,6 +224,7 @@ class BasicChallenge(Challenge):
                     print(line.strip())
 
     def test(self, file_operator):
+        print(f'Testing completion for challenge: "{self.full_name()}"')
         commits, head = parse_spec(self.test_spec_path)
         test_tree = level_json(commits, head)
         level_tree = file_operator.get_current_tree()

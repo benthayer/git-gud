@@ -115,7 +115,7 @@ class Operator:
             if branch.name == head:
                 branch.checkout()
 
-        repo.delete_head('git-gud-construction')
+        repo.delete_head('git-gud-construction', force=True)
 
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json

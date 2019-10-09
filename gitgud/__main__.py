@@ -31,6 +31,7 @@ class GitGud:
         # ie `git gud load level1 challenge1 random-input` should have output similar to `git gud load --help`
 
         start_parser = subparsers.add_parser('start', help='Git started!')
+        status_parser = subparsers.add_parser('status', help='Print out the current level')
         progress_parser = subparsers.add_parser('progress', help='Continue to the next level')
         reset_parser = subparsers.add_parser('reset', help='Reset the current level')
         levels_parser = subparsers.add_parser('levels', help='List levels')
@@ -53,6 +54,7 @@ class GitGud:
 
         self.command_dict = {
             'start': self.handle_start,
+            'status': self.handle_status,
             'progress': self.handle_progress,
             'reset': self.handle_reset,
             'levels': self.handle_levels,
@@ -65,13 +67,14 @@ class GitGud:
             'show_tree': self.handle_show_tree,
         }
 
+    def is_initialized(self):
+        return self.file_operator is not None
+
     def assert_initialized(self):
-        if not self.file_operator:
+        if not self.is_initialized():
             raise InitializationError("Git gud not initialized. Use \"git gud start\" to initialize")
 
     def handle_start(self, args):
-        # TODO Warn if there is already a git tree so we don't try to overwrite history
-
         if not args.force:
             # We aren't forcing
             if self.file_operator:
@@ -114,26 +117,40 @@ class GitGud:
         with open(self.file_operator.level_path, 'w+') as level_file:
             level_file.write('intro commits')
 
+        print('git gud successfully setup.')
+
+        self.file_operator.get_challenge().setup()
+
+    def handle_status(self, args):
+        if self.is_initialized():
+            print(f"Currently on challenge: \"{self.file_operator.get_challenge().full_name()}\"")
+        else:
+            print("Git gud not initialized.")
+            print("Initialize using \"git gud start\"")
+
     def handle_progress(self, args):
         self.assert_initialized()
+
+        print("Progressing to next level...")
 
         challenge = self.file_operator.get_challenge()
 
         next_challenge = challenge.next_challenge
         if next_challenge is not None:
             next_challenge.setup(self.file_operator)
+            self.file_operator.write_challenge(next_challenge)
         else:
             print("Wow! You've complete every challenge, congratulations!")
             print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
             print("We're always looking for a contributions and are more than happy to suggest both pull requests and suggestions!")
 
-        self.file_operator.write_challenge(challenge)
-
 
     def handle_reset(self, args):
         self.assert_initialized()
 
-        self.file_operator.get_challenge().setup(self.file_operator)
+        challenge = self.file_operator.get_challenge()
+        print("Resetting...")
+        challenge.setup(self.file_operator)
 
     def handle_levels(self, args):
         for level in all_levels:
@@ -146,6 +163,8 @@ class GitGud:
             level = self.file_operator.get_challenge().level
         else:
             level = all_levels[args.level_name]
+
+        print(f"Printing challenges for level: \"{level.name}\"\n")
 
         for challenge in level.challenges:
             print(challenge.name)
@@ -173,6 +192,10 @@ class GitGud:
                 commit_name = args.file
             except ValueError:
                 pass
+
+        print(f"Simulating: Create file \"{commit_name}\"")
+        print(f"Simulating: git add {commit_name}")
+        print(f"Simulating: git commit -m \"{commit_name}\"")
 
         self.file_operator.add_and_commit(commit_name)
 
