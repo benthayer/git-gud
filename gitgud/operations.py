@@ -42,15 +42,25 @@ class Operator:
         return commit
 
     def clear_tree_and_index(self):
-
+        dirs = []
         for x in [('**', '.*'), ('**',)]:
             path_spec = os.path.join(self.path, *x)
-            for file_path in glob(path_spec, recursive=True):
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-                    self.repo.index.remove([file_path])
+            for path in glob(path_spec, recursive=True):
+                if not os.path.sep + '.git' + os.path.sep in path:
+                    if os.path.isfile(path):
+                        os.unlink(path)
+                    else:
+                        dirs.append(path)
+
+        self.repo.git.add(update=True)
         self.repo.index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
 
+        # dirs = sorted(dirs, key=lambda x: len(x)) # Makes sure subdirs are deleted first
+        dirs.remove(self.path + os.path.sep) # Don't remove current directory
+
+        for path in os.listdir(self.path):
+            if path != '.git':
+                shutil.rmtree(path)
 
     def create_tree(self, commits, head):
         repo = self.repo
@@ -79,7 +89,6 @@ class Operator:
                 repo.delete_head(branch, force=True)
         repo.delete_tag(*repo.tags)
 
-        index = repo.index
         commit_objects = {}
 
         for name, parents, branches, tags in commits:
