@@ -20,6 +20,8 @@ python -m gitgud start # Initializes a git repository and lets us start using th
 Once you have the code downloaded, I would recommend having two terminals open at all times, one in the test directory you just created, and one in the git-gud directory. This allows you to both work with your code and test your code at the same time.
 
 ## Project Layout
+#### `GitPython`
+It's important to know that when you run `import git`, you're not actually importing git itself, you're importing Git Python, a library built to provide a way to access git from within Python. If you're writing something advanced, chances are you'll have to interact with that library. The project is located [here](https://github.com/gitpython-developers/GitPython) and the project's documentation can be found [here](https://gitpython.readthedocs.io/en/stable/).
 #### The `gitgud` module
 Git Gud is written in Python and stuctured like a Python module. Python modules can be run and provide a good amount of flexibility. Python also comes with PyPi, a package manager. This makes it easy to install Git Gud, even if you aren't the most technical. 
 
