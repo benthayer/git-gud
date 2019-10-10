@@ -45,7 +45,7 @@ class GitGud:
 
         start_parser.add_argument('--force', action='store_true')
 
-        challenges_parser.add_argument('level', nargs='?')
+        challenges_parser.add_argument('level_name', metavar='level', nargs='?')
 
         load_parser.add_argument('level_name', metavar='level', help='Level to load')
         load_parser.add_argument('challenge_name', metavar='challenge', nargs='?', help='Challenge to load')
@@ -119,7 +119,7 @@ class GitGud:
 
         print('git gud successfully setup.')
 
-        self.file_operator.get_challenge().setup()
+        self.file_operator.get_challenge().setup(self.file_operator)
 
     def handle_status(self, args):
         if self.is_initialized():
@@ -153,10 +153,14 @@ class GitGud:
         challenge.setup(self.file_operator)
 
     def handle_levels(self, args):
-        for level in all_levels:
+        cur_level = self.file_operator.get_challenge().level
+
+        print(f"Currently on level: \"{cur_level.name}\"\n")
+
+        for level in all_levels.values():
             # TODO Make pretty
             # TODO Add description
-            print(level.name)
+            print(level.name, f": {len(level.challenges)} challenges")
 
     def handle_challenges(self, args):
         if args.level_name is None:
@@ -166,7 +170,7 @@ class GitGud:
 
         print(f"Printing challenges for level: \"{level.name}\"\n")
 
-        for challenge in level.challenges:
+        for challenge in level.challenges.values():
             print(challenge.name)
 
     def handle_load(self, args):
