@@ -54,10 +54,11 @@ class Operator:
                     else:
                         dirs.append(path)
 
+        # TODO GitPython set index to working tree
         self.repo.git.add(update=True)
+        # TODO GitPython clear index (for initial commits)
         self.repo.index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
 
-        # dirs = sorted(dirs, key=lambda x: len(x)) # Makes sure subdirs are deleted first
         dirs.remove(self.path + os.path.sep)  # Don't remove current directory
 
         for path in os.listdir(self.path):
@@ -67,6 +68,7 @@ class Operator:
     def create_tree(self, commits, head):
         branches = self.repo.branches
         try:
+            # TODO GitPython detach head
             self.repo.git.checkout(self.repo.head.commit)  # Detached head, we can now delete everything
         except ValueError:
             pass
@@ -82,13 +84,16 @@ class Operator:
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
+                # TODO GitPython detach head
                 self.repo.git.checkout(parents[0])
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
                 self.repo.index.commit(name, author=actor, committer=actor, parent_commits=parents)
             else:
+                # TODO GitPython octopus merge
                 self.repo.git.merge(*parents)
+                # TODO GitPython amend commit
                 self.repo.git.commit('--amend', '-m', name,
                                      f'--author="{actor_string}"')
 

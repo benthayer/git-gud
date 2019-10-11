@@ -10,6 +10,7 @@ actor = Actor("Git Gud", "git-gud@example.com")
 actor_string = "Git Gud <git-gud@example.com>"
 
 
+# TODO GitPython global config parser without repo
 class GitConfig(Repo):
     def __init__(self, *args, **kwargs):
         #

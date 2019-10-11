@@ -3,7 +3,6 @@ import os
 from collections import OrderedDict
 
 
-
 def get_topology(tree):
     tree['topology'] = None
     raise NotImplementedError
