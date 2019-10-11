@@ -33,7 +33,7 @@ class Operator:
             self.repo = Repo.init(os.getcwd())
 
     def add_file_to_index(self, filename):
-        open(f'{self.path}/{filename}', 'w+').close()
+        open('{}/{}'.format(self.path, filename), 'w+').close()
         self.repo.index.add([filename])
 
     def add_and_commit(self, name):
@@ -95,7 +95,7 @@ class Operator:
                 self.repo.git.merge(*parents)
                 # TODO GitPython amend commit
                 self.repo.git.commit('--amend', '-m', name,
-                                     f'--author="{actor_string}"')
+                                     '--author="{}"'.format(actor_string))
 
             commit_objects[name] = self.repo.head.commit
 

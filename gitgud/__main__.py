@@ -75,8 +75,8 @@ class GitGud:
         if not args.force:
             # We aren't forcing
             if self.file_operator:
-                print(f'Repo {self.file_operator.path} already initialized for git gud.')
-                print(f'Use --force to initialize {os.getcwd()}.')
+                print('Repo {} already initialized for git gud.'.format(self.file_operator.path))
+                print('Use --force to initialize {}.'.format(os.getcwd()))
                 return
 
             self.file_operator = Operator(os.getcwd())
@@ -105,13 +105,14 @@ class GitGud:
         with open(self.file_operator.level_path, 'w+') as level_file:
             level_file.write('intro commits')
 
-        print(f'Git Gud successfully setup in {os.getcwd()}')
+        print('Git Gud successfully setup in {}'.format(os.getcwd()))
 
         self.file_operator.get_challenge().setup(self.file_operator)
 
     def handle_status(self, args):
         if self.is_initialized():
-            print(f"Currently on challenge: \"{self.file_operator.get_challenge().full_name()}\"")
+            challenge_name = self.file_operator.get_challenge().full_name()
+            print("Currently on challenge: \"{}\"".format(challenge_name))
         else:
             print("Git gud not initialized.")
             print("Initialize using \"git gud start\"")
@@ -155,12 +156,12 @@ class GitGud:
     def handle_levels(self, args):
         cur_level = self.file_operator.get_challenge().level
 
-        print(f"Currently on level: \"{cur_level.name}\"\n")
+        print("Currently on level: \"{}\"\n".format(cur_level.name))
 
         for level in all_levels.values():
             # TODO Make pretty
             # TODO Add description
-            print(level.name, f": {len(level.challenges)} challenges")
+            print(level.name, ": {} challenges".format(len(level.challenges)))
 
     def handle_challenges(self, args):
         if args.level_name is None:
@@ -168,7 +169,7 @@ class GitGud:
         else:
             level = all_levels[args.level_name]
 
-        print(f"Printing challenges for level: \"{level.name}\"\n")
+        print("Printing challenges for level: \"{level.name}\"\n".format(level.name))
 
         for challenge in level.challenges.values():
             print(challenge.name)
@@ -197,9 +198,9 @@ class GitGud:
             except ValueError:
                 pass
 
-        print(f"Simulating: Create file \"{commit_name}\"")
-        print(f"Simulating: git add {commit_name}")
-        print(f"Simulating: git commit -m \"{commit_name}\"")
+        print("Simulating: Create file \"{}\"".format(commit_name))
+        print("Simulating: git add {}".format(commit_name))
+        print("Simulating: git commit -m \"{}\"".format(commit_name))
 
         self.file_operator.add_and_commit(commit_name)
 

@@ -31,5 +31,5 @@ def create_alias(config_writer=None):
         config_writer.remove_option('alias', 'gud')
     except NoSectionError:
         pass
-    config_writer.add_value('alias', 'gud', f'"! {python} -m gitgud"')
+    config_writer.add_value('alias', 'gud', '"! {} -m gitgud"'.format(python))
 
