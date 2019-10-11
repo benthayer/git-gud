@@ -35,6 +35,7 @@ setup(
     packages=[
         'gitgud'
     ],
+    python_requires='>=3.6',
     install_requires=[
         'gitpython',
     ],
