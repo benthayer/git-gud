@@ -167,9 +167,13 @@ class GitGud:
         if args.level_name is None:
             level = self.file_operator.get_challenge().level
         else:
-            level = all_levels[args.level_name]
-
-        print("Printing challenges for level: \"{level.name}\"\n".format(level.name))
+            try:
+                level = all_levels[args.level_name]
+            except:
+                print("Level name not found.")
+                return
+                    
+        #print("Printing challenges for level: \"{level.name}\"\n".format(level.name))
 
         for challenge in level.challenges.values():
             print(challenge.name)
