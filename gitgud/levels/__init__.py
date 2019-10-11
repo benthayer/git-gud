@@ -18,15 +18,10 @@ for level in all_levels.values():
             last_challenge.next_challenge = challenge
         last_challenge = challenge
 
-try:
-    del level
-except NameError:
-    pass
-
-try:
-    del challenge
-except NameError:
-    pass
+del last_challenge
+del level
+del challenge
 
 
+del OrderedDict
 del Level

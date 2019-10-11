@@ -32,15 +32,15 @@ class GitGud:
 
         start_parser = subparsers.add_parser('start', help='Git started!')
         status_parser = subparsers.add_parser('status', help='Print out the current level')
-        progress_parser = subparsers.add_parser('progress', help='Continue to the next level')
+        instructions_parser = subparsers.add_parser('instructions', help='Show the instructions for the current level')
         reset_parser = subparsers.add_parser('reset', help='Reset the current level')
+        test_parser = subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level')
+        progress_parser = subparsers.add_parser('progress', help='Continue to the next level')
         levels_parser = subparsers.add_parser('levels', help='List levels')
         challenges_parser = subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified')
         load_parser = subparsers.add_parser('load', help='Load a specific level or challenge')
         commit_parser = subparsers.add_parser('commit', help='Quickly create and commit a file')
-        instructions_parser = subparsers.add_parser('instructions', help='Show the instructions for the current level')
         goal_parser = subparsers.add_parser('goal', help='Show a description of the current goal')
-        test_parser = subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level')
         show_tree_parser = subparsers.add_parser('show-tree', help='Show the current state of the branching tree')
 
         start_parser.add_argument('--force', action='store_true')
@@ -55,15 +55,15 @@ class GitGud:
         self.command_dict = {
             'start': self.handle_start,
             'status': self.handle_status,
-            'progress': self.handle_progress,
+            'instructions': self.handle_instructions,
             'reset': self.handle_reset,
+            'test': self.handle_test,
+            'progress': self.handle_progress,
             'levels': self.handle_levels,
             'challenges': self.handle_challenges,
             'load': self.handle_load,
             'commit': self.handle_commit,
-            'instructions': self.handle_instructions,
             'goal': self.handle_goal,
-            'test': self.handle_test,
             'show_tree': self.handle_show_tree,
         }
 
@@ -128,6 +128,26 @@ class GitGud:
             print("Git gud not initialized.")
             print("Initialize using \"git gud start\"")
 
+    def handle_instructions(self, args):
+        self.assert_initialized()
+        self.file_operator.get_challenge().instructions()
+
+    def handle_reset(self, args):
+        self.assert_initialized()
+
+        challenge = self.file_operator.get_challenge()
+        print("Resetting...")
+        challenge.setup(self.file_operator)
+
+    def handle_test(self, args):
+        self.assert_initialized()
+        challenge = self.file_operator.get_challenge()
+
+        if challenge.test(self.file_operator):
+            print("Level complete! `git gud progress` to advance to the next level")
+        else:
+            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
+
     def handle_progress(self, args):
         self.assert_initialized()
 
@@ -142,15 +162,7 @@ class GitGud:
         else:
             print("Wow! You've complete every challenge, congratulations!")
             print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
-            print("We're always looking for a contributions and are more than happy to suggest both pull requests and suggestions!")
-
-
-    def handle_reset(self, args):
-        self.assert_initialized()
-
-        challenge = self.file_operator.get_challenge()
-        print("Resetting...")
-        challenge.setup(self.file_operator)
+            print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
 
     def handle_levels(self, args):
         cur_level = self.file_operator.get_challenge().level
@@ -208,22 +220,9 @@ class GitGud:
         if int(commit_name) > int(last_commit):
             self.file_operator.write_last_commit(commit_name)
 
-    def handle_instructions(self, args):
-        self.assert_initialized()
-        self.file_operator.get_challenge().instructions()
-
     def handle_goal(self, args):
         self.assert_initialized()
         raise NotImplementedError
-
-    def handle_test(self, args):
-        self.assert_initialized()
-        challenge = self.file_operator.get_challenge()
-
-        if challenge.test(self.file_operator):
-            print("Level complete! `git gud progress` to advance to the next level")
-        else:
-            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
 
     def handle_show_tree(self, args):
         raise NotImplementedError
