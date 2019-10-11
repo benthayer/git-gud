@@ -173,10 +173,12 @@ class GitGud:
                 print("Level name not found.")
                 return
                     
-        #print("Printing challenges for level: \"{level.name}\"\n".format(level.name))
+        print("Challenges for level \"{}\" : \n".format(level.name))
 
+        count = 1
         for challenge in level.challenges.values():
-            print(challenge.name)
+            print(str(count) + ": " +challenge.name)
+            count += 1
 
     def handle_load(self, args):
         self.assert_initialized()
