@@ -180,10 +180,12 @@ class GitGud:
         level = all_levels[args.level_name]
 
         if args.challenge_name is not None:
-            level.challenges[args.challenge_name].setup(self.file_operator)
+            challenge = level.challenges[args.challenge_name]
         else:
-            first_level = next(iter(level.challenges.values()))
-            first_level.setup(self.file_operator)
+            challenge = next(iter(level.challenges.values()))
+
+        challenge.setup(self.file_operator)
+        self.file_operator.write_challenge(challenge)
 
     def handle_commit(self, args):
         self.assert_initialized()

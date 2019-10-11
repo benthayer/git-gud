@@ -1,2 +1,3 @@
-1 (master, bugFix)
+1 (master)
+2 (bugFix)
 bugFix
