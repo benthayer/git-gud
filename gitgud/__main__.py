@@ -1,11 +1,9 @@
 import os
-import sys
 
 import argparse
 
-from configparser import NoSectionError
 
-
+from gitgud import create_alias
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
 from gitgud.levels import all_levels
@@ -100,15 +98,6 @@ class GitGud:
 
         # After here, we initialize everything
         self.file_operator.initialize()
-
-        python = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
-
-        config_writer = self.file_operator.repo.config_writer()
-        try:
-            config_writer.remove_option('alias', 'gud')
-        except NoSectionError:
-            pass
-        config_writer.add_value('alias', 'gud', f'"! {python} -m gitgud"')
 
         if not os.path.exists(self.file_operator.gg_path):
             os.mkdir(self.file_operator.gg_path)

@@ -1,18 +1,45 @@
-import setuptools
+from setuptools import setup
+from setuptools.command.develop import develop
+from setuptools.command.install import install
+
+
+class PostDevelopCommand(develop):
+    """Post-installation for development mode."""
+    def run(self):
+        from gitgud import create_alias
+        create_alias()
+        develop.run(self)
+
+
+class PostInstallCommand(install):
+    """Post-installation for installation mode."""
+    def run(self):
+        from gitgud import create_alias
+        create_alias()
+        install.run(self)
+
 
 with open('README.md') as readme:
     long_description = readme.read()
 
-# TODO Add git as dependency and add alias using `git config --global alias.gud "! python -m gitgud"`
-
-setuptools.setup(
+setup(
     name='git-gud',
     version='0.1',
+    url='https://github.com/bthayer2365/git-gud/',
+    description='A tool to learn git',
     author='Ben Thayer',
     author_email='ben@benthayer.com',
-    description='A tool to learn git',
+    license='MIT',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/bthayer2365/git-gud/',
-    packages=setuptools.find_packages()
+    packages=[
+        'gitgud'
+    ],
+    install_requires=[
+        'gitpython',
+    ],
+    cmdclass={
+        'develop': PostDevelopCommand,
+        'install': PostInstallCommand,
+    }
 )
