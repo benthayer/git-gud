@@ -7,6 +7,7 @@ from git import Actor
 from git import Repo
 
 actor = Actor("Git Gud", "git-gud@example.com")
+actor_string = "Git Gud <git-gud@example.com>"
 
 
 class GitConfig(Repo):

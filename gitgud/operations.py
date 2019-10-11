@@ -9,6 +9,7 @@ from git.exc import GitCommandError
 from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
+from gitgud import actor_string
 from gitgud.levels import all_levels
 
 
@@ -57,38 +58,20 @@ class Operator:
         self.repo.index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
 
         # dirs = sorted(dirs, key=lambda x: len(x)) # Makes sure subdirs are deleted first
-        dirs.remove(self.path + os.path.sep) # Don't remove current directory
+        dirs.remove(self.path + os.path.sep)  # Don't remove current directory
 
         for path in os.listdir(self.path):
             if path != '.git':
                 shutil.rmtree(path)
 
     def create_tree(self, commits, head):
-        repo = self.repo
-        index = repo.index
 
+        self.repo.git.checkout(self.repo.head.commit)  # Detatched head, we can now delete everything
         self.clear_tree_and_index()
 
-        # Switch to temp first in case git-gud-construction exists
-        if repo.head.reference.name != 'temp':
-            repo.head.reference = Head(repo, 'refs/heads/temp')
-
-        # Delete git-gud-construction so we can guarantee it's an orphan
-        try:
-            repo.delete_head('git-gud-construction')
-        except GitCommandError:
-            pass  # Branch doesn't exist
-
-        repo.head.reference = Head(repo, 'refs/heads/git-gud-construction')
-        try:
-            repo.delete_head('temp')
-        except GitCommandError:
-            pass  # If temp didn't exist, we only checked it out as an orphan, so it already disappeared
-
-        for branch in repo.branches:
-            if branch.name != 'git-gud-construction':
-                repo.delete_head(branch, force=True)
-        repo.delete_tag(*repo.tags)
+        for branch in self.repo.branches:
+            self.repo.delete_head(branch, force=True)
+            self.repo.delete_tag(*self.repo.tags)
 
         commit_objects = {}
 
@@ -96,26 +79,29 @@ class Operator:
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
-                repo.active_branch.set_commit(parents[0])
+                self.repo.git.checkout(parents[0])
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-            commit = index.commit(name, author=actor, committer=actor, parent_commits=parents)
-            commit_objects[name] = commit
+                self.repo.index.commit(name, author=actor, committer=actor, parent_commits=parents)
+            else:
+                self.repo.git.merge(*parents)
+                self.repo.git.commit('--amend', '-m', name,
+                                     f'--author="{actor_string}"')
+
+            commit_objects[name] = self.repo.head.commit
 
             for branch in branches:
-                repo.create_head(branch, commit)
+                self.repo.create_head(branch, self.repo.head.commit)
 
             for tag in tags:
-                repo.create_tag(tag, commit)
+                self.repo.create_tag(tag, self.repo.head.commit)
             # TODO Log commit hash and info
 
         # TODO Checkout using name
-        for branch in repo.branches:
+        for branch in self.repo.branches:
             if branch.name == head:
                 branch.checkout()
-
-        repo.delete_head('git-gud-construction', force=True)
 
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json
