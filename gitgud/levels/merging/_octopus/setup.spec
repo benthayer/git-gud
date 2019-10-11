@@ -4,5 +4,5 @@
 4 : 1
 5
 6 (feature)
-M1 : 1 (feature2)
+7 : 1 (feature2)
 master

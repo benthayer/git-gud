@@ -2,7 +2,10 @@ import os
 
 from collections import OrderedDict
 
+from copy import deepcopy
 
+
+# TODO GitPython topology
 def get_topology(tree):
     tree['topology'] = None
     raise NotImplementedError
@@ -122,14 +125,42 @@ def level_json(commits, head):
 
 
 def test_level(level, test):
+    # We don't know the names of merges, so we match them with their test names
+    # TODO Only works when merges don't have other merges as parents
+    # TODO Topological sort merge commits
+    level = deepcopy(level)
+    merge_name_map = {}
+    for commit_name in level['commits']:
+        level_commit = level['commits'][commit_name]
+        if len(level_commit['parents']) >= 2:  # TODO Stop here to get list of merges
+            for test_commit_name in test['commits']:  # TODO Do this iteration in an intelligent manner
+                test_commit = test['commits'][test_commit_name]
+                parents_equal = True
+                level_parents = level_commit['parents']
+                test_parents = test_commit['parents']
+
+                for level_parent, test_parent in zip(level_parents, test_parents):
+                    if level_parent != test_parent:
+                        parents_equal = False
+                        break
+                if len(level_parents) == len(test_parents) and parents_equal:
+                    merge_name_map[test_commit_name] = commit_name
+
+    # TODO Update parents to reference merge commits by new name
+
     # Check commits
     if len(test['commits']) != len(level['commits']):
         return False
     for commit_name in test['commits']:
-        if commit_name not in level['commits']:
-            return False
-        level_commit = level['commits'][commit_name]
         test_commit = test['commits'][commit_name]
+        if commit_name not in level['commits']:
+            if merge_name_map[commit_name] in level['commits']:
+                # It's a known merge
+                level_commit = level['commits'][merge_name_map[commit_name]]
+            else:
+                return False
+        else:
+            level_commit = level['commits'][commit_name]
 
         # Commits must have the same number of parents and be in the same order
         if len(level_commit['parents']) != len(test_commit['parents']):
@@ -145,7 +176,8 @@ def test_level(level, test):
         if branch_name not in level['branches']:
             return False
         if level['branches'][branch_name]['target'] != test['branches'][branch_name]['target']:
-            return False
+            if merge_name_map[test['branches'][branch_name]['target']] != level['branches'][branch_name]['target']:
+                return False  # It's also not a known merge
 
     # Check tags
     if len(test['tags']) != len(level['tags']):

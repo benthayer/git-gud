@@ -2,11 +2,10 @@ import os
 
 import argparse
 
-
-from gitgud import create_alias
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
 from gitgud.levels import all_levels
+from git.cmd import Git
 
 # TODO Add test suite so testing can be separate from main code
 
