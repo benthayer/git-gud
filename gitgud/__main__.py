@@ -106,7 +106,7 @@ class GitGud:
         with open(self.file_operator.level_path, 'w+') as level_file:
             level_file.write('intro commits')
 
-        print('git gud successfully setup.')
+        print(f'Git Gud successfully setup in {os.getcwd()}')
 
         self.file_operator.get_challenge().setup(self.file_operator)
 

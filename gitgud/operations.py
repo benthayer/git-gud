@@ -65,13 +65,16 @@ class Operator:
                 shutil.rmtree(path)
 
     def create_tree(self, commits, head):
-
-        self.repo.git.checkout(self.repo.head.commit)  # Detatched head, we can now delete everything
+        branches = self.repo.branches
+        try:
+            self.repo.git.checkout(self.repo.head.commit)  # Detached head, we can now delete everything
+        except ValueError:
+            pass
         self.clear_tree_and_index()
 
-        for branch in self.repo.branches:
+        for branch in branches:
             self.repo.delete_head(branch, force=True)
-            self.repo.delete_tag(*self.repo.tags)
+        self.repo.delete_tag(*self.repo.tags)
 
         commit_objects = {}
 
