@@ -4,7 +4,7 @@ Make a new branch called bugFix by typing the command "git branch bugFix"
 >>> 
 Checkout the bugFix branch with "git checkout bugFix"
 >>>
-Commit once
+Commit once ("git gud commit")
 >>>
 Go back to master with "git checkout master"
 >>>
