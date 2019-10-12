@@ -164,15 +164,27 @@ class GitGud:
             print(level.name, ": {} challenges".format(len(level.challenges)))
 
     def handle_challenges(self, args):
+        key_error_flag = False
         if args.level_name is None:
             level = self.file_operator.get_challenge().level
         else:
-            level = all_levels[args.level_name]
+            try:
+                level = all_levels[args.level_name]
+            except KeyError:
+                print("There is no level \"{}\".".format(args.level_name))
+                print("You may run \"git gud levels\" to print all the levels. \n")
+                level = self.file_operator.get_challenge().level
+                key_error_flag = True
+        
+        if key_error_flag == True or args.level_name is None:
+            print("Challenges in the current level \"{}\" : \n".format(level.name))
+        else:
+            print("Challenges for level \"{}\" : \n".format(level.name))
 
-        print("Printing challenges for level: \"{level.name}\"\n".format(level.name))
-
+        count = 1
         for challenge in level.challenges.values():
-            print(challenge.name)
+            print(str(count) + ": " +challenge.name)
+            count += 1
 
     def handle_load(self, args):
         self.assert_initialized()
