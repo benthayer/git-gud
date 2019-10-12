@@ -5,5 +5,5 @@
 5
 6 (feature)
 7 : 1 (feature2)
-8 : 3 6 7 (master)
+M1 : 3 6 7 (master)
 master

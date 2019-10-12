@@ -5,28 +5,19 @@ from gitgud.levels.merging import all_challenges as merging_challenges
 
 from gitgud.levels.util import Level
 
-
 all_levels = OrderedDict()
 
 all_levels['intro'] = Level('intro', intro_challenges)
 all_levels['merging'] = Level('merging', merging_challenges)
 
-last_challenge = None
-for level in all_levels.values():
-    for challenge in level.challenges.values():
-        if last_challenge is not None:
-            last_challenge.next_challenge = challenge
-        last_challenge = challenge
 
-try:
-    del level
-except NameError:
-    pass
-
-try:
-    del challenge
-except NameError:
-    pass
+def _add_next_challenges():
+    last_challenge = None
+    for level in all_levels.values():
+        for challenge in level.challenges.values():
+            if last_challenge is not None:
+                last_challenge.next_challenge = challenge
+            last_challenge = challenge
 
 
-del Level
+_add_next_challenges()
