@@ -172,6 +172,7 @@ class GitGud:
                 level = all_levels[args.level_name]
             except KeyError:
                 print("There is no level \"{}\".".format(args.level_name))
+                print("You may run \"git gud levels\" to print all the levels. \n")
                 level = self.file_operator.get_challenge().level
                 key_error_flag = True
         
