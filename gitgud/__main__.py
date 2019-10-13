@@ -103,7 +103,9 @@ class GitGud:
         with open(self.file_operator.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
         with open(self.file_operator.level_path, 'w+') as level_file:
-            level_file.write('intro commits')
+            level1 = next(iter(all_levels.values()))
+            challenge1 = next(iter(level1.challenges.values()))
+            level_file.write(challenge1.full_name())
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
 
