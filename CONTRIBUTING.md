@@ -15,7 +15,7 @@ pip install -e . # Installs in edit mode so we can change files without needing 
 cd ..
 mkdir test
 cd test
-python -m gitgud start # Initializes a git repository and lets us start using the git gud command from within this folder
+git gud start # Initializes a git repository and lets us start using the git gud command from within this folder
 ```
 Once you have the code downloaded, I would recommend having two terminals open at all times, one in the test directory you just created, and one in the git-gud directory. This allows you to both work with your code and test your code at the same time.
 
