@@ -8,4 +8,6 @@ Rebasing "bases" your code off of a different commit. When we started working on
 >>>
 Also: observe what happens if we now checkout master, and execute "git rebase bugFix". Since master is already the ancestor of bugFix, the branch reference simply moves up to the position of bugFix.
 >>>
+One last helpful tip: Use "git log --graph --oneline --all" before and after your rebase to observe the changes caused by the rebase command!
+>>>
 Phew, that was a lot! Now that we know the basics, try rebasing a branch by yourself!
