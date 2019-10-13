@@ -61,7 +61,7 @@ class GitGud:
             'load': self.handle_load,
             'commit': self.handle_commit,
             'goal': self.handle_goal,
-            'show_tree': self.handle_show_tree,
+            'show-tree': self.handle_show_tree,
         }
 
     def is_initialized(self):
@@ -230,7 +230,7 @@ class GitGud:
         raise NotImplementedError
 
     def handle_show_tree(self, args):
-        self.file_operator.show_tree()
+        print(self.file_operator.show_tree())
 
     def parse(self):
         args = self.parser.parse_args()
