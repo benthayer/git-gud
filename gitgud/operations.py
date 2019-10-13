@@ -1,5 +1,7 @@
 import os
 import shutil
+import subprocess
+
 from glob import glob
 
 from git import Repo
@@ -43,6 +45,9 @@ class Operator:
 
         return commit
 
+    def show_tree(self):
+        subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
+    
     def clear_tree_and_index(self):
         dirs = []
         for x in [('**', '.*'), ('**',)]:
