@@ -157,11 +157,15 @@ class GitGud:
         cur_level = self.file_operator.get_challenge().level
 
         print("Currently on level: \"{}\"\n".format(cur_level.name))
-
+        
         for level in all_levels.values():
             # TODO Make pretty
             # TODO Add description
-            print(level.name, ": {} challenges".format(len(level.challenges)))
+            print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level.challenges), ("", "s")[len(level.challenges) > 1]))
+            count = 1
+            for challenge in level.challenges.values():
+                print("    Challenge {:>2} : {:<10}".format(str(count), challenge.name))
+                count += 1
 
     def handle_challenges(self, args):
         key_error_flag = False
