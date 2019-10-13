@@ -52,6 +52,8 @@ class GitGud:
 
         commit_parser.add_argument('file', nargs='?')
 
+        self.subparser_copy = subparsers
+
         self.command_dict = {
             'help': self.handle_help,
             'start': self.handle_start,
@@ -79,7 +81,12 @@ class GitGud:
         if args.command_name is None:
             self.parser.print_help()
         else:
-            print('Something')
+            try:
+                self.subparser_copy.choices[args.command_name].print_help()
+            except KeyError:
+                print('No such command exists. \n')
+                print("List of available commands:")
+                print("\n".join([command for command in self.subparser_copy.choices]))
 
     def handle_start(self, args):
         if not args.force:
