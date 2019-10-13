@@ -2,3 +2,4 @@
 **/__pycache__/
 git_gud.egg-info/
 dist/
+build/
