@@ -230,7 +230,7 @@ class GitGud:
         raise NotImplementedError
 
     def handle_show_tree(self, args):
-        raise NotImplementedError
+        self.file_operator.repo.git.log('--graph', '--oneline')
 
     def parse(self):
         args = self.parser.parse_args()
