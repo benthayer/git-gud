@@ -27,6 +27,7 @@ class GitGud:
         # TODO Display help message for subcommand when it fails.
         # ie `git gud load level1 challenge1 random-input` should have output similar to `git gud load --help`
 
+        help_parser = subparsers.add_parser('help', help='Show help for commands') 
         start_parser = subparsers.add_parser('start', help='Git started!')
         status_parser = subparsers.add_parser('status', help='Print out the current level')
         instructions_parser = subparsers.add_parser('instructions', help='Show the instructions for the current level')
@@ -40,6 +41,8 @@ class GitGud:
         goal_parser = subparsers.add_parser('goal', help='Show a description of the current goal')
         show_tree_parser = subparsers.add_parser('show-tree', help='Show the current state of the branching tree')
 
+        help_parser.add_argument('command_name', metavar='<command>', nargs='?')
+
         start_parser.add_argument('--force', action='store_true')
 
         challenges_parser.add_argument('level_name', metavar='level', nargs='?')
@@ -50,6 +53,7 @@ class GitGud:
         commit_parser.add_argument('file', nargs='?')
 
         self.command_dict = {
+            'help': self.handle_help,
             'start': self.handle_start,
             'status': self.handle_status,
             'instructions': self.handle_instructions,
@@ -70,6 +74,12 @@ class GitGud:
     def assert_initialized(self):
         if not self.is_initialized():
             raise InitializationError("Git gud not initialized. Use \"git gud start\" to initialize")
+
+    def handle_help(self, args):
+        if args.command_name is None:
+            self.parser.print_help()
+        else:
+            print('Something')
 
     def handle_start(self, args):
         if not args.force:
