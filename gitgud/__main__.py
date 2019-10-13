@@ -161,10 +161,12 @@ class GitGud:
         for level in all_levels.values():
             # TODO Make pretty
             # TODO Add description
+            # 10 characters for the short IDs. 
             print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level.challenges), ("", "s")[len(level.challenges) > 1]))
             count = 1
             for challenge in level.challenges.values():
-                print("    Challenge {:>2} : {:<10}".format(str(count), challenge.name))
+                # " " * 4
+                print("{}Challenge {:>2} : {:<10}".format(" " * 4, str(count), challenge.name))
                 count += 1
 
     def handle_challenges(self, args):
