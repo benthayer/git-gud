@@ -44,7 +44,8 @@ class Operator:
         return commit
 
     def show_tree(self):
-        self.repo.git.log('--graph', '--oneline')
+        tree = self.repo.git.log('--graph', '--oneline', '--all')
+        return tree
     
     def clear_tree_and_index(self):
         dirs = []
