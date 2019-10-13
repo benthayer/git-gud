@@ -165,7 +165,7 @@ class GitGud:
             print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level.challenges), ("", "s")[len(level.challenges) > 1]))
             count = 1
             for challenge in level.challenges.values():
-                # " " * 4
+                # " " * (characters allocated for ID - 6)
                 print("{}Challenge {:>2} : {:<10}".format(" " * 4, str(count), challenge.name))
                 count += 1
 
