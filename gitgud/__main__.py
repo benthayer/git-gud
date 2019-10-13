@@ -26,20 +26,26 @@ class GitGud:
 
         # TODO Display help message for subcommand when it fails.
         # ie `git gud load level1 challenge1 random-input` should have output similar to `git gud load --help`
+        
+        '''
+        Use "git gud help" to print helps of all subcommands.
+        "git gud help <command>" prints the description of the <command> but not help.
+        Longer descriptions can be added later
+        '''
 
-        help_parser = subparsers.add_parser('help', help='Show help for commands') 
-        start_parser = subparsers.add_parser('start', help='Git started!')
-        status_parser = subparsers.add_parser('status', help='Print out the current level')
-        instructions_parser = subparsers.add_parser('instructions', help='Show the instructions for the current level')
-        reset_parser = subparsers.add_parser('reset', help='Reset the current level')
-        test_parser = subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level')
-        progress_parser = subparsers.add_parser('progress', help='Continue to the next level')
-        levels_parser = subparsers.add_parser('levels', help='List levels')
-        challenges_parser = subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified')
-        load_parser = subparsers.add_parser('load', help='Load a specific level or challenge')
-        commit_parser = subparsers.add_parser('commit', help='Quickly create and commit a file')
-        goal_parser = subparsers.add_parser('goal', help='Show a description of the current goal')
-        show_tree_parser = subparsers.add_parser('show-tree', help='Show the current state of the branching tree')
+        help_parser = subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
+        start_parser = subparsers.add_parser('start', help='Git started!', description='Git started!')
+        status_parser = subparsers.add_parser('status', help='Print out the current level', description='Print out the current level')
+        instructions_parser = subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
+        reset_parser = subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
+        test_parser = subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
+        progress_parser = subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
+        levels_parser = subparsers.add_parser('levels', help='List levels', description='List levels')
+        challenges_parser = subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified', description='List challenges in current level or in other level if specified')
+        load_parser = subparsers.add_parser('load', help='Load a specific level or challenge', description='Load a specific level or challenge')
+        commit_parser = subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
+        goal_parser = subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
+        show_tree_parser = subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
 
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
