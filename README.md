@@ -7,15 +7,41 @@ The goal is to make this project contributor-friendly and to support many differ
 There is also another project we recommend trying out. It is called ["Learn Git Branching"](https://learngitbranching.js.org), and it can teach you some of the things Git Gud teaches, and with a nice visual interface. Git Gud differentiates itself by (eventually) having more levels and the ability to test you on all the concepts there are.
 
 ## How do I use it?
-### Development install (Currently only option):  
+First, no matter what, you'll need Python 3. We'll use python to install Git Gud. Depending on which way you want to install, we'll either do a "User install" by downloading the `git-gud` package from PyPi, which is handled by pip, or we'll do an edit-mode (development) install, which also uses pip, but in a different way. Once it's installed, we make an empty directory and switch into it. We need to do this because Git Gud acts as if we're in a git repository and modifies the files to set up different "challenges". If we were in another directory, it would delete all our files! But don't worry, there's a built in failsafe, so Git Gud will warn us before it does anything like that.
+
+Recap:
+
+1. Make sure we're using Python 3
+2. Install Git Gud
+3. Create and change into an empty directory for Git Gud to load the levels into
+4. Run `git gud start`
+5. Follow the instructions to git gud!
+
+For specific instructions, see below.
+
+### User install:
+Use this method if all you're looking to do is to use Git Gud.
+Open up a command line and type the following in.
+```
+python --version # Must say Python 3, any minor version
+python -m  pip install git-gud
+mkdir test
+cd test
+git gud start # Initializes a git repository and lets us start using git gud from within this folder
+```
+
+### Development install:  
+Use this method if you'd like to contribute to this repository.  
+Open up a command line and type the following in. Make sure you're in the directory you want your local copy of Git Gud to be in.
 ```
 git clone https://github.com/bthayer2365/git-gud
 cd git-gud
-pip install -e . # Installs in edit mode so we can change files without needing to reinstall
+python --version # Must say Python 3, any minor version
+python -m pip install -e . # Installs in edit mode so we can change files without needing to reinstall
 cd ..
 mkdir test
 cd test
-python -m gitgud start # Initializes a git repository and lets us start using git gud from within this folder
+git gud start # Initializes a git repository and lets us start using git gud from within this folder
 ```
 
 Once it's installed, you can access all the features that Git Gud has to offer. If you just want to get started, type in `git gud instructions`. The first level is already loaded for you, and all you just have to do is follow the instructions and it'll guide you through the challenges. Once you think you're done with a level, run `git gud test` to see of you've completed the challenge. If you've solved it, run `git gud progress` to move on to the next challenge! Look at the full command list below for a complete command list.
