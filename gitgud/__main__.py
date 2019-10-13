@@ -159,7 +159,6 @@ class GitGud:
         print("Currently on level: \"{}\"\n".format(cur_level.name))
         
         for level in all_levels.values():
-            # TODO Make pretty
             # TODO Add description
             # 10 characters for the short IDs. 
             print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level.challenges), ("", "s")[len(level.challenges) > 1]))
