@@ -27,11 +27,9 @@ class GitGud:
         # TODO Display help message for subcommand when it fails.
         # ie `git gud load level1 challenge1 random-input` should have output similar to `git gud load --help`
         
-        '''
-        Use "git gud help" to print helps of all subcommands.
-        "git gud help <command>" prints the description of the <command> but not help.
-        Longer descriptions can be added later
-        '''
+        # Use "git gud help" to print helps of all subcommands.
+        # "git gud help <command>" prints the description of the <command> but not help.
+        # TODO Add longer descriptions
 
         help_parser = subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
         start_parser = subparsers.add_parser('start', help='Git started!', description='Git started!')
