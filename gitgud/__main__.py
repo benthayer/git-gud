@@ -162,11 +162,9 @@ class GitGud:
             # TODO Add description
             # 10 characters for the short IDs. 
             print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level.challenges), ("", "s")[len(level.challenges) > 1]))
-            count = 1
-            for challenge in level.challenges.values():
+            for index, challenge in enumerate(level.challenges.values()):
                 # " " * (characters allocated for ID - 6)
-                print("{}Challenge {:>2} : {:<10}".format(" " * 4, str(count), challenge.name))
-                count += 1
+                print("{}Challenge {:>2} : {:<10}".format(" " * 4, index + 1, challenge.name))
 
     def handle_challenges(self, args):
         key_error_flag = False
@@ -186,10 +184,9 @@ class GitGud:
         else:
             print("Challenges for level \"{}\" : \n".format(level.name))
 
-        count = 1
-        for challenge in level.challenges.values():
-            print(str(count) + ": " +challenge.name)
-            count += 1
+        
+        for index, challenge in enumerate(level.challenges.values()):
+            print(str(index + 1) + ": " + challenge.name)
 
     def handle_load(self, args):
         self.assert_initialized()
