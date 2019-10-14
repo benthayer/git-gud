@@ -87,8 +87,7 @@ class GitGud:
                 self.subparsers.choices[args.command_name].print_help()
             except KeyError:
                 print('No such command exists: \"{}\"\n'.format(args.command_name))
-                print("List of available commands:")
-                print("\n".join([command for command in self.subparsers.choices]))
+                self.parser.print_help()
 
     def handle_start(self, args):
         if not args.force:
