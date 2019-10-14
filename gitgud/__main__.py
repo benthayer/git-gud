@@ -20,7 +20,7 @@ class GitGud:
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
-        subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
+        self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
         # TODO Add git gud help <command>, which would return the same output as git gud <command> -- help
 
@@ -31,19 +31,19 @@ class GitGud:
         # "git gud help <command>" prints the description of the <command> but not help.
         # TODO Add longer descriptions
 
-        help_parser = subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
-        start_parser = subparsers.add_parser('start', help='Git started!', description='Git started!')
-        status_parser = subparsers.add_parser('status', help='Print out the current level', description='Print out the current level')
-        instructions_parser = subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
-        reset_parser = subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
-        test_parser = subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
-        progress_parser = subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
-        levels_parser = subparsers.add_parser('levels', help='List levels', description='List levels')
-        challenges_parser = subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified', description='List challenges in current level or in other level if specified')
-        load_parser = subparsers.add_parser('load', help='Load a specific level or challenge', description='Load a specific level or challenge')
-        commit_parser = subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
-        goal_parser = subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
-        show_tree_parser = subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
+        help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
+        start_parser = self.subparsers.add_parser('start', help='Git started!', description='Git started!')
+        status_parser = self.subparsers.add_parser('status', help='Print out the current level', description='Print out the current level')
+        instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
+        reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
+        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
+        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
+        levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels')
+        challenges_parser = self.subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified', description='List challenges in current level or in other level if specified')
+        load_parser = self.subparsers.add_parser('load', help='Load a specific level or challenge', description='Load a specific level or challenge')
+        commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
+        goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
+        show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
 
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
@@ -55,8 +55,6 @@ class GitGud:
         load_parser.add_argument('challenge_name', metavar='challenge', nargs='?', help='Challenge to load')
 
         commit_parser.add_argument('file', nargs='?')
-
-        self.subparser_copy = subparsers
 
         self.command_dict = {
             'help': self.handle_help,
@@ -86,7 +84,7 @@ class GitGud:
             self.parser.print_help()
         else:
             try:
-                self.subparser_copy.choices[args.command_name].print_help()
+                self.subparsers.choices[args.command_name].print_help()
             except KeyError:
                 print('No such command exists. \n')
                 print("List of available commands:")
