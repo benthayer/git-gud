@@ -177,11 +177,14 @@ class GitGud:
         cur_level = self.file_operator.get_challenge().level
 
         print("Currently on level: \"{}\"\n".format(cur_level.name))
-
+        
         for level in all_levels.values():
-            # TODO Make pretty
             # TODO Add description
-            print(level.name, ": {} challenges".format(len(level.challenges)))
+            # 10 characters for the short IDs. 
+            print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level.challenges), ("", "s")[len(level.challenges) > 1]))
+            for index, challenge in enumerate(level.challenges.values()):
+                # " " * (characters allocated for ID - 6)
+                print("{}Challenge {:>2} : {:<10}".format(" " * 4, index + 1, challenge.name))
 
     def handle_challenges(self, args):
         key_error_flag = False
@@ -201,10 +204,9 @@ class GitGud:
         else:
             print("Challenges for level \"{}\" : \n".format(level.name))
 
-        count = 1
-        for challenge in level.challenges.values():
-            print(str(count) + ": " +challenge.name)
-            count += 1
+        
+        for index, challenge in enumerate(level.challenges.values()):
+            print(str(index + 1) + ": " + challenge.name)
 
     def handle_load(self, args):
         self.assert_initialized()
