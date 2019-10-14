@@ -176,7 +176,16 @@ class Operator:
     def get_challenge(self):
         with open(self.level_path) as level_file:
             level_name, challenge_name = level_file.read().split()
-        return all_levels[level_name].challenges[challenge_name]
+        if level_name in all_levels:
+            if challenge_name in all_levels[level_name].challenges:
+                challenge = all_levels[level_name].challenges[challenge_name]
+            else:
+                print("Challenge {} does not exist".format(challenge_name))
+                print("To view challenges/levels, use git gud challenges or git gud levels")
+        else:
+            print("Level {} does not exist".format(level_name))
+            print("To view challenges/levels, use git gud challenges or git gud levels")
+        return challenge
 
     def write_challenge(self, challenge):
         with open(self.level_path, 'w+') as level_file:
