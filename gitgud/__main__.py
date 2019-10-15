@@ -199,14 +199,14 @@ class GitGud:
                     challenge.setup(self.file_operator)
                     self.file_operator.write_challenge(challenge)
                 else:
-                    print("Challenge {} does not exist".format(args.challenge_name))
+                    print("Challenge \"{}\" does not exist".format(args.challenge_name))
                     print("To view challenges/levels, use git gud challenges or git gud levels")
             else:
                 challenge = next(iter(level.challenges.values()))
                 challenge.setup(self.file_operator)
                 self.file_operator.write_challenge(challenge)
         else:
-            print("Level {} does not exist".format(args.level_name))
+            print("Level \"{}\" does not exist".format(args.level_name))
             print("To view challenges/levels, use git gud challenges or git gud levels")
 
     def handle_commit(self, args):
