@@ -170,9 +170,9 @@ class GitGud:
         challenge = self.file_operator.get_challenge()
 
         if challenge.test(self.file_operator):
-            print("Level complete! `git gud progress` to advance to the next level")
+            print("Challenge complete! `git gud progress` to advance to the next level")
         else:
-            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
+            print("Challenge not complete, keep trying. `git gud reset` to start from scratch.")
 
     def handle_progress(self, args):
         self.assert_initialized()
