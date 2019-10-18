@@ -1,11 +1,15 @@
 import os
+import sys
 
 import argparse
+
+from git import Repo
+from git.exc import InvalidGitRepositoryError
 
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
 from gitgud.levels import all_levels
-from git.cmd import Git
+from gitgud.hooks import all_hooks
 
 # TODO Add test suite so testing can be separate from main code
 
@@ -90,6 +94,7 @@ class GitGud:
                 self.parser.print_help()
 
     def handle_start(self, args):
+        # Make sure it's safe to initialize
         if not args.force:
             # We aren't forcing
             if self.file_operator:
@@ -97,7 +102,7 @@ class GitGud:
                 print('Use --force to initialize {}.'.format(os.getcwd()))
                 return
 
-            self.file_operator = Operator(os.getcwd())
+            self.file_operator = Operator(os.getcwd(), initialize_repo=False)
 
             if os.path.exists(self.file_operator.git_path):
                 # Current directory is a git repo
@@ -114,7 +119,10 @@ class GitGud:
             print('Force initializing git gud.')
 
         # After here, we initialize everything
-        self.file_operator.initialize()
+        try:
+            self.file_operator.repo = Repo(self.file_operator.path)
+        except InvalidGitRepositoryError:
+            self.file_operator.repo = Repo.init(self.file_operator.path)
 
         if not os.path.exists(self.file_operator.gg_path):
             os.mkdir(self.file_operator.gg_path)
@@ -124,6 +132,14 @@ class GitGud:
             level1 = next(iter(all_levels.values()))
             challenge1 = next(iter(level1.challenges.values()))
             level_file.write(challenge1.full_name())
+
+        python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
+
+        for git_hook_name, module_hook_name in all_hooks:
+            with open(os.path.join(self.file_operator.hooks_path, git_hook_name), 'w+') as hook_file:
+                hook_file.write('#!/bin/sh' + os.linesep)
+                hook_file.write('cat - | ' + python_exec + ' -m gitgud.hooks.' + module_hook_name + ' $1' +os.linesep)
+                hook_file.write('exit 0' + os.linesep)
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
 
