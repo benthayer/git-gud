@@ -1,6 +1,5 @@
 import os
 import shutil
-import subprocess
 
 from glob import glob
 
@@ -35,9 +34,6 @@ class Operator:
         commit = self.repo.index.commit(name, author=actor, committer=actor)
 
         return commit
-
-    def show_tree(self):
-        subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
     
     def clear_tree_and_index(self):
         dirs = []

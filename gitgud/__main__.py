@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess
 
 import argparse
 
@@ -274,7 +275,7 @@ class GitGud:
         raise NotImplementedError
 
     def handle_show_tree(self, args):
-        self.file_operator.show_tree()
+        subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
 
     def parse(self):
         args = self.parser.parse_args()
