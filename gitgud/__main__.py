@@ -186,8 +186,8 @@ class GitGud:
             next_challenge.setup(self.file_operator)
             self.file_operator.write_challenge(next_challenge)
         else:
-            print("Wow! You've complete every challenge, congratulations!")
-            print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
+            print("Wow! You've completed every challenge, congratulations!")
+            print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/ ?")
             print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
 
     def handle_levels(self, args):
