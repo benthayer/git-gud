@@ -69,7 +69,7 @@ Instead, it'll think of `gitgud` exclusively as a package that can be imported.
 
 `gitgud\__main__.py` contains the `GitGud` class, which is loaded up with an argument parser and a bunch of methods to handle the different commands that Git Gud can be given. 
 The argument parser is defined in `.__init__()`. 
-It sets up all the commands that Git Gud is capable of handling, along with any sub-commands and additional arugments. 
+It sets up all the commands that Git Gud is capable of handling, along with any sub-commands and additional arguments. 
 The parser is run using `.parse()`. 
 The method will look for the command that was sent in and direct it to the appropriate handler. 
 Each command has its own handler, and the handlers will process the arguments and perform the appropriate tasks.
