@@ -1,11 +1,16 @@
 import os
+import sys
+import subprocess
 
 import argparse
+
+from git import Repo
+from git.exc import InvalidGitRepositoryError
 
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
 from gitgud.levels import all_levels
-from git.cmd import Git
+from gitgud.hooks import all_hooks
 
 # TODO Add test suite so testing can be separate from main code
 
@@ -20,25 +25,32 @@ class GitGud:
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
-        subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
+        self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
         # TODO Add git gud help <command>, which would return the same output as git gud <command> -- help
 
         # TODO Display help message for subcommand when it fails.
         # ie `git gud load level1 challenge1 random-input` should have output similar to `git gud load --help`
+        
+        # Use "git gud help" to print helps of all subcommands.
+        # "git gud help <command>" prints the description of the <command> but not help.
+        # TODO Add longer descriptions
 
-        start_parser = subparsers.add_parser('start', help='Git started!')
-        status_parser = subparsers.add_parser('status', help='Print out the current level')
-        instructions_parser = subparsers.add_parser('instructions', help='Show the instructions for the current level')
-        reset_parser = subparsers.add_parser('reset', help='Reset the current level')
-        test_parser = subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level')
-        progress_parser = subparsers.add_parser('progress', help='Continue to the next level')
-        levels_parser = subparsers.add_parser('levels', help='List levels')
-        challenges_parser = subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified')
-        load_parser = subparsers.add_parser('load', help='Load a specific level or challenge')
-        commit_parser = subparsers.add_parser('commit', help='Quickly create and commit a file')
-        goal_parser = subparsers.add_parser('goal', help='Show a description of the current goal')
-        show_tree_parser = subparsers.add_parser('show-tree', help='Show the current state of the branching tree')
+        help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
+        start_parser = self.subparsers.add_parser('start', help='Git started!', description='Git started!')
+        status_parser = self.subparsers.add_parser('status', help='Print out the current level', description='Print out the current level')
+        instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
+        reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
+        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
+        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
+        levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels')
+        challenges_parser = self.subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified', description='List challenges in current level or in other level if specified')
+        load_parser = self.subparsers.add_parser('load', help='Load a specific level or challenge', description='Load a specific level or challenge')
+        commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
+        goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
+        show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
+
+        help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
         start_parser.add_argument('--force', action='store_true')
 
@@ -50,6 +62,7 @@ class GitGud:
         commit_parser.add_argument('file', nargs='?')
 
         self.command_dict = {
+            'help': self.handle_help,
             'start': self.handle_start,
             'status': self.handle_status,
             'instructions': self.handle_instructions,
@@ -61,7 +74,7 @@ class GitGud:
             'load': self.handle_load,
             'commit': self.handle_commit,
             'goal': self.handle_goal,
-            'show_tree': self.handle_show_tree,
+            'show-tree': self.handle_show_tree,
         }
 
     def is_initialized(self):
@@ -71,7 +84,18 @@ class GitGud:
         if not self.is_initialized():
             raise InitializationError("Git gud not initialized. Use \"git gud start\" to initialize")
 
+    def handle_help(self, args):
+        if args.command_name is None:
+            self.parser.print_help()
+        else:
+            try:
+                self.subparsers.choices[args.command_name].print_help()
+            except KeyError:
+                print('No such command exists: \"{}\"\n'.format(args.command_name))
+                self.parser.print_help()
+
     def handle_start(self, args):
+        # Make sure it's safe to initialize
         if not args.force:
             # We aren't forcing
             if self.file_operator:
@@ -79,7 +103,7 @@ class GitGud:
                 print('Use --force to initialize {}.'.format(os.getcwd()))
                 return
 
-            self.file_operator = Operator(os.getcwd())
+            self.file_operator = Operator(os.getcwd(), initialize_repo=False)
 
             if os.path.exists(self.file_operator.git_path):
                 # Current directory is a git repo
@@ -96,14 +120,27 @@ class GitGud:
             print('Force initializing git gud.')
 
         # After here, we initialize everything
-        self.file_operator.initialize()
+        try:
+            self.file_operator.repo = Repo(self.file_operator.path)
+        except InvalidGitRepositoryError:
+            self.file_operator.repo = Repo.init(self.file_operator.path)
 
         if not os.path.exists(self.file_operator.gg_path):
             os.mkdir(self.file_operator.gg_path)
         with open(self.file_operator.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
         with open(self.file_operator.level_path, 'w+') as level_file:
-            level_file.write('intro commits')
+            level1 = next(iter(all_levels.values()))
+            challenge1 = next(iter(level1.challenges.values()))
+            level_file.write(challenge1.full_name())
+
+        python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
+
+        for git_hook_name, module_hook_name in all_hooks:
+            with open(os.path.join(self.file_operator.hooks_path, git_hook_name), 'w+') as hook_file:
+                hook_file.write('#!/bin/sh' + os.linesep)
+                hook_file.write('cat - | ' + python_exec + ' -m gitgud.hooks.' + module_hook_name + ' $1' +os.linesep)
+                hook_file.write('exit 0' + os.linesep)
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
 
@@ -133,9 +170,9 @@ class GitGud:
         challenge = self.file_operator.get_challenge()
 
         if challenge.test(self.file_operator):
-            print("Level complete! `git gud progress` to advance to the next level")
+            print("Challenge complete! `git gud progress` to advance to the next level")
         else:
-            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
+            print("Challenge not complete, keep trying. `git gud reset` to start from scratch.")
 
     def handle_progress(self, args):
         self.assert_initialized()
@@ -190,16 +227,24 @@ class GitGud:
 
     def handle_load(self, args):
         self.assert_initialized()
+        if args.level_name in all_levels:
+            level = all_levels[args.level_name]
 
-        level = all_levels[args.level_name]
-
-        if args.challenge_name is not None:
-            challenge = level.challenges[args.challenge_name]
+            if args.challenge_name is not None:
+                if args.challenge_name in all_levels[args.level_name].challenges:
+                    challenge = level.challenges[args.challenge_name]
+                    challenge.setup(self.file_operator)
+                    self.file_operator.write_challenge(challenge)
+                else:
+                    print("Challenge \"{}\" does not exist".format(args.challenge_name))
+                    print("To view challenges/levels, use git gud challenges or git gud levels")
+            else:
+                challenge = next(iter(level.challenges.values()))
+                challenge.setup(self.file_operator)
+                self.file_operator.write_challenge(challenge)
         else:
-            challenge = next(iter(level.challenges.values()))
-
-        challenge.setup(self.file_operator)
-        self.file_operator.write_challenge(challenge)
+            print("Level \"{}\" does not exist".format(args.level_name))
+            print("To view challenges/levels, use git gud challenges or git gud levels")
 
     def handle_commit(self, args):
         self.assert_initialized()
@@ -230,7 +275,7 @@ class GitGud:
         raise NotImplementedError
 
     def handle_show_tree(self, args):
-        raise NotImplementedError
+        subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
 
     def parse(self):
         args = self.parser.parse_args()
