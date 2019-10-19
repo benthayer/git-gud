@@ -1,5 +1,10 @@
 ## So, you want to be a contributor?
-You're in luck! Git Gud was intentionally designed to make it easy for you to contribute! If the only thing you want to do is to make a challenge that tests to see if you can modify the tree in a simple way, then there's already the `BasicChallenge` class to deal with that.  If you want to do something more complicated, just throw out the idea. The easiest way to contribute is to open up an issue. Even though you're not writing code, GitHub still counts issues as contributions!
+You're in luck! 
+Git Gud was intentionally designed to make it easy for you to contribute! 
+If the only thing you want to do is to make a challenge that tests to see if you can modify the tree in a simple way, then there's already the `BasicChallenge` class to deal with that.
+If you want to do something more complicated, just throw out the idea.
+The easiest way to contribute is to open up an issue.
+Even though you're not writing code, GitHub still counts issues as contributions!
 
 Once you write your first issue, I'll respond and we can figure out how to design a level, add your feature, or fix your problem. If you want to end it there, you can, but I encourage you to continue. A Pull Request might just be a couple lines of code away, and I'll be happy to help you through any issues you encounter!  
 
