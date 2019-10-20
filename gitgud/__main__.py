@@ -21,7 +21,7 @@ class InitializationError(Exception):
 
 class GitGud:
     def __init__(self):
-        self.file_operator = get_operator()  # Only gets operator if in a valid gitgud repo
+        self.file_operator = get_operator()  # Only gets operator if in a valid git
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
@@ -42,7 +42,7 @@ class GitGud:
         instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
         reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
         test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
-        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
+        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='This command is now deprecated. To continue to the next level please use `git gud load` instead.')
         levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels')
         challenges_parser = self.subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified', description='List challenges in current level or in other level if specified')
         load_parser = self.subparsers.add_parser('load', help='Load a specific level or challenge', description='Load a specific level or challenge')
@@ -177,18 +177,19 @@ class GitGud:
     def handle_progress(self, args):
         self.assert_initialized()
 
-        print("Progressing to next level...")
+        # print("Progressing to next level...")
+        print("Command deprecated. Please use `git gud load` instead.")
 
-        challenge = self.file_operator.get_challenge()
+        # challenge = self.file_operator.get_challenge()
 
-        next_challenge = challenge.next_challenge
-        if next_challenge is not None:
-            next_challenge.setup(self.file_operator)
-            self.file_operator.write_challenge(next_challenge)
-        else:
-            print("Wow! You've complete every challenge, congratulations!")
-            print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
-            print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
+        # next_challenge = challenge.next_challenge
+        # if next_challenge is not None:
+        #     next_challenge.setup(self.file_operator)
+        #     self.file_operator.write_challenge(next_challenge)
+        # else:
+        #     print("Wow! You've completed every challenge, congratulations!")
+        #     print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/ ?")
+        #     print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
 
     def handle_levels(self, args):
         cur_level = self.file_operator.get_challenge().level
@@ -242,6 +243,19 @@ class GitGud:
                 challenge = next(iter(level.challenges.values()))
                 challenge.setup(self.file_operator)
                 self.file_operator.write_challenge(challenge)
+
+        elif args.level_name.lower() == "next":
+            challenge = self.file_operator.get_challenge()
+
+            next_challenge = challenge.next_challenge
+            if next_challenge is not None:
+                next_challenge.setup(self.file_operator)
+                self.file_operator.write_challenge(next_challenge)
+            else:
+                print("Wow! You've completed every challenge, congratulations!")
+                print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/ ?")
+                print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
+
         else:
             print("Level \"{}\" does not exist".format(args.level_name))
             print("To view challenges/levels, use git gud challenges or git gud levels")
