@@ -280,12 +280,12 @@ class GitGud:
         subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
 
     def parse(self):
-        args = self.parser.parse_known_args()
-        if args[0].command is None:
+        args, badargs = self.parser.parse_known_args()
+        if args.command is None:
             self.parser.print_help()
         else:
             try:
-                self.command_dict[args[0].command](args[0])
+                self.command_dict[args.command](args)
             except InitializationError:
                 print("Git gud has not been initialized. Initialize using \"git gud start\"")
                 pass
