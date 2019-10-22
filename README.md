@@ -37,7 +37,7 @@ Open up a command line and type the following in. Make sure you're in the direct
 git clone https://github.com/bthayer2365/git-gud
 cd git-gud
 python --version # Must say Python 3, any minor version
-python -m pip install -e . # Installs in edit mode so we can change files without needing to reinstall
+python -m pip install -e . # NB: Do not overlook the `.` after the -e option! Installs in edit mode so we can change files without needing to reinstall
 cd ..
 mkdir test
 cd test

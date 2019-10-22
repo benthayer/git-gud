@@ -209,9 +209,10 @@ class Challenge:
         self.name = name
         self.level = None
         self.next_challenge = None
+        self.human_name = None
 
     def full_name(self):
-        return '{} {}'.format(self.level.name, self.name)
+        return '{} {}: {}'.format(self.level.name, self.name, self.human_name)
 
     def setup(self, file_operator):
         pass

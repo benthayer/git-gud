@@ -42,7 +42,6 @@ class GitGud:
         instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
         reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
         test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
-        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels')
         challenges_parser = self.subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified', description='List challenges in current level or in other level if specified')
         load_parser = self.subparsers.add_parser('load', help='Load a specific level or challenge', description='Load a specific level or challenge')
@@ -68,7 +67,6 @@ class GitGud:
             'instructions': self.handle_instructions,
             'reset': self.handle_reset,
             'test': self.handle_test,
-            'progress': self.handle_progress,
             'levels': self.handle_levels,
             'challenges': self.handle_challenges,
             'load': self.handle_load,
@@ -170,25 +168,10 @@ class GitGud:
         challenge = self.file_operator.get_challenge()
 
         if challenge.test(self.file_operator):
-            print("Challenge complete! `git gud progress` to advance to the next level")
+            print("Challenge complete! `git gud load next` to advance to the next level")
         else:
             print("Challenge not complete, keep trying. `git gud reset` to start from scratch.")
 
-    def handle_progress(self, args):
-        self.assert_initialized()
-
-        print("Progressing to next level...")
-
-        challenge = self.file_operator.get_challenge()
-
-        next_challenge = challenge.next_challenge
-        if next_challenge is not None:
-            next_challenge.setup(self.file_operator)
-            self.file_operator.write_challenge(next_challenge)
-        else:
-            print("Wow! You've complete every challenge, congratulations!")
-            print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
-            print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
 
     def handle_levels(self, args):
         cur_level = self.file_operator.get_challenge().level
