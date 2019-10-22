@@ -112,14 +112,14 @@ class Operator:
             # TODO Log commit hash and info
 
         # TODO Checkout using name
-        head_is_branch = 0;                              #By default, assume HEAD is a commit.
+        head_is_commit = True;                              #By default, assume HEAD is a commit.
         for branch in self.repo.branches:
             if branch.name == head:
                 branch.checkout()
-                head_is_branch = 1;                      #Updates if HEAD is a branch.
-                
+                head_is_commit = False                      #Updates if HEAD is a branch.
+        
         #If HEAD isn't set as a branch, then 'head' is a commit id. Use it to checkout the commit.
-        if (~head_is_branch):
+        if (head_is_commit):
             self.repo.git.checkout(commit_objects[head])
 
     def get_current_tree(self):
