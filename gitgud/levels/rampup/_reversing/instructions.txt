@@ -1,0 +1,19 @@
+Sometimes you may find that you made changes that you aren't happy with. Wouldn't it be great if there was a simple way to undo all your changes and return to the last commit? Here are two ways!
+>>>
+The commands "git reset" and "git revert" both allow you to rollback changes to an older commit. While "git reset" is used for the local branch, "git revert" is used for public branches.
+>>>
+Let's start with "git reset". There are three modes: --soft, --mixed(default), and --hard.
+>>>
+The "git reset --soft <commit_ref>" is not used often. The branch pointer will move to the specified <commit_ref> (can use hash, HEAD^, HEAD~<num>, etc!). All the changes you've made since that commit will be left as staged ("Changes to be committed" in git status).
+>>>
+The "git reset --mixed <commit_ref>" is the default mode of git reset. In other words "git reset <commit_ref>" implies the mixed mode. The functionality is similar to soft mode—the branch pointer will be moved to <commit_ref> and changes will be preserved. The only difference is that your changes will be unstaged (will need to use "git add").
+>>>
+The third option is the most extreme (but may be the most useful). When you want to rollback the clock completely to a certain commit: use "git reset --hard <commit_ref>". This command will annihilate any changes you've made since the specified commit. Essentially, using this command will reset your repository to exactly what it was at the time of the specified commit. Be careful with this option!
+>>>
+I mentioned "git reset" isn't the only revision command.
+>>>
+The second method is "git revert". Using "git revert" will create a new commit that is the same as the one you wish to revert to. Assume we've made changes on top of the HEAD node that we don't like anymore. Using "git revert HEAD" will create a new commit that is the same as the original version of HEAD.
+>>>
+Now, that seems redundant doesn't it? However, that's precisely why revert is important! By being redundant, we are keeping track of the changes we made in the edited version of HEAD. Therefore, if we decided we actually needed those changes, we can return to them. This is unlike reset, which modifies the commit history (you wouldn't be able to recover the reset data).
+>>>
+Wow! You learned a lot (hopefully), prove yourself by completing the challenge!
