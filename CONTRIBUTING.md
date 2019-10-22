@@ -25,7 +25,7 @@ I am committed to that goal and more than happy to help to you learn to code and
 ```
 git clone https://github.com/bthayer2365/git-gud
 cd git-gud
-pip install -e . # Installs in edit mode so we can change files without needing to reinstall
+pip install -e . # NB: Do not overlook the `.` after the -e option! Installs in edit mode so we can change files without needing to reinstall
 cd ..
 mkdir test
 cd test
@@ -69,7 +69,7 @@ Instead, it'll think of `gitgud` exclusively as a package that can be imported.
 
 `gitgud\__main__.py` contains the `GitGud` class, which is loaded up with an argument parser and a bunch of methods to handle the different commands that Git Gud can be given. 
 The argument parser is defined in `.__init__()`. 
-It sets up all the commands that Git Gud is capable of handling, along with any sub-commands and additional arugments. 
+It sets up all the commands that Git Gud is capable of handling, along with any sub-commands and additional arguments. 
 The parser is run using `.parse()`. 
 The method will look for the command that was sent in and direct it to the appropriate handler. 
 Each command has its own handler, and the handlers will process the arguments and perform the appropriate tasks.
@@ -115,14 +115,13 @@ In this case, the parser knows that the previous commit is the parent and that t
 In the case of branches, the first commit on a branch will have a parent that is not the previous commit. 
 Instead, you'll need to include the colon and specify the parent commit. 
 Likewise, if a branch head or a tag points to a commit, then we must include the parenthesis, otherwise, we can leave it out. 
-The most complete example of a spec file is `gitgud/levels/extras/_octopus/test.spec`. 
 If you're looking for more details, check out the other spec files and `parse_spec` in `gitgud/levels/util.py`
 
 #### `CONTRIBUTING.md`
 The purpose of `CONTRIBUTING.md` is to serve as a starting point for new developers. 
 It exists mainly to cover the "why", not the "what". 
 To see the specifics of how to implement something, you're encouraged to look through the source code and see for yourself what everything does. 
-If something isn't self-explanitory, comment on whatever issue you're working on or post a new issue. 
+If something isn't self-explanatory, comment on whatever issue you're working on or post a new issue. 
 I'll be happy to respond there and to update this document. 
 
 ## Submitting Your Changes
