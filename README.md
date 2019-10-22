@@ -44,7 +44,7 @@ cd test
 git gud start # Initializes a git repository and lets us start using git gud from within this folder
 ```
 
-Once it's installed, you can access all the features that Git Gud has to offer. If you just want to get started, type in `git gud instructions`. The first level is already loaded for you, and all you just have to do is follow the instructions and it'll guide you through the challenges. Once you think you're done with a level, run `git gud test` to see of you've completed the challenge. If you've solved it, run `git gud progress` to move on to the next challenge! Look at the full command list below for a complete command list.
+Once it's installed, you can access all the features that Git Gud has to offer. If you just want to get started, type in `git gud instructions`. The first level is already loaded for you, and all you just have to do is follow the instructions and it'll guide you through the challenges. Once you think you're done with a level, run `git gud test` to see of you've completed the challenge. If you've solved it, run `git gud load next` to move on to the next challenge! Look at the full command list below for a complete command list.
 
 There will be several challenges within each level. Complete all of them to complete the level, or feel free to skip ahead!
 
@@ -62,8 +62,6 @@ Some commands you'll want to learn and what they do:
   * Will reset the current challenge in case you mess up
 * git gud test
   * Tests to see if the current challenge is complete. If it congratulates you, you've successfully completed the challenge and you can move on! (You can also move on anyways)
-* git gud progress
-  * Takes you to the next challenge
 * git gud levels
   * Displays all levels
 * git gud challenges
@@ -74,6 +72,8 @@ Some commands you'll want to learn and what they do:
   * Begin the first challenge of the specified level
 * git gud load <level_name> <challenge_name>
   * Begin the specified challenge (it is optional to specify the challenge)
+* git gud load next
+  * Takes you to the next challenge
 * git gud commit
   * Commit an empty file with a unique name
 * git gud commit <name>
