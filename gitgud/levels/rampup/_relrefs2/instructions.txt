@@ -1,0 +1,7 @@
+Now that you are a master with the ^ operator, let's learn how to use the ~operator.
+>>>
+The tilde operator is used much the same way as the ^ operator; although it can be more concise than the ^ operator. The usage of the ~ operator is this: "git checkout HEAD~<num>". Using this command will place the HEAD pointer at the commit node that is <num> above current HEAD. So, if I want to check out the node 5 commits before HEAD, I would use: "git checkout HEAD~5". This command also works with branch names instead of HEAD.
+>>>
+A useful application of the tilde operator is the command "git branch -f <branch_name> HEAD~<num>". This command allows you to move a certain branch to a certain commit node <num> above the current node.
+>>>
+Easy right? Use what you've learned about the tilde operator to solve the next challenge!
