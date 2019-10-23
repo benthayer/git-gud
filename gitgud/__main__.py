@@ -41,6 +41,7 @@ class GitGud:
         status_parser = self.subparsers.add_parser('status', help='Print out the current level', description='Print out the current level')
         instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
         reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
+        reload_parser = self.subparsers.add_parser('reload', help='Reset the current level. Reload command is an alias for reset command.', description='Reset the current level. Reload command is an alias for reset command.')
         test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels')
@@ -67,6 +68,7 @@ class GitGud:
             'status': self.handle_status,
             'instructions': self.handle_instructions,
             'reset': self.handle_reset,
+            'reload': self.handle_reset,
             'test': self.handle_test,
             'progress': self.handle_progress,
             'levels': self.handle_levels,
