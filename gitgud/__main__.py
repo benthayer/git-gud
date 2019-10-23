@@ -280,7 +280,7 @@ class GitGud:
         subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
 
     def parse(self):
-        args, badargs = self.parser.parse_known_args()
+        args, _ = self.parser.parse_known_args()
         if args.command is None:
             self.parser.print_help()
         else:
