@@ -147,6 +147,7 @@ class GitGud:
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
 
         self.file_operator.get_challenge().setup(self.file_operator)
+        self.handle_show_tree(args)
 
     def handle_status(self, args):
         if self.is_initialized():
@@ -186,12 +187,16 @@ class GitGud:
 
         next_challenge = challenge.next_challenge
         if next_challenge is not None:
-            next_challenge.setup(self.file_operator)
-            self.file_operator.write_challenge(next_challenge)
+            self.handle_load_challenge(args, next_challenge)
         else:
             print("Wow! You've complete every challenge, congratulations!")
             print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
             print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
+
+    def handle_load_challenge(self, args, challenge):
+        challenge.setup(self.file_operator)
+        self.file_operator.write_challenge(challenge)
+        self.handle_show_tree(args)
 
     def handle_levels(self, args):
         cur_level = self.file_operator.get_challenge().level
@@ -224,7 +229,6 @@ class GitGud:
         else:
             print("Challenges for level \"{}\" : \n".format(level.name))
 
-        
         for index, challenge in enumerate(level.challenges.values()):
             print(str(index + 1) + ": " + challenge.name)
 
@@ -236,17 +240,13 @@ class GitGud:
             if args.challenge_name is not None:
                 if args.challenge_name in all_levels[args.level_name].challenges:
                     challenge = level.challenges[args.challenge_name]
-                    challenge.setup(self.file_operator)
-                    self.file_operator.write_challenge(challenge)
-                    self.handle_show_tree(args)
+                    self.handle_load_challenge(args, challenge)
                 else:
                     print("Challenge \"{}\" does not exist".format(args.challenge_name))
                     print("To view challenges/levels, use git gud challenges or git gud levels")
             else:
                 challenge = next(iter(level.challenges.values()))
-                challenge.setup(self.file_operator)
-                self.file_operator.write_challenge(challenge)
-                self.handle_show_tree(args)
+                self.handle_load_challenge(challenge)
         else:
             print("Level \"{}\" does not exist".format(args.level_name))
             print("To view challenges/levels, use git gud challenges or git gud levels")
