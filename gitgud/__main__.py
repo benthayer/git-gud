@@ -90,6 +90,11 @@ class GitGud:
         if not self.is_initialized():
             raise InitializationError("Git gud not initialized. Use \"git gud start\" to initialize")
 
+    def load_challenge(self, challenge):
+        challenge.setup(self.file_operator)
+        self.file_operator.write_challenge(challenge)
+        show_tree()
+
     def handle_help(self, args):
         if args.command_name is None:
             self.parser.print_help()
@@ -196,11 +201,6 @@ class GitGud:
             print("Wow! You've complete every challenge, congratulations!")
             print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
             print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
-
-    def load_challenge(self, challenge):
-        challenge.setup(self.file_operator)
-        self.file_operator.write_challenge(challenge)
-        show_tree()
 
     def handle_levels(self, args):
         cur_level = self.file_operator.get_challenge().level
