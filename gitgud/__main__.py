@@ -15,6 +15,10 @@ from gitgud.hooks import all_hooks
 # TODO Add test suite so testing can be separate from main code
 
 
+def show_tree():
+    subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
+
+
 class InitializationError(Exception):
     pass
 
@@ -147,7 +151,7 @@ class GitGud:
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
 
         self.file_operator.get_challenge().setup(self.file_operator)
-        self.handle_show_tree(args)
+        show_tree()
 
     def handle_status(self, args):
         if self.is_initialized():
@@ -167,7 +171,7 @@ class GitGud:
         challenge = self.file_operator.get_challenge()
         print("Resetting...")
         challenge.setup(self.file_operator)
-        self.handle_show_tree(args)
+        show_tree()
 
     def handle_test(self, args):
         self.assert_initialized()
@@ -187,16 +191,16 @@ class GitGud:
 
         next_challenge = challenge.next_challenge
         if next_challenge is not None:
-            self.handle_load_challenge(args, next_challenge)
+            self.load_challenge(next_challenge)
         else:
             print("Wow! You've complete every challenge, congratulations!")
             print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
             print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
 
-    def handle_load_challenge(self, args, challenge):
+    def load_challenge(self, challenge):
         challenge.setup(self.file_operator)
         self.file_operator.write_challenge(challenge)
-        self.handle_show_tree(args)
+        show_tree()
 
     def handle_levels(self, args):
         cur_level = self.file_operator.get_challenge().level
@@ -240,13 +244,13 @@ class GitGud:
             if args.challenge_name is not None:
                 if args.challenge_name in all_levels[args.level_name].challenges:
                     challenge = level.challenges[args.challenge_name]
-                    self.handle_load_challenge(args, challenge)
+                    self.load_challenge(challenge)
                 else:
                     print("Challenge \"{}\" does not exist".format(args.challenge_name))
                     print("To view challenges/levels, use git gud challenges or git gud levels")
             else:
                 challenge = next(iter(level.challenges.values()))
-                self.handle_load_challenge(challenge)
+                self.load_challenge(challenge)
         else:
             print("Level \"{}\" does not exist".format(args.level_name))
             print("To view challenges/levels, use git gud challenges or git gud levels")
@@ -280,7 +284,7 @@ class GitGud:
         raise NotImplementedError
 
     def handle_show_tree(self, args):
-        subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
+        show_tree()
 
     def parse(self):
         args, _ = self.parser.parse_known_args()
