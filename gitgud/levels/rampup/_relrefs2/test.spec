@@ -1,6 +1,7 @@
-1 (bugFix)
-2
-4
-5 (master)
-6
-2
+1
+2 : 1
+4 (master)
+3 : 1
+5
+6 (bugFix)
+3
