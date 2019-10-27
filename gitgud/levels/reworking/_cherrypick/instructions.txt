@@ -1,0 +1,11 @@
+This practice level will familiarize with you with the command git cherry-pick.
+>>>
+Cherry-pick in git allows you to copy a series of commits below your current location (HEAD).
+>>>
+It appears in the form of "git cherry-pick <commit1> <commit2> <...>"
+>>>
+To use this properly, lets say we have some work in our branch that we want to copy into master. While we can accomplish this through a rebase, we can also do this through cherry-pick.
+Let's say there are 3 commits in the branch: commit2, commit3, and commit4. If we want to copy commit2 and commit4 into master then we would use the command "git cherry-pick commit2 commit3".
+>>>
+Now lets say there are 3 branches: branch1, branch2, and branch3. branch1 contains commit2 and commit3, branch2 contains commit4 and commit5, branch3 contains commit6 and commit7.
+To complete this level, copy some work commit3, commit4, and commit7 from the three branches into master.
