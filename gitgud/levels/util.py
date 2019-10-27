@@ -1,7 +1,5 @@
 import os
 
-from collections import OrderedDict
-
 from copy import deepcopy
 
 
@@ -207,6 +205,10 @@ class NamedList:
             return self.items[self.namedict[query]]
         else:
             return None
+    def __iter__(self):
+        return self.items.__iter__()
+    def __len__(self):
+        return len(self.items)
     def __setitem__(self, key, item):
         if isinstance(key, str):
             self.namedict[key] = len(self.items)
@@ -218,11 +220,11 @@ class NamedList:
     def keys(self):
         return self.namedict.keys()
 
-class Level:
+class Level():
     def __init__(self, name, challenges):
         self.name = name
-        self.challenges = OrderedDict()
-        for challenge in challenges.values():
+        self.challenges = NamedList()
+        for challenge in challenges:
             challenge.level = self
             self.challenges[challenge.name] = challenge
 
