@@ -193,11 +193,11 @@ def test_level(level, test):
     return True
 
 class NamedList:
-    # feed in tuple (reference, Object), where the reference is of type str
+    # Pass in list of tuples in format (reference, Object), where reference is of type str
     def __init__(self, data=[]):
-        # Pass in a list with tuples
-        self.namedict = {data[i][0]:i for i in range(len(data))}
-        self.items = [obj for nam,obj in data]
+        self.namedict = {d[0]:i for i, d in enumerate(data)}
+        self.items = [obj for name, obj in data]
+    
     def __getitem__(self, query):
         if isinstance(query, int):
             return self.items[query]
@@ -215,6 +215,7 @@ class NamedList:
             self.items.append(item)
         else:
             raise TypeError
+    
     def values(self):
         return self.items
     def keys(self):
