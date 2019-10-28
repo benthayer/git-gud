@@ -31,7 +31,7 @@ class Operator:
     def add_and_commit(self, name):
         # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
         self.add_file_to_index(name)
-        commit = self.repo.index.commit(name, author=actor, committer=actor)
+        commit = self.repo.index.commit(name, author=actor, committer=actor, skip_hooks=True)
 
         return commit
     
@@ -49,7 +49,7 @@ class Operator:
         # TODO GitPython set index to working tree
         self.repo.git.add(update=True)
         # TODO GitPython clear index (for initial commits)
-        self.repo.index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
+        self.repo.index.commit("Clearing index", skip_hooks=True)  # Easiest way to clear the index is to commit an empty directory
 
         dirs.remove(self.path + os.path.sep)  # Don't remove current directory
 
@@ -81,7 +81,7 @@ class Operator:
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-                self.repo.index.commit(name, author=actor, committer=actor, parent_commits=parents)
+                self.repo.index.commit(name, author=actor, committer=actor, parent_commits=parents, skip_hooks=True)
             else:
                 # TODO GitPython octopus merge
                 self.repo.git.merge(*parents)
