@@ -12,4 +12,4 @@ The caret operator can be stacked. That is, you can use ^^ to refer to the grand
 >>>
 Likewise, the ^ operator can be used on the HEAD. Using "git checkout HEAD^" allows us to move back one commit relative to the current commit we are on. Repeatedly using this command is a convenient way to move back in time!
 >>>
-Woohoo! You've learned how to use the caret operator to refer to commit objects. Now, try using the caret operator to checkout the parent node of bugFix!
+Woohoo! You've learned how to use the caret operator to refer to commit objects. Use "git gud show-tree" to see the initial state of the commit history. Now, apply what you've learned about the ^ operator to checkout commit 4. (Hint: how is commit 4 related to HEAD?)
