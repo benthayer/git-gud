@@ -1,6 +1,8 @@
 Sometimes you may find that you made changes that you aren't happy with. Wouldn't it be great if there was a simple way to undo all your changes and return to the last commit? Here are two ways!
 >>>
-The commands "git reset" and "git revert" both allow you to rollback changes to an older commit. While "git reset" is used for the local branch, "git revert" is used for public branches.
+The commands "git reset" and "git revert" both allow you to rollback changes to an older commit. While "git reset" is used for the local branch, "git revert" is typically used for remote branches that other people are likely to have based their work off of.
+>>>
+To be brief, "git reset" throws away changes that you have made. In contrast, "git revert" preserves the changes you made and gives you another clean copy.
 >>>
 Let's start with "git reset". There are three modes: --soft, --mixed(default), and --hard.
 >>>
