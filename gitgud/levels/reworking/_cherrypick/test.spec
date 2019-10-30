@@ -5,7 +5,7 @@
 5 (side)
 6 : 1
 7 (another)
-8 : 1
-9
-10 (master)
+3' : 1
+4'
+7' (master)
 master
