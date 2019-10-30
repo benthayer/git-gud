@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import webbrowser
 
 import argparse
 
@@ -54,6 +55,7 @@ class GitGud:
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
+        contrib_parser = self.subparsers.add_parser('contributors', help='Show all the contributors of the project', description='Show all the contributors of the project')
 
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
@@ -81,6 +83,7 @@ class GitGud:
             'commit': self.handle_commit,
             'goal': self.handle_goal,
             'show-tree': self.handle_show_tree,
+            'contributors': self.handle_contrib,
         }
 
     def is_initialized(self):
@@ -285,6 +288,10 @@ class GitGud:
 
     def handle_show_tree(self, args):
         show_tree()
+
+    def handle_contrib(self, args):
+        contrib_website = "https://github.com/bthayer2365/git-gud/graphs/contributors"
+        webbrowser.open_new(contrib_website)
 
     def parse(self):
         args, _ = self.parser.parse_known_args()
