@@ -132,9 +132,8 @@ class GitGud:
         with open(self.file_operator.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
         with open(self.file_operator.level_path, 'w+') as level_file:
-            level1 = all_levels[0]
-            challenge1 = level1.challenges[0]
-            level_file.write(challenge1.full_name())
+            level_file.write(all_levels[0][0].full_name())
+
 
         python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
@@ -165,7 +164,7 @@ class GitGud:
 
         challenge = self.file_operator.get_challenge()
         print("Resetting...")
-        challenge.setup(self.file_operator)
+        level[0].setup(self.file_operator)
 
     def handle_test(self, args):
         self.assert_initialized()
@@ -200,8 +199,8 @@ class GitGud:
         for level in all_levels:
             # TODO Add description
             # 10 characters for the short IDs. 
-            print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level.challenges), ("", "s")[len(level.challenges) > 1]))
-            for index, challenge in enumerate(level.challenges):
+            print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level), ("", "s")[len(level) > 1]))
+            for index, challenge in enumerate(level):
                 # " " * (characters allocated for ID - 6)
                 print("{}Challenge {:>2} : {:<10}".format(" " * 4, index + 1, challenge.name))
 
@@ -224,7 +223,7 @@ class GitGud:
             print("Challenges for level \"{}\" : \n".format(level.name))
 
         
-        for index, challenge in enumerate(level.challenges):
+        for index, challenge in enumerate(level):
             print(str(index + 1) + ": " + challenge.name)
 
     def handle_load(self, args):
@@ -233,7 +232,7 @@ class GitGud:
             level = all_levels[args.level_name]
 
             if args.challenge_name is not None:
-                if args.challenge_name in all_levels[args.level_name].challenges:
+                if args.challenge_name in all_levels[args.level_name]:
                     challenge = level.challenges[args.challenge_name]
                     challenge.setup(self.file_operator)
                     self.file_operator.write_challenge(challenge)
@@ -241,7 +240,7 @@ class GitGud:
                     print("Challenge \"{}\" does not exist".format(args.challenge_name))
                     print("To view challenges/levels, use git gud challenges or git gud levels")
             else:
-                challenge = next(iter(level.challenges))
+                challenge = level[0]
                 challenge.setup(self.file_operator)
                 self.file_operator.write_challenge(challenge)
         else:

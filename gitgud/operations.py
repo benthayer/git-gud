@@ -163,7 +163,7 @@ class Operator:
     def get_challenge(self):
         with open(self.level_path) as level_file:
             level_name, challenge_name = level_file.read().split()
-        return all_levels[level_name].challenges[challenge_name]
+        return all_levels[level_name][challenge_name]
 
     def write_challenge(self, challenge):
         with open(self.level_path, 'w+') as level_file:

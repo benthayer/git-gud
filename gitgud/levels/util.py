@@ -193,42 +193,51 @@ def test_level(level, test):
     return True
 
 class NamedList:
-    # Pass in list of tuples in format (reference, Object), where reference is of type str
-    def __init__(self, data=[]):
-        self.namedict = {d[0]:i for i, d in enumerate(data)}
-        self.items = [obj for name, obj in data]
+    # names is a list populated with type str, items is a list populated with any type 
+    def __init__(self, names, items):
+        assert len(names) == len(items)
+        self._name_dict = {name:index for index, name in enumerate(names)}
+        self._items = [item for name, item in zip(names, items)]
     
     def __getitem__(self, query):
         if isinstance(query, int):
-            return self.items[query]
+            return self._items[query]
         elif isinstance(query, str):
-            return self.items[self.namedict[query]]
+            return self._items[self._name_dict[query]]
         else:
             return None
+
     def __iter__(self):
-        return self.items.__iter__()
+        return self._items.__iter__()
+
     def __len__(self):
-        return len(self.items)
+        return len(self._items)
+
     def __setitem__(self, key, item):
         if isinstance(key, str):
-            self.namedict[key] = len(self.items)
-            self.items.append(item)
+            self._name_dict[key] = len(self._items)
+            self._items.append(item)
         else:
             raise TypeError
-    
-    def values(self):
-        return self.items
-    def keys(self):
-        return self.namedict.keys()
 
-class Level():
+    def values(self):
+        return self._items
+
+    def keys(self):
+        return self._name_dict.keys()
+
+class Level(NamedList):
     def __init__(self, name, challenges):
         self.name = name
-        self.challenges = NamedList()
-        for challenge in challenges:
+        self._name_dict = {challenge.name:index for index, challenge in enumerate(challenges)}
+        self._items = challenges
+        for challenge in self._items:
             challenge.level = self
-            self.challenges[challenge.name] = challenge
 
+class AllLevels(NamedList):
+    def __init__(self, levels):
+        self._name_dict = {level.name:index for index, level in enumerate(levels)}
+        self._items = levels
 
 class Challenge:
     def __init__(self, name):
