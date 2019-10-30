@@ -233,6 +233,8 @@ class Level(NamedList):
         self._items = challenges
         for challenge in self._items:
             challenge.level = self
+    def challenges():
+        return self._items
 
 class AllLevels(NamedList):
     def __init__(self, levels):
