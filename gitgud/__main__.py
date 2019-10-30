@@ -150,7 +150,7 @@ class GitGud:
         for git_hook_name, module_hook_name in all_hooks:
             with open(os.path.join(self.file_operator.hooks_path, git_hook_name), 'w+') as hook_file:
                 hook_file.write('#!/bin/sh' + os.linesep)
-                hook_file.write('cat - | ' + python_exec + ' -m gitgud.hooks.' + module_hook_name + ' $1' +os.linesep)
+                hook_file.write('cat - | ' + python_exec + ' -m gitgud.hooks.' + module_hook_name + ' "$@"' +os.linesep)
                 hook_file.write('exit 0' + os.linesep)
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
