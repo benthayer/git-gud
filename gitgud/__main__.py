@@ -55,7 +55,7 @@ class GitGud:
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
-        contrib_parser = self.subparsers.add_parser('contributers', help='Show all the contributers of the project', description='Show all the contributers of the project')
+        contrib_parser = self.subparsers.add_parser('contributors', help='Show all the contributors of the project', description='Show all the contributors of the project')
 
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
@@ -83,7 +83,7 @@ class GitGud:
             'commit': self.handle_commit,
             'goal': self.handle_goal,
             'show-tree': self.handle_show_tree,
-            'contributers': self.handle_contrib,
+            'contributors': self.handle_contrib,
         }
 
     def is_initialized(self):
