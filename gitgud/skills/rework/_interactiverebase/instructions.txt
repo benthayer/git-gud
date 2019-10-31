@@ -1,6 +1,6 @@
 This practice level will familiarize with using interactive rebasing.
 >>>
-This is an alternative way of using the "rebase" command with "-i" right after it. For example, "git rebase -i HEAD~4" allows you to change 
+This is an alternative way of using the "rebase" command with "-i" right after it. For example, "git rebase -i HEAD~4" allows you to change the last 4 commits with the text editor.
 >>>
 When you include this option, git will open a text editor to show which commits will be copied below the rebase target.
 In the text editor, you're given the ability to do three things: reorder commits, omit commits, and squash commits(combine commits).
