@@ -1,0 +1,13 @@
+This practice level will familiarize with using interactive rebasing.
+>>>
+This is an alternative way of using the "rebase" command with "-i" right after it. For example, "git rebase -i HEAD~4" allows you to change 
+>>>
+When you include this option, git will open a text editor to show which commits will be copied below the rebase target.
+In the text editor, you're given the ability to do three things: reorder commits, omit commits, and squash commits(combine commits).
+>>>
+In order to reorder commits, simply change the order of the commits in the text editor.
+In order to omit a commit, simply delete the "pick" before the commit.
+In order to squash commits, simply replace "pick" with "squash"
+>>>
+Now let's say there are 2 branches: overHere and master. overHere contains commit 1. master contains commit 2, commit 3, commit 4, and commit 5.
+In order to complete this level, reoder the commits using rebase -i so that commit 3, commit 5, and commit 4 are copied into master in that order.

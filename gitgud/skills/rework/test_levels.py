@@ -11,6 +11,8 @@ level_tests = [
             'git cherry-pick bugFix',
             'git cherry-pick side~',
             'git cherry-pick another'
+        ],
+        skill['interactiverebase'], [
         ]
     )
 ]

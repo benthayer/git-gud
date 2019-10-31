@@ -4,6 +4,7 @@ from gitgud.skills.util import Skill
 skill = Skill(
     'rework',
     [
-        BasicLevel('cherrypicking', __name__)
+        BasicLevel('cherrypicking', __name__),
+        BasicLevel('interactiverebase', __name__)
     ]
 )
