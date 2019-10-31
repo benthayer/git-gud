@@ -164,7 +164,7 @@ class GitGud:
 
         challenge = self.file_operator.get_challenge()
         print("Resetting...")
-        level[0].setup(self.file_operator)
+        challenge.setup(self.file_operator)
 
     def handle_test(self, args):
         self.assert_initialized()
@@ -228,21 +228,20 @@ class GitGud:
 
     def handle_load(self, args):
         self.assert_initialized()
-        if args.level_name in all_levels:
+        if args.level_name in all_levels.keys():
             level = all_levels[args.level_name]
 
             if args.challenge_name is not None:
-                if args.challenge_name in all_levels[args.level_name]:
-                    challenge = level.challenges[args.challenge_name]
+                if args.challenge_name in all_levels[args.level_name].keys():
+                    challenge = level[args.challenge_name]
                     challenge.setup(self.file_operator)
                     self.file_operator.write_challenge(challenge)
                 else:
                     print("Challenge \"{}\" does not exist".format(args.challenge_name))
                     print("To view challenges/levels, use git gud challenges or git gud levels")
             else:
-                challenge = level[0]
-                challenge.setup(self.file_operator)
-                self.file_operator.write_challenge(challenge)
+                level[0].setup(self.file_operator)
+                self.file_operator.write_challenge(level[0])
         else:
             print("Level \"{}\" does not exist".format(args.level_name))
             print("To view challenges/levels, use git gud challenges or git gud levels")
