@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from gitgud.levels.intro import all_challenges as intro_challenges
 from gitgud.levels.merging import all_challenges as merging_challenges
+from gitgud.levels.reworking import all_challenges as reworking_challenges
 
 from gitgud.levels.util import Level
 
@@ -9,7 +10,7 @@ all_levels = OrderedDict()
 
 all_levels['intro'] = Level('intro', intro_challenges)
 all_levels['merging'] = Level('merging', merging_challenges)
-
+all_levels['reworking'] = Level('reworking', reworking_challenges)
 
 def _add_next_challenges():
     last_challenge = None
