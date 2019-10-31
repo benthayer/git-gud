@@ -1,4 +1,4 @@
-1 (master, local)
+1 (master)
 3
 4 : 3
 5 : 3
