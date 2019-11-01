@@ -1,14 +1,9 @@
 import os
 import shutil
-import subprocess
 
 from glob import glob
 
 from git import Repo
-from git import Head
-
-from git.exc import GitCommandError
-from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
 from gitgud import actor_string
@@ -16,23 +11,18 @@ from gitgud.levels import all_levels
 
 
 class Operator:
-    def __init__(self, path, initialize=False):
+    def __init__(self, path, initialize_repo=True):
         self.path = path
-        self.repo = None
-
-        if initialize:
-            self.initialize()
+        if initialize_repo:
+            self.repo = Repo(os.getcwd())
+        else:
+            self.repo = None
 
         self.git_path = os.path.join(self.path, '.git')
+        self.hooks_path = os.path.join(self.path, '.git', 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
         self.level_path = os.path.join(self.gg_path, 'level')
-
-    def initialize(self):
-        try:
-            self.repo = Repo(os.getcwd())
-        except InvalidGitRepositoryError:
-            self.repo = Repo.init(os.getcwd())
 
     def add_file_to_index(self, filename):
         open('{}/{}'.format(self.path, filename), 'w+').close()
@@ -44,9 +34,6 @@ class Operator:
         commit = self.repo.index.commit(name, author=actor, committer=actor)
 
         return commit
-
-    def show_tree(self):
-        subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
     
     def clear_tree_and_index(self):
         dirs = []
@@ -112,9 +99,15 @@ class Operator:
             # TODO Log commit hash and info
 
         # TODO Checkout using name
+        head_is_commit = True;                              #By default, assume HEAD is a commit.
         for branch in self.repo.branches:
             if branch.name == head:
                 branch.checkout()
+                head_is_commit = False                      #Updates if HEAD is a branch.
+        
+        #If HEAD isn't set as a branch, then 'head' is a commit id. Use it to checkout the commit.
+        if (head_is_commit):
+            self.repo.git.checkout(commit_objects[head])
 
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json
@@ -198,7 +191,5 @@ def get_operator():
         path = os.path.sep.join(cwd[:i+1])
         gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
         if os.path.isdir(gg_path):
-            operator = Operator(path)
-            operator.initialize()
-            return operator
+            return Operator(path)
     return None
