@@ -1,0 +1,13 @@
+This practice level is designed to put to use your previously learned skills.
+>>>
+Let's say you were working on a project and you have some changes to newImage and caption which are stacked on top of each other in your repository. 
+To complete the project we need to change newImage, despite it being a previous commit. There are several ways to do this.
+One method is to first reorder the commits with rebase -i. 
+Then modify the commit with commit --amend.
+Next, reorder the commits to how they were previously.
+Finally, move master back to the updated part of the tree.
+>>>
+To visualize this lets say that there are 3 commits, commit 1 "master" , commit 2 "newImage", commit 3 "caption" .
+>>>
+To complete this level copy the two commits with the modified newImage commit into the master branch using the above method or one of your choice. 
+hint: HEAD is currently at caption
