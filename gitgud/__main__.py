@@ -132,6 +132,8 @@ class GitGud:
                 return
         else:
             print('Force initializing git gud.')
+            if not self.file_operator:
+                self.file_operator = Operator(os.getcwd(), initialize_repo=False)
 
         # After here, we initialize everything
         try:
