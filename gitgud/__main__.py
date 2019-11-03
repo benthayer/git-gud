@@ -228,11 +228,11 @@ class GitGud:
 
     def handle_load(self, args):
         self.assert_initialized()
-        if args.level_name in all_levels.keys():
+        if args.level_name in all_levels:
             level = all_levels[args.level_name]
 
             if args.challenge_name is not None:
-                if args.challenge_name in all_levels[args.level_name].keys():
+                if args.challenge_name in all_levels[args.level_name]:
                     challenge = level[args.challenge_name]
                     challenge.setup(self.file_operator)
                     self.file_operator.write_challenge(challenge)

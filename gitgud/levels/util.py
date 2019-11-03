@@ -197,7 +197,7 @@ class NamedList:
     def __init__(self, names, items):
         assert len(names) == len(items)
         self._name_dict = {name:index for index, name in enumerate(names)}
-        self._items = [item for name, item in zip(names, items)]
+        self._items = items
     
     def __getitem__(self, query):
         if isinstance(query, int):
@@ -205,7 +205,7 @@ class NamedList:
         elif isinstance(query, str):
             return self._items[self._name_dict[query]]
         else:
-            return None
+            raise ValueError('Bad key type.')
 
     def __iter__(self):
         return self._items.__iter__()
@@ -220,9 +220,15 @@ class NamedList:
         else:
             raise TypeError
 
+    def __contains__(self, key):
+        if isinstance(key, str):
+            return key in self._name_dict.keys()
+        else:
+            return key in self._items()
+
     def values(self):
         return self._items
-
+    
     def keys(self):
         return self._name_dict.keys()
 
@@ -231,13 +237,20 @@ class Level(NamedList):
         self.name = name
         self._name_dict = {challenge.name:index for index, challenge in enumerate(challenges)}
         self._items = challenges
-        for challenge in self._items:
+
+        for challenge in challenges:
             challenge.level = self
 
 class AllLevels(NamedList):
     def __init__(self, levels):
         self._name_dict = {level.name:index for index, level in enumerate(levels)}
         self._items = levels
+
+    def __contains__(self, key):
+        if isinstance(key, str):
+            return key in self._name_dict.keys()
+        else:
+            return key in self._items()
 
 class Challenge:
     def __init__(self, name):

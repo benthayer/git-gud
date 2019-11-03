@@ -1,13 +1,13 @@
-from gitgud.levels.intro import all_challenges as intro_challenges
-from gitgud.levels.merging import all_challenges as merging_challenges
+from gitgud.levels.intro import level as intro_level
+from gitgud.levels.merging import level as merging_level
 
 from gitgud.levels.util import Level
 from gitgud.levels.util import AllLevels
 
 all_levels = AllLevels(
     [
-        Level('intro', intro_challenges),
-        Level('merging', merging_challenges)
+        intro_level,
+        merging_level
     ]
 )
 
