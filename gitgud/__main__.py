@@ -17,6 +17,7 @@ from gitgud.hooks import all_hooks
 
 
 def show_tree():
+    print("Simulating: git log --graph --oneline --all ")
     subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
 
 
