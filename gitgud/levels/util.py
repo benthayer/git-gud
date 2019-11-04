@@ -245,12 +245,14 @@ class AllLevels(NamedList):
     def __init__(self, levels):
         self._name_dict = {level.name:index for index, level in enumerate(levels)}
         self._items = levels
-
-    def __contains__(self, key):
-        if isinstance(key, str):
-            return key in self._name_dict.keys()
-        else:
-            return key in self._items()
+    
+    def _add_next_challenges(self):
+        last_challenge = None
+        for level in self:
+            for challenge in level:
+                if last_challenge is not None:
+                    last_challenge.next_challenge = challenge
+                last_challenge = challenge
 
 class Challenge:
     def __init__(self, name):
