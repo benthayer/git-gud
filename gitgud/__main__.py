@@ -148,9 +148,8 @@ class GitGud:
         with open(self.file_operator.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
         with open(self.file_operator.level_path, 'w+') as level_file:
-            level1 = next(iter(all_levels.values()))
-            challenge1 = next(iter(level1.challenges.values()))
-            level_file.write(challenge1.full_name())
+            level_file.write(all_levels[0][0].full_name())
+
 
         python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
@@ -226,11 +225,11 @@ class GitGud:
 
         print("Currently on level: \"{}\"\n".format(cur_level.name))
         
-        for level in all_levels.values():
+        for level in all_levels:
             # TODO Add description
             # 10 characters for the short IDs. 
-            print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level.challenges), ("", "s")[len(level.challenges) > 1]))
-            for index, challenge in enumerate(level.challenges.values()):
+            print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level), ("", "s")[len(level) > 1]))
+            for index, challenge in enumerate(level):
                 # " " * (characters allocated for ID - 6)
                 print("{}Challenge {:>2} : {:<10}".format(" " * 4, index + 1, challenge.name))
 
@@ -252,7 +251,7 @@ class GitGud:
         else:
             print("Challenges for level \"{}\" : \n".format(level.name))
 
-        for index, challenge in enumerate(level.challenges.values()):
+        for index, challenge in enumerate(level):
             print(str(index + 1) + ": " + challenge.name)
 
     def handle_load(self, args):
@@ -261,15 +260,14 @@ class GitGud:
             level = all_levels[args.level_name]
 
             if args.challenge_name is not None:
-                if args.challenge_name in all_levels[args.level_name].challenges:
-                    challenge = level.challenges[args.challenge_name]
+                if args.challenge_name in all_levels[args.level_name]:
+                    challenge = level[args.challenge_name]
                     self.load_challenge(challenge)
                 else:
                     print("Challenge \"{}\" does not exist".format(args.challenge_name))
                     print("To view challenges/levels, use git gud challenges or git gud levels")
             else:
-                challenge = next(iter(level.challenges.values()))
-                self.load_challenge(challenge)
+                self.load_challenge(level[0])
         else:
             print("Level \"{}\" does not exist".format(args.level_name))
             print("To view challenges/levels, use git gud challenges or git gud levels")
