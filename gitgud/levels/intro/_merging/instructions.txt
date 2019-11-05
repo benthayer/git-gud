@@ -8,6 +8,6 @@ Commit once ("git gud commit")
 >>>
 Go back to master with "git checkout master"
 >>>
-Commit another time the same way that you did before. Use the command "git log --graph --oneline --all"; take note of the commit tree pre-merge.
+Commit another time the same way that you did before. Use the command "git gud show-tree" to see the commit tree; Take a note of what it looks like before and after the merge!
 >>>
-Merge the branch bugFix into master with "git merge bugFix". Now use "git log --graph --oneline --all" again and see the changes made by the merge!
+Merge the branch bugFix into master with "git merge bugFix" and use look at the tree again and see the changes made by the merge!

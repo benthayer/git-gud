@@ -1,0 +1,1 @@
+Merge feature1 and feature2 into master in a single commit

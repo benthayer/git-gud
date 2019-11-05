@@ -44,14 +44,15 @@ class GitGud:
 
         help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
         start_parser = self.subparsers.add_parser('start', help='Git started!', description='Git started!')
-        status_parser = self.subparsers.add_parser('status', help='Print out the current level', description='Print out the current level')
-        instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
-        reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
-        reload_parser = self.subparsers.add_parser('reload', help='Reset the current level. Reload command is an alias for reset command.', description='Reset the current level. Reload command is an alias for reset command.')
-        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
-        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
+        status_parser = self.subparsers.add_parser('status', help='Print out the name of the current challenge', description='Print out the name of the current challenge')
+        instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current challenge', description='Show the instructions for the current challenge')
+        goal_parser = self.subparsers.add_parser('goal', help='Concisely show what needs to be done to complete the challenge.', description='Concisely show what needs to be done to complete the challenge.')
+        reset_parser = self.subparsers.add_parser('reset', help='Reset the current challenge', description='Reset the current challenge')
+        reload_parser = self.subparsers.add_parser('reload', help='Reset the current challenge. Reload command is an alias for reset command.', description='Reset the current challenge. Reload command is an alias for reset command.')
+        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current challenge', description='Test to see if you\'ve successfully completed the current challenge')
+        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next challenge', description='Continue to the next challenge')
         levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels')
-        challenges_parser = self.subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified', description='List challenges in current level or in other level if specified')
+        challenges_parser = self.subparsers.add_parser('challenges', help='List challenges', description='List challenges in current level or in other level if specified')
         load_parser = self.subparsers.add_parser('load', help='Load a specific level or challenge', description='Load a specific level or challenge')
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
@@ -74,6 +75,7 @@ class GitGud:
             'start': self.handle_start,
             'status': self.handle_status,
             'instructions': self.handle_instructions,
+            'goal': self.handle_goal,
             'reset': self.handle_reset,
             'reload': self.handle_reset,
             'test': self.handle_test,
@@ -82,7 +84,6 @@ class GitGud:
             'challenges': self.handle_challenges,
             'load': self.handle_load,
             'commit': self.handle_commit,
-            'goal': self.handle_goal,
             'show-tree': self.handle_show_tree,
             'contributors': self.handle_contrib,
         }
@@ -175,6 +176,10 @@ class GitGud:
     def handle_instructions(self, args):
         self.assert_initialized()
         self.file_operator.get_challenge().instructions()
+
+    def handle_goal(self, args):
+        self.assert_initialized()
+        self.file_operator.get_challenge().goal()
 
     def handle_reset(self, args):
         self.assert_initialized()
@@ -293,10 +298,6 @@ class GitGud:
 
         if int(commit_name) > int(last_commit):
             self.file_operator.write_last_commit(commit_name)
-
-    def handle_goal(self, args):
-        self.assert_initialized()
-        raise NotImplementedError
 
     def handle_show_tree(self, args):
         show_tree()
