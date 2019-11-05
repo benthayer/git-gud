@@ -270,6 +270,9 @@ class Challenge:
     def instructions(self):
         pass
 
+    def goal(self):
+        pass
+
     def test(self, file_operator):
         pass
 
@@ -280,6 +283,7 @@ class BasicChallenge(Challenge):
         self.path = path
         self.setup_spec_path = os.path.join(self.path, 'setup.spec')
         self.instructions_path = os.path.join(self.path, 'instructions.txt')
+        self.goal_path = os.path.join(self.path, 'goal.txt')
         self.test_spec_path = os.path.join(self.path, 'test.spec')
 
     def setup(self, file_operator):
@@ -294,7 +298,10 @@ class BasicChallenge(Challenge):
 
         file_operator.write_last_commit(latest_commit)
         print("Setup complete")
-        print("Type \"git gud instructions\" to view instructions")
+        print()
+        print("Type \"git gud instructions\" to view full instructions")
+        print("Type \"git gud goal\" to view goal")
+        print()
 
     def instructions(self):
         print('Printing instructions for challenge: "{}"'.format(self.full_name()))
@@ -304,6 +311,10 @@ class BasicChallenge(Challenge):
                     input(">>>")
                 else:
                     print(line.strip())
+
+    def goal(self):
+        with open(self.goal_path) as goal_file:
+            print(goal_file.read())
 
     def test(self, file_operator):
         print('Testing completion for challenge: "{}"'.format(self.full_name()))

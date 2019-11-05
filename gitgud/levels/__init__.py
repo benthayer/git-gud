@@ -1,9 +1,11 @@
 from gitgud.levels.intro import level as intro_level
-from gitgud.levels.merging import level as merging_level
+from gitgud.levels.rampup import level as rampup_level
+from gitgud.levels.extras import level as extras_level
 
 from gitgud.levels.util import AllLevels
 
 all_levels = AllLevels([
     intro_level,
-    merging_level
+    rampup_level,
+    extras_level
 ])

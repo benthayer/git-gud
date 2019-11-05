@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import webbrowser
 
 import argparse
 
@@ -13,6 +14,11 @@ from gitgud.levels import all_levels
 from gitgud.hooks import all_hooks
 
 # TODO Add test suite so testing can be separate from main code
+
+
+def show_tree():
+    print("Simulating: git log --graph --oneline --all ")
+    subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
 
 
 class InitializationError(Exception):
@@ -38,18 +44,20 @@ class GitGud:
 
         help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
         start_parser = self.subparsers.add_parser('start', help='Git started!', description='Git started!')
-        status_parser = self.subparsers.add_parser('status', help='Print out the current level', description='Print out the current level')
-        instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
-        reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
-        reload_parser = self.subparsers.add_parser('reload', help='Reset the current level. Reload command is an alias for reset command.', description='Reset the current level. Reload command is an alias for reset command.')
-        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
-        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
+        status_parser = self.subparsers.add_parser('status', help='Print out the name of the current challenge', description='Print out the name of the current challenge')
+        instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current challenge', description='Show the instructions for the current challenge')
+        goal_parser = self.subparsers.add_parser('goal', help='Concisely show what needs to be done to complete the challenge.', description='Concisely show what needs to be done to complete the challenge.')
+        reset_parser = self.subparsers.add_parser('reset', help='Reset the current challenge', description='Reset the current challenge')
+        reload_parser = self.subparsers.add_parser('reload', help='Reset the current challenge. Reload command is an alias for reset command.', description='Reset the current challenge. Reload command is an alias for reset command.')
+        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current challenge', description='Test to see if you\'ve successfully completed the current challenge')
+        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next challenge', description='Continue to the next challenge')
         levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels')
-        challenges_parser = self.subparsers.add_parser('challenges', help='List challenges in current level or in other level if specified', description='List challenges in current level or in other level if specified')
+        challenges_parser = self.subparsers.add_parser('challenges', help='List challenges', description='List challenges in current level or in other level if specified')
         load_parser = self.subparsers.add_parser('load', help='Load a specific level or challenge', description='Load a specific level or challenge')
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
+        contrib_parser = self.subparsers.add_parser('contributors', help='Show all the contributors of the project', description='Show all the contributors of the project')
 
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
@@ -67,6 +75,7 @@ class GitGud:
             'start': self.handle_start,
             'status': self.handle_status,
             'instructions': self.handle_instructions,
+            'goal': self.handle_goal,
             'reset': self.handle_reset,
             'reload': self.handle_reset,
             'test': self.handle_test,
@@ -75,8 +84,8 @@ class GitGud:
             'challenges': self.handle_challenges,
             'load': self.handle_load,
             'commit': self.handle_commit,
-            'goal': self.handle_goal,
             'show-tree': self.handle_show_tree,
+            'contributors': self.handle_contrib,
         }
 
     def is_initialized(self):
@@ -85,6 +94,11 @@ class GitGud:
     def assert_initialized(self):
         if not self.is_initialized():
             raise InitializationError("Git gud not initialized. Use \"git gud start\" to initialize")
+
+    def load_challenge(self, challenge):
+        challenge.setup(self.file_operator)
+        self.file_operator.write_challenge(challenge)
+        show_tree()
 
     def handle_help(self, args):
         if args.command_name is None:
@@ -120,6 +134,8 @@ class GitGud:
                 return
         else:
             print('Force initializing git gud.')
+            if not self.file_operator:
+                self.file_operator = Operator(os.getcwd(), initialize_repo=False)
 
         # After here, we initialize everything
         try:
@@ -140,12 +156,13 @@ class GitGud:
         for git_hook_name, module_hook_name in all_hooks:
             with open(os.path.join(self.file_operator.hooks_path, git_hook_name), 'w+') as hook_file:
                 hook_file.write('#!/bin/sh' + os.linesep)
-                hook_file.write('cat - | ' + python_exec + ' -m gitgud.hooks.' + module_hook_name + ' $1' +os.linesep)
+                hook_file.write('cat - | ' + python_exec + ' -m gitgud.hooks.' + module_hook_name + ' "$@"' +os.linesep)
                 hook_file.write('exit 0' + os.linesep)
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
 
         self.file_operator.get_challenge().setup(self.file_operator)
+        show_tree()
 
     def handle_status(self, args):
         if self.is_initialized():
@@ -159,19 +176,32 @@ class GitGud:
         self.assert_initialized()
         self.file_operator.get_challenge().instructions()
 
+    def handle_goal(self, args):
+        self.assert_initialized()
+        self.file_operator.get_challenge().goal()
+
     def handle_reset(self, args):
         self.assert_initialized()
 
         challenge = self.file_operator.get_challenge()
         print("Resetting...")
         challenge.setup(self.file_operator)
+        show_tree()
 
     def handle_test(self, args):
         self.assert_initialized()
         challenge = self.file_operator.get_challenge()
 
         if challenge.test(self.file_operator):
-            print("Challenge complete! `git gud progress` to advance to the next level")
+            try:
+                if challenge.next_challenge.level != challenge.level:
+                    print("Challenge complete, you've completed this level! `git gud progress` to advance to the next level")
+                    print("Next level is: {}".format(challenge.next_challenge.level.name))
+                else :
+                    print("Challenge complete! `git gud progress` to advance to the next challenge")
+                    print("Next challenge is: {}".format(challenge.next_challenge.full_name()))
+            except AttributeError:
+                print("All challenges completed!")
         else:
             print("Challenge not complete, keep trying. `git gud reset` to start from scratch.")
 
@@ -184,8 +214,7 @@ class GitGud:
 
         next_challenge = challenge.next_challenge
         if next_challenge is not None:
-            next_challenge.setup(self.file_operator)
-            self.file_operator.write_challenge(next_challenge)
+            self.load_challenge(next_challenge)
         else:
             print("Wow! You've complete every challenge, congratulations!")
             print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
@@ -222,7 +251,6 @@ class GitGud:
         else:
             print("Challenges for level \"{}\" : \n".format(level.name))
 
-        
         for index, challenge in enumerate(level):
             print(str(index + 1) + ": " + challenge.name)
 
@@ -234,14 +262,12 @@ class GitGud:
             if args.challenge_name is not None:
                 if args.challenge_name in all_levels[args.level_name]:
                     challenge = level[args.challenge_name]
-                    challenge.setup(self.file_operator)
-                    self.file_operator.write_challenge(challenge)
+                    self.load_challenge(challenge)
                 else:
                     print("Challenge \"{}\" does not exist".format(args.challenge_name))
                     print("To view challenges/levels, use git gud challenges or git gud levels")
             else:
-                level[0].setup(self.file_operator)
-                self.file_operator.write_challenge(level[0])
+                self.load_challenge(level[0])
         else:
             print("Level \"{}\" does not exist".format(args.level_name))
             print("To view challenges/levels, use git gud challenges or git gud levels")
@@ -263,19 +289,20 @@ class GitGud:
         print("Simulating: git add {}".format(commit_name))
         print("Simulating: git commit -m \"{}\"".format(commit_name))
 
-        self.file_operator.add_and_commit(commit_name)
+        commit = self.file_operator.add_and_commit(commit_name)
+        print("New Commit: {}".format(commit.hexsha[:7]))
 
         # Check if the newest commit is greater than the last_commit, if yes, then write
 
         if int(commit_name) > int(last_commit):
             self.file_operator.write_last_commit(commit_name)
 
-    def handle_goal(self, args):
-        self.assert_initialized()
-        raise NotImplementedError
-
     def handle_show_tree(self, args):
-        subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
+        show_tree()
+
+    def handle_contrib(self, args):
+        contrib_website = "https://github.com/bthayer2365/git-gud/graphs/contributors"
+        webbrowser.open_new(contrib_website)
 
     def parse(self):
         args, _ = self.parser.parse_known_args()
