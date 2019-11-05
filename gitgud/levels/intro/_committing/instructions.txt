@@ -7,7 +7,10 @@ As you progress, `git gud` will guide you through the relevant commands in both 
 Let's start out by writing some commits.
 >>>
 `git gud` offers a special command to facilitate creating example commits faster.
-By running `git gud commit`, `git gud` will automatically create a new file, add that file to the git index and commit it.
-Hit enter to try it out!
+By running `git gud commit`, `git gud` will automatically create a new file, add that file to the git index and commit it. Try it out!
+>>>
+When you're done, run `git gud test` to see if you've completed this challenge.
+You'll run this command to check future challenges as well.
+Hit enter to start!
 >>>
 Now, let's start using git!
