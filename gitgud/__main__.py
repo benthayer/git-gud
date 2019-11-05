@@ -189,9 +189,9 @@ class GitGud:
 
         if challenge.test(self.file_operator):
             try:
-                if challenge.next_challenge.level != challenge.level :
+                if challenge.next_challenge.level != challenge.level:
                     print("Challenge complete, you've completed this level! `git gud progress` to advance to the next level")
-                    print("Next levels is: {}".format(challenge.next_challenge.level.name))
+                    print("Next level is: {}".format(challenge.next_challenge.level.name))
                 else :
                     print("Challenge complete! `git gud progress` to advance to the next challenge")
                     print("Next challenge is: {}".format(challenge.next_challenge.full_name()))
