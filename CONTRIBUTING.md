@@ -115,7 +115,7 @@ In this case, the parser knows that the previous commit is the parent and that t
 In the case of branches, the first commit on a branch will have a parent that is not the previous commit. 
 Instead, you'll need to include the colon and specify the parent commit. 
 Likewise, if a branch head or a tag points to a commit, then we must include the parenthesis, otherwise, we can leave it out. 
-The most complete example of a spec file is `gitgud/levels/merging/_octopus/test.spec`. 
+The most complete example of a spec file is `gitgud/levels/extras/_octopus/test.spec`. 
 If you're looking for more details, check out the other spec files and `parse_spec` in `gitgud/levels/util.py`
 
 #### `CONTRIBUTING.md`
