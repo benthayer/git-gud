@@ -232,6 +232,7 @@ class NamedList:
     def keys(self):
         return self._name_dict.keys()
 
+
 class Level(NamedList):
     def __init__(self, name, challenges):
         self.name = name
@@ -240,6 +241,7 @@ class Level(NamedList):
 
         for challenge in challenges:
             challenge.level = self
+
 
 class AllLevels(NamedList):
     def __init__(self, levels):
@@ -250,7 +252,8 @@ class AllLevels(NamedList):
             for challenge in level:
                 if last_challenge is not None:
                     last_challenge.next_challenge = challenge
-                last_challenge = challenge        
+                last_challenge = challenge
+
 
 class Challenge:
     def __init__(self, name):
