@@ -240,17 +240,17 @@ class GitGud:
                 challenge = next(iter(level.challenges.values()))
                 self.load_challenge(challenge)
 
-	else if args.level_name.lower() == "next":
+        elif args.level_name.lower() == "next":
             challenge = self.file_operator.get_challenge()
 
             next_challenge = challenge.next_challenge
             if next_challenge is not None:
                 next_challenge.setup(self.file_operator)
-            	self.file_operator.write_challenge(next_challenge)
+                self.file_operator.write_challenge(next_challenge)
             else:
-            	print("Wow! You've completed every challenge, congratulations!")
-            	print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/ ?")
-            	print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
+                print("Wow! You've completed every challenge, congratulations!")
+                print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/ ?")
+                print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
 
 
         else:
