@@ -246,7 +246,7 @@ class GitGud:
                 level = self.file_operator.get_challenge().level
                 key_error_flag = True
         
-        if key_error_flag == True or args.level_name is None:
+        if key_error_flag or args.level_name is None:
             print("Challenges in the current level \"{}\" : \n".format(level.name))
         else:
             print("Challenges for level \"{}\" : \n".format(level.name))
