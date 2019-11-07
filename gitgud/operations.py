@@ -108,6 +108,21 @@ class Operator:
         if head_is_commit:
             self.repo.git.checkout(commit_objects[head])
 
+    # Revert detection helper function
+    @staticmethod
+    def find_Revert(commit_name):
+        if ("Revert" in commit_name):
+            keystrings = ["\"0\"", "\"1\"", "\"2\"", "\"3\"", "\"4\"", "\"5\"", "\"6\"",
+                          "\"7\"", "\"8\"", "\"9\""]
+            keycodes = {"\"0\"" : "0", "\"1\"" : "1", "\"2\"" : "2", "\"3\"" : "3",                  "\"4\"" : "4", "\"5\"" : "5", "\"6\"" : "6",
+                        "\"7\"" : "7", "\"8\"" : "8", "\"9\"" : "9"}
+            for key in keystrings:
+                if (key in commit_name):
+                    commit_name = keycodes[key]
+            commit_name += '-'
+        return commit_name
+                              
+
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json
 
@@ -126,6 +141,7 @@ class Operator:
         for branch in repo.branches:
             commits.add(branch.commit)
             commit_name = branch.commit.message.strip()
+            commit_name = self.find_Revert(commit_name)
             tree['branches'][branch.name] = {
                 "target": commit_name,
                 "id": branch.name
@@ -148,8 +164,11 @@ class Operator:
         while len(visited) > 0:
             cur_commit = visited.pop()
             commit_name = cur_commit.message.strip()
+            # If revert detected, modifies commit_name; o/w nothing happens
+            commit_name = self.find_Revert(commit_name)
+
             tree['commits'][commit_name] = {
-                'parents': [parent.message.strip() for parent in cur_commit.parents],
+                'parents': [self.find_Revert(parent.message.strip()) for parent in cur_commit.parents],
                 'id': commit_name
             }
 
@@ -162,7 +181,7 @@ class Operator:
             'target': target,
             'id': 'HEAD'
         }
-
+        print(tree)
         return tree
 
     def get_level(self):
