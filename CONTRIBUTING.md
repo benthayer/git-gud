@@ -69,21 +69,21 @@ Instead, it'll think of `gitgud` exclusively as a package that can be imported.
 
 `gitgud\__main__.py` contains the `GitGud` class, which is loaded up with an argument parser and a bunch of methods to handle the different commands that Git Gud can be given. 
 The argument parser is defined in `.__init__()`. 
-It sets up all the commands that Git Gud is capable of handling, along with any sub-commands and additional arugments. 
+It sets up all the commands that Git Gud is capable of handling, along with any sub-commands and additional arguments.
 The parser is run using `.parse()`. 
 The method will look for the command that was sent in and direct it to the appropriate handler. 
 Each command has its own handler, and the handlers will process the arguments and perform the appropriate tasks.
 
 #### Skills
 Every skill in Git Gud exists as a Python module.
-If I wanted to import the "intro" skill, I use `import gitgud.skills.intro`.
+If I wanted to import the "basis" skill, I use `import gitgud.skills.basics`.
 Each skill module exists to organize the levels within that skill.
 The skill is always a folder with an `__init__.py` file so that it can organize the code to run the levels.
 Levels can either be their own folder or their own python file, but they must follow the rule that the folder/file must be named `_level/` or `_level.py`.
 This is Python's way of saying that those are meant to be used by the skill module only and aren't supposed to be imported by another package.
 
-We access the levels throught the skill module.
-If you take a look in a skill's `__init__.py`, you'll see where all the levels are defined.
+We access the levels through the skills module.
+If you take a look in a skills' `__init__.py`, you'll see where all the levels are defined.
 The code is fairly simple and is meant to be that way. 
 All you are meant to do is instantiate the objects that you define elsewhere. 
 For many of the levels, this is `gitgud.skills.util.BasicLevel`, and all that is needed is to supply the name of the subfolder.
@@ -122,7 +122,7 @@ If you're looking for more details, check out the other spec files and `parse_sp
 The purpose of `CONTRIBUTING.md` is to serve as a starting point for new developers. 
 It exists mainly to cover the "why", not the "what". 
 To see the specifics of how to implement something, you're encouraged to look through the source code and see for yourself what everything does. 
-If something isn't self-explanitory, comment on whatever issue you're working on or post a new issue. 
+If something isn't self-explanatory, comment on whatever issue you're working on or post a new issue.
 I'll be happy to respond there and to update this document. 
 
 ## Submitting Your Changes
