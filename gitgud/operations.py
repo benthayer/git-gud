@@ -1,5 +1,6 @@
 import os
 import shutil
+import datetime
 
 from glob import glob
 
@@ -71,8 +72,11 @@ class Operator:
         self.repo.delete_tag(*self.repo.tags)
 
         commit_objects = {}
-
+        counter = len(commits)
         for name, parents, branches, tags in commits:
+            committime = datetime.datetime.now()
+            committime_offset = datetime.timedelta(seconds = -1 * counter)
+            committime_iso = (committime - committime_offset).replace(microsecond=0).isoformat()
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
@@ -80,8 +84,9 @@ class Operator:
                 self.repo.git.checkout(parents[0])
             if len(parents) < 2:
                 # Not a merge
+                print(committime_iso)
                 self.add_file_to_index(name)
-                self.repo.index.commit(name, author=actor, committer=actor, parent_commits=parents)
+                self.repo.index.commit(name, author=actor, committer=actor, commit_date = committime_iso, parent_commits=parents)
             else:
                 # TODO GitPython octopus merge
                 self.repo.git.merge(*parents)
@@ -97,6 +102,7 @@ class Operator:
             for tag in tags:
                 self.repo.create_tag(tag, self.repo.head.commit)
             # TODO Log commit hash and info
+            counter = counter - 1
 
         # TODO Checkout using name
         head_is_commit = True;                              #By default, assume HEAD is a commit.
