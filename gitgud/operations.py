@@ -75,7 +75,7 @@ class Operator:
         counter = len(commits)
         for name, parents, branches, tags in commits:
             committime = datetime.datetime.now()
-            committime_offset = datetime.timedelta(seconds = -1 * counter)
+            committime_offset = datetime.timedelta(seconds = counter)
             committime_iso = (committime - committime_offset).replace(microsecond=0).isoformat()
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
@@ -84,9 +84,8 @@ class Operator:
                 self.repo.git.checkout(parents[0])
             if len(parents) < 2:
                 # Not a merge
-                print(committime_iso)
                 self.add_file_to_index(name)
-                self.repo.index.commit(name, author=actor, committer=actor, commit_date = committime_iso, parent_commits=parents)
+                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_iso, commit_date = committime_iso, parent_commits=parents)
             else:
                 # TODO GitPython octopus merge
                 self.repo.git.merge(*parents)
