@@ -1,0 +1,1 @@
+First, reverse all changes on the "master" branch. Lastly, reverse changes made in commits 3 and 5 on the "remote" branch using only one command. Assume that "master" is local and "remote" is a remote branch. Also, when using revert, do not modify the default message.
