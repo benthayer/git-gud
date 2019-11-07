@@ -112,13 +112,7 @@ class Operator:
     @staticmethod
     def parse_name(commit_msg):
         if ("Revert" in commit_msg):
-            keystrings = ["\"0\"", "\"1\"", "\"2\"", "\"3\"", "\"4\"", "\"5\"", "\"6\"",
-                          "\"7\"", "\"8\"", "\"9\""]
-            keycodes = {"\"0\"" : "0", "\"1\"" : "1", "\"2\"" : "2", "\"3\"" : "3",                  "\"4\"" : "4", "\"5\"" : "5", "\"6\"" : "6",
-                        "\"7\"" : "7", "\"8\"" : "8", "\"9\"" : "9"}
-            for key in keystrings:
-                if (key in commit_msg):
-                    commit_msg = keycodes[key]
+            commit_msg = commit_msg[8:-64]
             commit_msg += '-'
         return commit_msg
                               
@@ -181,7 +175,6 @@ class Operator:
             'target': target,
             'id': 'HEAD'
         }
-        print(tree)
         return tree
 
     def get_level(self):
