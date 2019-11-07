@@ -3,7 +3,7 @@
 4 : 3
 5 : 3
 6 : 4 5
--5
--3 (remote)
+5-
+3- (remote)
 remote
 
