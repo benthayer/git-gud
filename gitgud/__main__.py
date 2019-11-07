@@ -147,8 +147,8 @@ class GitGud:
             os.mkdir(self.file_operator.gg_path)
         with open(self.file_operator.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
-        with open(self.file_operator.level_path, 'w+') as skill_file:
-            skill_file.write(all_skills[0][0].full_name())
+        with open(self.file_operator.level_path, 'w+') as level_file:
+            level_file.write(all_skills[0][0].full_name())
 
         python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
