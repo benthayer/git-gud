@@ -108,19 +108,19 @@ class Operator:
         if head_is_commit:
             self.repo.git.checkout(commit_objects[head])
 
-    # Revert detection helper function
+    # Parses commit msg for keywords (e.g. Revert)
     @staticmethod
-    def find_Revert(commit_name):
-        if ("Revert" in commit_name):
+    def parse_name(commit_msg):
+        if ("Revert" in commit_msg):
             keystrings = ["\"0\"", "\"1\"", "\"2\"", "\"3\"", "\"4\"", "\"5\"", "\"6\"",
                           "\"7\"", "\"8\"", "\"9\""]
             keycodes = {"\"0\"" : "0", "\"1\"" : "1", "\"2\"" : "2", "\"3\"" : "3",                  "\"4\"" : "4", "\"5\"" : "5", "\"6\"" : "6",
                         "\"7\"" : "7", "\"8\"" : "8", "\"9\"" : "9"}
             for key in keystrings:
-                if (key in commit_name):
-                    commit_name = keycodes[key]
-            commit_name += '-'
-        return commit_name
+                if (key in commit_msg):
+                    commit_msg = keycodes[key]
+            commit_msg += '-'
+        return commit_msg
                               
 
     def get_current_tree(self):
@@ -141,7 +141,7 @@ class Operator:
         for branch in repo.branches:
             commits.add(branch.commit)
             commit_name = branch.commit.message.strip()
-            commit_name = self.find_Revert(commit_name)
+            commit_name = self.parse_name(commit_name)
             tree['branches'][branch.name] = {
                 "target": commit_name,
                 "id": branch.name
@@ -165,10 +165,10 @@ class Operator:
             cur_commit = visited.pop()
             commit_name = cur_commit.message.strip()
             # If revert detected, modifies commit_name; o/w nothing happens
-            commit_name = self.find_Revert(commit_name)
+            commit_name = self.parse_name(commit_name)
 
             tree['commits'][commit_name] = {
-                'parents': [self.find_Revert(parent.message.strip()) for parent in cur_commit.parents],
+                'parents': [self.parse_name(parent.message.strip()) for parent in cur_commit.parents],
                 'id': commit_name
             }
 
