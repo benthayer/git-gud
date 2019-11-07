@@ -8,6 +8,7 @@ skill = Skill(
     [
         BasicLevel('detaching', pkg_resources.resource_filename(__name__, '_detaching/')),
         BasicLevel('relrefs1', pkg_resources.resource_filename(__name__, '_relrefs1/')),
-        BasicLevel('relrefs2', pkg_resources.resource_filename(__name__, '_relrefs2/'))
+        BasicLevel('relrefs2', pkg_resources.resource_filename(__name__, '_relrefs2/')),
+        BasicLevel('reversing', pkg_resources.resource_filename(__name__, '_reversing/'))
     ]
 )

@@ -1,0 +1,2 @@
+1. Reverse commit 2 on "master" without preserving history.
+2. Reverse commits 3 and 5 on "remote" while using one command and preserving history.

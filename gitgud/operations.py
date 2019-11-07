@@ -108,6 +108,15 @@ class Operator:
         if head_is_commit:
             self.repo.git.checkout(commit_objects[head])
 
+    # Parses commit msg for keywords (e.g. Revert)
+    @staticmethod
+    def parse_name(commit_msg):
+        if ("Revert" in commit_msg):
+            commit_msg = commit_msg[8:-64]
+            commit_msg += '-'
+        return commit_msg
+                              
+
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json
 
@@ -126,6 +135,7 @@ class Operator:
         for branch in repo.branches:
             commits.add(branch.commit)
             commit_name = branch.commit.message.strip()
+            commit_name = self.parse_name(commit_name)
             tree['branches'][branch.name] = {
                 "target": commit_name,
                 "id": branch.name
@@ -148,8 +158,11 @@ class Operator:
         while len(visited) > 0:
             cur_commit = visited.pop()
             commit_name = cur_commit.message.strip()
+            # If revert detected, modifies commit_name; o/w nothing happens
+            commit_name = self.parse_name(commit_name)
+
             tree['commits'][commit_name] = {
-                'parents': [parent.message.strip() for parent in cur_commit.parents],
+                'parents': [self.parse_name(parent.message.strip()) for parent in cur_commit.parents],
                 'id': commit_name
             }
 
@@ -162,7 +175,6 @@ class Operator:
             'target': target,
             'id': 'HEAD'
         }
-
         return tree
 
     def get_level(self):
