@@ -122,75 +122,76 @@ def level_json(commits, head):
     return level
 
 
-def test_level(level, test):
+def test_skill(skill, test):
     # We don't know the names of merges, so we match them with their test names
     # TODO Only works when merges don't have other merges as parents
     # TODO Topological sort merge commits
-    level = deepcopy(level)
+    skill = deepcopy(skill)
     merge_name_map = {}
-    for commit_name in level['commits']:
-        level_commit = level['commits'][commit_name]
-        if len(level_commit['parents']) >= 2:  # TODO Stop here to get list of merges
+    for commit_name in skill['commits']:
+        skill_commit = skill['commits'][commit_name]
+        if len(skill_commit['parents']) >= 2:  # TODO Stop here to get list of merges
             for test_commit_name in test['commits']:  # TODO Do this iteration in an intelligent manner
                 test_commit = test['commits'][test_commit_name]
                 parents_equal = True
-                level_parents = level_commit['parents']
+                skill_parents = skill_commit['parents']
                 test_parents = test_commit['parents']
 
-                for level_parent, test_parent in zip(level_parents, test_parents):
-                    if level_parent != test_parent:
+                for skill_parent, test_parent in zip(skill_parents, test_parents):
+                    if skill_parent != test_parent:
                         parents_equal = False
                         break
-                if len(level_parents) == len(test_parents) and parents_equal:
+                if len(skill_parents) == len(test_parents) and parents_equal:
                     merge_name_map[test_commit_name] = commit_name
 
     # TODO Update parents to reference merge commits by new name
 
     # Check commits
-    if len(test['commits']) != len(level['commits']):
+    if len(test['commits']) != len(skill['commits']):
         return False
     for commit_name in test['commits']:
         test_commit = test['commits'][commit_name]
-        if commit_name not in level['commits']:
-            if merge_name_map[commit_name] in level['commits']:
+        if commit_name not in skill['commits']:
+            if merge_name_map[commit_name] in skill['commits']:
                 # It's a known merge
-                level_commit = level['commits'][merge_name_map[commit_name]]
+                skill_commit = skill['commits'][merge_name_map[commit_name]]
             else:
                 return False
         else:
-            level_commit = level['commits'][commit_name]
+            skill_commit = skill['commits'][commit_name]
 
         # Commits must have the same number of parents and be in the same order
-        if len(level_commit['parents']) != len(test_commit['parents']):
+        if len(skill_commit['parents']) != len(test_commit['parents']):
             return False
-        for level_parent, test_parent in zip(level_commit['parents'], test_commit['parents']):
-            if level_parent != test_parent:
+        for skill_parent, test_parent in zip(skill_commit['parents'], test_commit['parents']):
+            if skill_parent != test_parent:
                 return False
 
     # Check branches
-    if len(test['branches']) != len(level['branches']):
+    if len(test['branches']) != len(skill['branches']):
         return False
     for branch_name in test['branches']:
-        if branch_name not in level['branches']:
+        if branch_name not in skill['branches']:
             return False
-        if level['branches'][branch_name]['target'] != test['branches'][branch_name]['target']:
-            if merge_name_map[test['branches'][branch_name]['target']] != level['branches'][branch_name]['target']:
+        if skill['branches'][branch_name]['target'] != test['branches'][branch_name]['target']:
+            if merge_name_map[test['branches'][branch_name]['target']] != skill['branches'][branch_name]['target']:
                 return False  # It's also not a known merge
 
     # Check tags
-    if len(test['tags']) != len(level['tags']):
+    if len(test['tags']) != len(skill['tags']):
         return False
     for tag_name in test['tags']:
-        if tag_name not in level['tags']:
+        if tag_name not in skill['tags']:
             return False
-        if level['tags'][tag_name]['target'] != test['tags'][tag_name]['target']:
+        if skill['tags'][tag_name]['target'] != test['tags'][tag_name]['target']:
             return False
 
     # Check HEAD
-    if level['HEAD']['target'] != test['HEAD']['target']:
+    if skill['HEAD']['target'] != test['HEAD']['target']:
         return False
 
     return True
+
 
 class NamedList:
     # names is a list populated with type str, items is a list populated with any type 
@@ -233,36 +234,36 @@ class NamedList:
         return self._name_dict.keys()
 
 
-class Level(NamedList):
-    def __init__(self, name, challenges):
+class Skill(NamedList):
+    def __init__(self, name, levels):
         self.name = name
-        self._name_dict = {challenge.name:index for index, challenge in enumerate(challenges)}
-        self._items = challenges
-
-        for challenge in challenges:
-            challenge.level = self
-
-
-class AllLevels(NamedList):
-    def __init__(self, levels):
         self._name_dict = {level.name:index for index, level in enumerate(levels)}
         self._items = levels
-        last_challenge = None
-        for level in self:
-            for challenge in level:
-                if last_challenge is not None:
-                    last_challenge.next_challenge = challenge
-                last_challenge = challenge
+
+        for level in levels:
+            level.skill = self
 
 
-class Challenge:
+class AllSkills(NamedList):
+    def __init__(self, skills):
+        self._name_dict = {skill.name: index for index, skill in enumerate(skills)}
+        self._items = skills
+        last_level = None
+        for skill in self:
+            for level in skill:
+                if last_level is not None:
+                    last_level.next_level = level
+                last_level = level
+
+
+class Level:
     def __init__(self, name):
         self.name = name
-        self.level = None
-        self.next_challenge = None
+        self.skill = None
+        self.next_level = None
 
     def full_name(self):
-        return '{} {}'.format(self.level.name, self.name)
+        return '{} {}'.format(self.skill.name, self.name)
 
     def setup(self, file_operator):
         pass
@@ -277,7 +278,7 @@ class Challenge:
         pass
 
 
-class BasicChallenge(Challenge):
+class BasicLevel(Level):
     def __init__(self, name, path):
         super().__init__(name)
         self.path = path
@@ -287,7 +288,7 @@ class BasicChallenge(Challenge):
         self.test_spec_path = os.path.join(self.path, 'test.spec')
 
     def setup(self, file_operator):
-        print('Setting up challenge: "{}"'.format(self.full_name()))
+        print('Setting up level: "{}"'.format(self.full_name()))
         commits, head = parse_spec(self.setup_spec_path)
         file_operator.create_tree(commits, head)
 
@@ -304,7 +305,7 @@ class BasicChallenge(Challenge):
         print()
 
     def instructions(self):
-        print('Printing instructions for challenge: "{}"'.format(self.full_name()))
+        print('Printing instructions for level: "{}"'.format(self.full_name()))
         with open(self.instructions_path) as instructions_file:
             for line in instructions_file:
                 if line[:3] == '>>>':
@@ -317,8 +318,8 @@ class BasicChallenge(Challenge):
             print(goal_file.read())
 
     def test(self, file_operator):
-        print('Testing completion for challenge: "{}"'.format(self.full_name()))
+        print('Testing completion for level: "{}"'.format(self.full_name()))
         commits, head = parse_spec(self.test_spec_path)
         test_tree = level_json(commits, head)
         level_tree = file_operator.get_current_tree()
-        return test_level(level_tree, test_tree)
+        return test_skill(level_tree, test_tree)

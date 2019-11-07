@@ -1,4 +1,4 @@
-This level will introduce the idea of detaching your HEAD!
+This skill will introduce the idea of detaching your HEAD!
 >>>
 Don't worry, we don't mean your head; we mean the head of your commit tree. First, what is the HEAD of a commit tree?
 >>>

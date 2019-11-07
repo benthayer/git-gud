@@ -10,7 +10,7 @@ from git.exc import InvalidGitRepositoryError
 
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
-from gitgud.levels import all_levels
+from gitgud.skills import all_skills
 from gitgud.hooks import all_hooks
 
 # TODO Add test suite so testing can be separate from main code
@@ -36,7 +36,7 @@ class GitGud:
         # TODO Add git gud help <command>, which would return the same output as git gud <command> -- help
 
         # TODO Display help message for subcommand when it fails.
-        # ie `git gud load level1 challenge1 random-input` should have output similar to `git gud load --help`
+        # ie `git gud load skill1 level1 random-input` should have output similar to `git gud load --help`
         
         # Use "git gud help" to print helps of all subcommands.
         # "git gud help <command>" prints the description of the <command> but not help.
@@ -44,16 +44,16 @@ class GitGud:
 
         help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
         start_parser = self.subparsers.add_parser('start', help='Git started!', description='Git started!')
-        status_parser = self.subparsers.add_parser('status', help='Print out the name of the current challenge', description='Print out the name of the current challenge')
-        instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current challenge', description='Show the instructions for the current challenge')
-        goal_parser = self.subparsers.add_parser('goal', help='Concisely show what needs to be done to complete the challenge.', description='Concisely show what needs to be done to complete the challenge.')
-        reset_parser = self.subparsers.add_parser('reset', help='Reset the current challenge', description='Reset the current challenge')
-        reload_parser = self.subparsers.add_parser('reload', help='Reset the current challenge. Reload command is an alias for reset command.', description='Reset the current challenge. Reload command is an alias for reset command.')
-        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current challenge', description='Test to see if you\'ve successfully completed the current challenge')
-        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next challenge', description='Continue to the next challenge')
-        levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels')
-        challenges_parser = self.subparsers.add_parser('challenges', help='List challenges', description='List challenges in current level or in other level if specified')
-        load_parser = self.subparsers.add_parser('load', help='Load a specific level or challenge', description='Load a specific level or challenge')
+        status_parser = self.subparsers.add_parser('status', help='Print out the name of the current level', description='Print out the name of the current level')
+        instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
+        goal_parser = self.subparsers.add_parser('goal', help='Concisely show what needs to be done to complete the level.', description='Concisely show what needs to be done to complete the level.')
+        reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
+        reload_parser = self.subparsers.add_parser('reload', help='Reset the current level. Reload command is an alias for reset command.', description='Reset the current level. Reload command is an alias for reset command.')
+        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
+        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
+        skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
+        levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels in current skill or in other skill if specified')
+        load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description='Load a specific skill or level')
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
@@ -63,10 +63,10 @@ class GitGud:
 
         start_parser.add_argument('--force', action='store_true')
 
-        challenges_parser.add_argument('level_name', metavar='level', nargs='?')
+        levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
 
-        load_parser.add_argument('level_name', metavar='level', help='Level to load')
-        load_parser.add_argument('challenge_name', metavar='challenge', nargs='?', help='Challenge to load')
+        load_parser.add_argument('skill_name', metavar='skill', help='Skill to load')
+        load_parser.add_argument('level_name', metavar='level', nargs='?', help='Level to load')
 
         commit_parser.add_argument('file', nargs='?')
 
@@ -80,8 +80,8 @@ class GitGud:
             'reload': self.handle_reset,
             'test': self.handle_test,
             'progress': self.handle_progress,
+            'skills': self.handle_skills,
             'levels': self.handle_levels,
-            'challenges': self.handle_challenges,
             'load': self.handle_load,
             'commit': self.handle_commit,
             'show-tree': self.handle_show_tree,
@@ -95,9 +95,9 @@ class GitGud:
         if not self.is_initialized():
             raise InitializationError("Git gud not initialized. Use \"git gud start\" to initialize")
 
-    def load_challenge(self, challenge):
-        challenge.setup(self.file_operator)
-        self.file_operator.write_challenge(challenge)
+    def load_level(self, level):
+        level.setup(self.file_operator)
+        self.file_operator.write_level(level)
         show_tree()
 
     def handle_help(self, args):
@@ -147,9 +147,8 @@ class GitGud:
             os.mkdir(self.file_operator.gg_path)
         with open(self.file_operator.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
-        with open(self.file_operator.level_path, 'w+') as level_file:
-            level_file.write(all_levels[0][0].full_name())
-
+        with open(self.file_operator.level_path, 'w+') as skill_file:
+            skill_file.write(all_skills[0][0].full_name())
 
         python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
@@ -161,116 +160,116 @@ class GitGud:
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
 
-        self.file_operator.get_challenge().setup(self.file_operator)
+        self.file_operator.get_level().setup(self.file_operator)
         show_tree()
 
     def handle_status(self, args):
         if self.is_initialized():
-            challenge_name = self.file_operator.get_challenge().full_name()
-            print("Currently on challenge: \"{}\"".format(challenge_name))
+            level_name = self.file_operator.get_level().full_name()
+            print("Currently on level: \"{}\"".format(level_name))
         else:
             print("Git gud not initialized.")
             print("Initialize using \"git gud start\"")
 
     def handle_instructions(self, args):
         self.assert_initialized()
-        self.file_operator.get_challenge().instructions()
+        self.file_operator.get_level().instructions()
 
     def handle_goal(self, args):
         self.assert_initialized()
-        self.file_operator.get_challenge().goal()
+        self.file_operator.get_level().goal()
 
     def handle_reset(self, args):
         self.assert_initialized()
 
-        challenge = self.file_operator.get_challenge()
+        level = self.file_operator.get_level()
         print("Resetting...")
-        challenge.setup(self.file_operator)
+        level.setup(self.file_operator)
         show_tree()
 
     def handle_test(self, args):
         self.assert_initialized()
-        challenge = self.file_operator.get_challenge()
+        level = self.file_operator.get_level()
 
-        if challenge.test(self.file_operator):
+        if level.test(self.file_operator):
             try:
-                if challenge.next_challenge.level != challenge.level:
-                    print("Challenge complete, you've completed this level! `git gud progress` to advance to the next level")
-                    print("Next level is: {}".format(challenge.next_challenge.level.name))
+                if level.next_level.skill != level.skill:
+                    print("Level complete, you've completed this skill! `git gud progress` to advance to the next skill")
+                    print("Next skill is: {}".format(level.next_level.skill.name))
                 else :
-                    print("Challenge complete! `git gud progress` to advance to the next challenge")
-                    print("Next challenge is: {}".format(challenge.next_challenge.full_name()))
+                    print("Level complete! `git gud progress` to advance to the next level")
+                    print("Next level is: {}".format(level.next_level.full_name()))
             except AttributeError:
-                print("All challenges completed!")
+                print("All levels completed!")
         else:
-            print("Challenge not complete, keep trying. `git gud reset` to start from scratch.")
+            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
 
     def handle_progress(self, args):
         self.assert_initialized()
 
-        print("Progressing to next level...")
+        print("Progressing to next skill...")
 
-        challenge = self.file_operator.get_challenge()
+        level = self.file_operator.get_level()
 
-        next_challenge = challenge.next_challenge
-        if next_challenge is not None:
-            self.load_challenge(next_challenge)
+        next_level = level.next_level
+        if next_level is not None:
+            self.load_level(next_level)
         else:
-            print("Wow! You've complete every challenge, congratulations!")
+            print("Wow! You've complete every level, congratulations!")
             print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
             print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
 
-    def handle_levels(self, args):
-        cur_level = self.file_operator.get_challenge().level
+    def handle_skills(self, args):
+        cur_skill = self.file_operator.get_level().skill
 
-        print("Currently on level: \"{}\"\n".format(cur_level.name))
+        print("Currently on skill: \"{}\"\n".format(cur_skill.name))
         
-        for level in all_levels:
+        for skill in all_skills:
             # TODO Add description
             # 10 characters for the short IDs. 
-            print("Level {:<10} :{:>2} challenge{}".format("\"" + level.name + "\"", len(level), ("", "s")[len(level) > 1]))
-            for index, challenge in enumerate(level):
+            print("Skill {:<10} :{:>2} level{}".format("\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
+            for index, level in enumerate(skill):
                 # " " * (characters allocated for ID - 6)
-                print("{}Challenge {:>2} : {:<10}".format(" " * 4, index + 1, challenge.name))
+                print("{}Level {:>2} : {:<10}".format(" " * 4, index + 1, level.name))
 
-    def handle_challenges(self, args):
+    def handle_levels(self, args):
         key_error_flag = False
-        if args.level_name is None:
-            level = self.file_operator.get_challenge().level
+        if args.skill_name is None:
+            skill = self.file_operator.get_level().skill
         else:
             try:
-                level = all_levels[args.level_name]
+                skill = all_skills[args.skill_name]
             except KeyError:
-                print("There is no level \"{}\".".format(args.level_name))
-                print("You may run \"git gud levels\" to print all the levels. \n")
-                level = self.file_operator.get_challenge().level
+                print("There is no skill \"{}\".".format(args.skill_name))
+                print("You may run \"git gud skills\" to print all the skills. \n")
+                skill = self.file_operator.get_level().skill
                 key_error_flag = True
         
-        if key_error_flag or args.level_name is None:
-            print("Challenges in the current level \"{}\" : \n".format(level.name))
+        if key_error_flag or args.skill_name is None:
+            print("Levels in the current skill \"{}\" : \n".format(skill.name))
         else:
-            print("Challenges for level \"{}\" : \n".format(level.name))
+            print("Levels for skill \"{}\" : \n".format(skill.name))
 
-        for index, challenge in enumerate(level):
-            print(str(index + 1) + ": " + challenge.name)
+        for index, level in enumerate(skill):
+            print(str(index + 1) + ": " + level.name)
 
     def handle_load(self, args):
         self.assert_initialized()
-        if args.level_name in all_levels:
-            level = all_levels[args.level_name]
+        if args.skill_name in all_skills:
+            skill = all_skills[args.skill_name]
 
-            if args.challenge_name is not None:
-                if args.challenge_name in all_levels[args.level_name]:
-                    challenge = level[args.challenge_name]
-                    self.load_challenge(challenge)
+            if args.level_name is not None:
+                if args.level_name in all_skills[args.skill_name]:
+                    level = skill[args.level_name]
+                    self.load_level(level)
                 else:
-                    print("Challenge \"{}\" does not exist".format(args.challenge_name))
-                    print("To view challenges/levels, use git gud challenges or git gud levels")
+                    print("Level \"{}\" does not exist".format(args.level_name))
+                    print("To view levels/skills, use git gud levels or git gud skills")
             else:
-                self.load_challenge(level[0])
+                self.load_level(skill[0])
         else:
-            print("Level \"{}\" does not exist".format(args.level_name))
-            print("To view challenges/levels, use git gud challenges or git gud levels")
+            print("Skill \"{}\" does not exist".format(args.skill_name))
+            print("To view levels/skills, use git gud levels or git gud skills")
 
     def handle_commit(self, args):
         self.assert_initialized()

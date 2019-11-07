@@ -7,7 +7,7 @@ from git import Repo
 
 from gitgud import actor
 from gitgud import actor_string
-from gitgud.levels import all_levels
+from gitgud.skills import all_skills
 
 
 class Operator:
@@ -99,14 +99,13 @@ class Operator:
             # TODO Log commit hash and info
 
         # TODO Checkout using name
-        head_is_commit = True;                              #By default, assume HEAD is a commit.
+        head_is_commit = True
         for branch in self.repo.branches:
             if branch.name == head:
                 branch.checkout()
-                head_is_commit = False                      #Updates if HEAD is a branch.
-        
-        #If HEAD isn't set as a branch, then 'head' is a commit id. Use it to checkout the commit.
-        if (head_is_commit):
+                head_is_commit = False
+
+        if head_is_commit:
             self.repo.git.checkout(commit_objects[head])
 
     def get_current_tree(self):
@@ -116,7 +115,7 @@ class Operator:
 
         tree = {
             'branches': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
-            'tags': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
+            'tags': {},  # 'tag_name': {'target': 'commit_id', 'id': 'tag_name'}
             'commits': {},  # '2': {'parents': ['1'], 'id': '1'}
             'HEAD': {}  # 'target': 'branch_name', 'id': 'HEAD'
         }
@@ -166,14 +165,14 @@ class Operator:
 
         return tree
 
-    def get_challenge(self):
-        with open(self.level_path) as level_file:
-            level_name, challenge_name = level_file.read().split()
-        return all_levels[level_name][challenge_name]
+    def get_level(self):
+        with open(self.level_path) as skill_file:
+            skill_name, level_name = skill_file.read().split()
+        return all_skills[skill_name][level_name]
 
-    def write_challenge(self, challenge):
-        with open(self.level_path, 'w+') as level_file:
-            level_file.write(' '.join([challenge.level.name, challenge.name]))
+    def write_level(self, level):
+        with open(self.level_path, 'w+') as skill_file:
+            skill_file.write(' '.join([level.skill.name, level.name]))
 
     def get_last_commit(self):
         with open(self.last_commit_path) as last_commit_file:
