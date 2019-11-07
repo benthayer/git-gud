@@ -306,6 +306,8 @@ class BasicLevel(Level):
 
     def instructions(self):
         print('Printing instructions for level: "{}"'.format(self.full_name()))
+        print()
+
         with open(self.instructions_path) as instructions_file:
             for line in instructions_file:
                 if line[:3] == '>>>':
