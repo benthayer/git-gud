@@ -12,7 +12,7 @@ if cwd[-7:] == "git-gud":
     if not os.path.exists(skill_path):
         os.mkdir(skill_path)
 
-    level_path = os.path.join(skill_path,"{}".format(level_name))
+    level_path = os.path.join(skill_path,"_{}".format(level_name))
     if not os.path.exists(level_path):
         os.mkdir(level_path)
 
@@ -20,12 +20,12 @@ if cwd[-7:] == "git-gud":
     if not os.path.exists(inst_path):
         open(inst_path,'a').close()
 
-    goal_path = os.path.join(goal_path,"instructions.txt")
+    goal_path = os.path.join(level_path,"goal.txt")
     if not os.path.exists(goal_path):
         open(goal_path,'a').close()
 
     setup_path = os.path.join(level_path,"setup.spec")
-    if not os.path.exists(inst_path):
+    if not os.path.exists(setup_path):
         open(setup_path,'a').close()
 
     test_path = os.path.join(level_path,"test.spec")
