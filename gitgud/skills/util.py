@@ -234,16 +234,6 @@ class NamedList:
         return self._name_dict.keys()
 
 
-class Skill(NamedList):
-    def __init__(self, name, levels):
-        self.name = name
-        self._name_dict = {level.name:index for index, level in enumerate(levels)}
-        self._items = levels
-
-        for level in levels:
-            level.skill = self
-
-
 class AllSkills(NamedList):
     def __init__(self, skills):
         self._name_dict = {skill.name: index for index, skill in enumerate(skills)}
@@ -256,11 +246,27 @@ class AllSkills(NamedList):
                 last_level = level
 
 
+class Skill(NamedList):
+    def __init__(self, name, levels):
+        self.name = name
+        self._name_dict = {level.name:index for index, level in enumerate(levels)}
+        self._items = levels
+
+        for level in levels:
+            level.skill = self
+
+
 class Level:
     def __init__(self, name):
         self.name = name
         self.skill = None
         self.next_level = None
+
+    def __repr__(self):
+        return "<{class_name}: {full_name}>".format(
+            class_name=type(self),
+            full_name=self.full_name()
+        )
 
     def full_name(self):
         return '{} {}'.format(self.skill.name, self.name)

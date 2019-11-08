@@ -18,12 +18,6 @@ def test_types():
             assert isinstance(level, Level)
 
 
-def test_setup():
-    for skill in all_skills:
-        for level in skill:
-            level._setup()
-
-
 def test_instructions():
     for skill in all_skills:
         for level in skill:
@@ -34,9 +28,3 @@ def test_goal():
     for skill in all_skills:
         for level in skill:
             os.path.isfile(level.goal_path)
-
-
-def test_test():
-    for skill in all_skills:
-        for level in skill:
-            level._test()
