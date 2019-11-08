@@ -195,19 +195,7 @@ class GitGud:
     def handle_test(self, args):
         self.assert_initialized()
         level = self.file_operator.get_level()
-
-        if level.test(self.file_operator):
-            try:
-                if level.next_level.skill != level.skill:
-                    print("Level complete, you've completed this skill! `git gud progress` to advance to the next skill")
-                    print("Next skill is: {}".format(level.next_level.skill.name))
-                else :
-                    print("Level complete! `git gud progress` to advance to the next level")
-                    print("Next level is: {}".format(level.next_level.full_name()))
-            except AttributeError:
-                print("All levels completed!")
-        else:
-            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
+        level.test(self.file_operator)
 
     def handle_progress(self, args):
         self.assert_initialized()
