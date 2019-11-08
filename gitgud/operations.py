@@ -111,11 +111,10 @@ class Operator:
     # Parses commit msg for keywords (e.g. Revert)
     @staticmethod
     def parse_name(commit_msg):
-        if ("Revert" in commit_msg):
+        if "Revert" in commit_msg:
             commit_msg = commit_msg[8:-64]
             commit_msg += '-'
         return commit_msg
-                              
 
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json
