@@ -1,6 +1,7 @@
 import os
 import shutil
-import datetime
+import datetime as dt
+import email.utils
 
 from glob import glob
 
@@ -74,9 +75,9 @@ class Operator:
         commit_objects = {}
         counter = len(commits)
         for name, parents, branches, tags in commits:
-            committime = datetime.datetime.now()
-            committime_offset = datetime.timedelta(seconds = counter)
-            committime_iso = (committime - committime_offset).replace(microsecond=0).isoformat()
+            committime = dt.datetime.now(dt.timezone.utc).astimezone().replace(microsecond=0)
+            committime_offset = dt.timedelta(seconds = counter)
+            committime_rfc = email.utils.format_datetime(committime - committime_offset)
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
@@ -85,7 +86,7 @@ class Operator:
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_iso, commit_date = committime_iso, parent_commits=parents)
+                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
             else:
                 # TODO GitPython octopus merge
                 self.repo.git.merge(*parents)
