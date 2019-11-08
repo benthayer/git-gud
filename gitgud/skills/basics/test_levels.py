@@ -13,23 +13,25 @@ level_tests = [
         ]
     ), (
         skill['branching'], [
-            'git gud commit',
+            'git checkout -b bugFix',
             'git gud commit'
         ]
     ), (
         skill['merging'], [
+            'git checkout -b bugFix',
             'git gud commit',
-            'git gud commit'
+            'git checkout master',
+            'git gud commit',
+            'git merge bugFix'
         ]
     ), (
         skill['rebasing'], [
-            'git gud commit',
-            'git gud commit'
+            'git rebase master bugFix'
         ]
     )
 ]
 
 
 @pytest.mark.parametrize('level,commands', level_tests)
-def test_level(level, commands):
-    simulate(level, commands)
+def test_level(gg, level, commands):
+    simulate(gg, level, commands)

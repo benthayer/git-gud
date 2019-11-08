@@ -7,29 +7,28 @@ from . import skill
 
 level_tests = [
     (
-        skill['detaching'], [
-            'git gud commit',
-            'git gud commit'
+        skill['detaching'], [  # User would instead check out the commit hash using only one command
+            'git checkout bugFix',
+            'git checkout @',
         ]
     ), (
         skill['relrefs1'], [
-            'git gud commit',
-            'git gud commit'
+            'git checkout HEAD^2'
         ]
     ), (
         skill['relrefs2'], [
-            'git gud commit',
-            'git gud commit'
+            'git checkout bugFix~2'
         ]
     ), (
         skill['reversing'], [
-            'git gud commit',
-            'git gud commit'
+            'git reset HEAD~ --hard',
+            'git checkout remote',
+            'git revert HEAD^2~~..HEAD^2'
         ]
     )
 ]
 
 
 @pytest.mark.parametrize('level,commands', level_tests)
-def test_level(level, commands):
-    simulate(level, commands)
+def test_level(gg, level, commands):
+    simulate(gg, level, commands)
