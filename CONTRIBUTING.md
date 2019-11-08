@@ -40,7 +40,7 @@ It's important to know that when you run `import git`, you're not actually impor
 If you're writing something advanced, chances are you'll have to interact with that library. 
 The project is located [here](https://github.com/gitpython-developers/GitPython) and the project's documentation can be found [here](https://gitpython.readthedocs.io/en/stable/).
 #### The `gitgud` module
-Git Gud is written in Python and stuctured like a Python module. 
+Git Gud is written in Python and structured like a Python module.
 Python modules can be run and provide a good amount of flexibility. 
 Python also comes with PyPi, a package manager. 
 This makes it easy to install Git Gud, even if you aren't the most technical. 
