@@ -311,8 +311,10 @@ class BasicLevel(Level):
 
         print("Setup complete")
         print()
+        print("Goal: " + self.goal_str())
+        print()
         print("Type \"git gud instructions\" to view full instructions")
-        print("Type \"git gud goal\" to view goal")
+        print("Type \"git gud help\" for more help")
         print()
 
     def instructions(self):
@@ -326,9 +328,12 @@ class BasicLevel(Level):
                 else:
                     print(line.strip())
 
-    def goal(self):
+    def goal_str(self):
         with open(self.goal_path) as goal_file:
-            print(goal_file.read())
+            return goal_file.read()
+
+    def goal(self):
+        print(self.goal_str())
 
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
