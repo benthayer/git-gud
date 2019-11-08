@@ -287,8 +287,7 @@ class BasicLevel(Level):
         self.goal_path = os.path.join(self.path, 'goal.txt')
         self.test_spec_path = os.path.join(self.path, 'test.spec')
 
-    def setup(self, file_operator):
-        print('Setting up level: "{}"'.format(self.full_name()))
+    def _setup(self, file_operator):
         commits, head = parse_spec(self.setup_spec_path)
         file_operator.create_tree(commits, head)
 
@@ -298,6 +297,12 @@ class BasicLevel(Level):
                 latest_commit = commit_name
 
         file_operator.write_last_commit(latest_commit)
+
+    def setup(self, file_operator):
+        print('Setting up level: "{}"'.format(self.full_name()))
+
+        self._setup(file_operator)
+
         print("Setup complete")
         print()
         print("Type \"git gud instructions\" to view full instructions")
@@ -319,9 +324,24 @@ class BasicLevel(Level):
         with open(self.goal_path) as goal_file:
             print(goal_file.read())
 
-    def test(self, file_operator):
-        print('Testing completion for level: "{}"'.format(self.full_name()))
+    def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
         test_tree = level_json(commits, head)
         level_tree = file_operator.get_current_tree()
         return test_skill(level_tree, test_tree)
+
+    def test(self, file_operator):
+        print('Testing completion for level: "{}"'.format(self.full_name()))
+
+        if self._test(file_operator):
+            try:
+                if self.next_level.skill != self.skill:
+                    print("Level complete, you've completed this skill! `git gud progress` to advance to the next skill")
+                    print("Next skill is: {}".format(self.next_level.skill.name))
+                else:
+                    print("Level complete! `git gud progress` to advance to the next level")
+                    print("Next level is: {}".format(self.next_level.full_name()))
+            except AttributeError:
+                print("All levels completed!")
+        else:
+            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
