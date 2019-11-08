@@ -272,20 +272,31 @@ class GitGud:
 
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
-        if args.skill_name in all_skills:
-            skill = all_skills[args.skill_name]
+        
+        argset = args.skill_name.split("-")
 
+        if (len(argset) == 2):
+            args.skill_name, args.level_name = tuple(argset)
+        elif(len(argset) > 2):
+            print("You put too many dashes! Use at most one dash when trying to load a level.")
+            return
+        
+        args.skill_name = int(args.skill_name) - 1 if args.skill_name.isnumeric() else args.skill_name
+        args.level_name = int(args.level_name) - 1 if (args.level_name is not None and args.level_name.isnumeric()) else args.level_name
+        
+        if args.skill_name in all_skills or (isinstance(args.skill_name, int) and args.skill_name in range(len(all_skills))):
+            skill = all_skills[args.skill_name]
             if args.level_name is not None:
-                if args.level_name in all_skills[args.skill_name]:
+                if args.level_name in all_skills[args.skill_name]  or (isinstance(args.level_name, int) and args.level_name in range(len(all_skills[args.skill_name]))):
                     level = skill[args.level_name]
                     self.load_level(level)
                 else:
-                    print("Level \"{}\" does not exist".format(args.level_name))
+                    print("Level \"{}\" does not exist".format(args.level_name if not isinstance(args.level_name, int) else args.level_name + 1))
                     print("To view levels/skills, use git gud levels or git gud skills")
             else:
                 self.load_level(skill[0])
         else:
-            print("Skill \"{}\" does not exist".format(args.skill_name))
+            print("Skill \"{}\" does not exist".format(args.skill_name if not isinstance(args.skill_name, int) else args.skill_name + 1))
             print("To view levels/skills, use git gud levels or git gud skills")
 
     def handle_commit(self, args):
