@@ -227,7 +227,7 @@ class GitGud:
     def handle_skills(self, args):
         try:
             cur_skill = self.file_operator.get_level().skill
-            print("Currently on skill: \"{}\"\n".format(cur_skill.name))
+            print("Currently on skill: \"{}\"".format(cur_skill.name))
             print()
         except KeyError:
             pass
