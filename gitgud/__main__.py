@@ -235,10 +235,10 @@ class GitGud:
         for skill in all_skills:
             # TODO Add description
             # 10 characters for the short IDs. 
-            print("Skill {:<10} :{:>2} level{}".format("\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
+            print("Skill {:<9} :{:>2} level{}".format("\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
             for index, level in enumerate(skill):
                 # " " * (characters allocated for ID - 6)
-                print("{}Level {:>2} : {:<10}".format(" " * 4, index + 1, level.name))
+                print("{}Level {:>2} : {:<10}".format(" " * 7, index + 1, level.name))
 
     def handle_levels(self, args):
         key_error_flag = False
