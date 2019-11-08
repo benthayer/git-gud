@@ -225,7 +225,7 @@ class NamedList:
         if isinstance(key, str):
             return key in self._name_dict.keys()
         else:
-            return key in self._items()
+            return key in self._items
 
     def values(self):
         return self._items
