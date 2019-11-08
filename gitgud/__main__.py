@@ -232,13 +232,17 @@ class GitGud:
         except KeyError:
             pass
         
+        skill_chars = max(len(skill.name) for skill in all_skills)
+        skill_format_template = "Skill {{:<{}}} :{{:>2}} level{{}}".format(skill_chars)
+        level_format_template = "{}Level {{:>2}} : {{:<3}}".format(" " * (skill_chars))
         for skill in all_skills:
             # TODO Add description
             # 10 characters for the short IDs. 
-            print("Skill {:<9} :{:>2} level{}".format("\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
+            print(skill_format_template.format("\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
+            
             for index, level in enumerate(skill):
                 # " " * (characters allocated for ID - 6)
-                print("{}Level {:>2} : {:<10}".format(" " * 7, index + 1, level.name))
+                print(level_format_template.format(index + 1, level.name))
 
     def handle_levels(self, args):
         key_error_flag = False
