@@ -7,22 +7,22 @@ from . import skill
 
 level_tests = [
     (
-        skill['committing'], [
+        skill['detaching'], [
             'git gud commit',
             'git gud commit'
         ]
     ), (
-        skill['branching'], [
+        skill['relrefs1'], [
             'git gud commit',
             'git gud commit'
         ]
     ), (
-        skill['merging'], [
+        skill['relrefs2'], [
             'git gud commit',
             'git gud commit'
         ]
     ), (
-        skill['rebasing'], [
+        skill['reversing'], [
             'git gud commit',
             'git gud commit'
         ]
