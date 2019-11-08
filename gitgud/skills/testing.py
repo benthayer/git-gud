@@ -5,8 +5,10 @@ from gitgud.operations import Operator
 
 
 def simulate(level, commands):
-    os.chdir('Q:/Open Source/test')
-    file_operator = Operator('Q:/Open Source/test')
+    # TODO Move the test dir to a temporary directory that will always be accessible
+    test_dir = 'Q:/Open Source/test'
+    os.chdir(test_dir)
+    file_operator = Operator(test_dir)
 
     level._setup(file_operator)
 
