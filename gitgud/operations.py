@@ -9,7 +9,7 @@ from git import Repo
 
 from gitgud import actor
 from gitgud import actor_string
-from gitgud.levels import all_levels
+from gitgud.skills import all_skills
 
 
 class Operator:
@@ -105,15 +105,22 @@ class Operator:
             counter = counter - 1
 
         # TODO Checkout using name
-        head_is_commit = True;                              #By default, assume HEAD is a commit.
+        head_is_commit = True
         for branch in self.repo.branches:
             if branch.name == head:
                 branch.checkout()
-                head_is_commit = False                      #Updates if HEAD is a branch.
-        
-        #If HEAD isn't set as a branch, then 'head' is a commit id. Use it to checkout the commit.
-        if (head_is_commit):
+                head_is_commit = False
+
+        if head_is_commit:
             self.repo.git.checkout(commit_objects[head])
+
+    # Parses commit msg for keywords (e.g. Revert)
+    @staticmethod
+    def parse_name(commit_msg):
+        if "Revert" in commit_msg:
+            commit_msg = commit_msg[8:-64]
+            commit_msg += '-'
+        return commit_msg
 
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json
@@ -122,7 +129,7 @@ class Operator:
 
         tree = {
             'branches': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
-            'tags': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
+            'tags': {},  # 'tag_name': {'target': 'commit_id', 'id': 'tag_name'}
             'commits': {},  # '2': {'parents': ['1'], 'id': '1'}
             'HEAD': {}  # 'target': 'branch_name', 'id': 'HEAD'
         }
@@ -133,6 +140,7 @@ class Operator:
         for branch in repo.branches:
             commits.add(branch.commit)
             commit_name = branch.commit.message.strip()
+            commit_name = self.parse_name(commit_name)
             tree['branches'][branch.name] = {
                 "target": commit_name,
                 "id": branch.name
@@ -155,8 +163,11 @@ class Operator:
         while len(visited) > 0:
             cur_commit = visited.pop()
             commit_name = cur_commit.message.strip()
+            # If revert detected, modifies commit_name; o/w nothing happens
+            commit_name = self.parse_name(commit_name)
+
             tree['commits'][commit_name] = {
-                'parents': [parent.message.strip() for parent in cur_commit.parents],
+                'parents': [self.parse_name(parent.message.strip()) for parent in cur_commit.parents],
                 'id': commit_name
             }
 
@@ -169,17 +180,19 @@ class Operator:
             'target': target,
             'id': 'HEAD'
         }
-
         return tree
 
-    def get_challenge(self):
+    def read_level_file(self):
         with open(self.level_path) as level_file:
-            level_name, challenge_name = level_file.read().split()
-        return all_levels[level_name][challenge_name]
+            return level_file.read()
 
-    def write_challenge(self, challenge):
-        with open(self.level_path, 'w+') as level_file:
-            level_file.write(' '.join([challenge.level.name, challenge.name]))
+    def get_level(self):
+        skill_name, level_name = self.read_level_file().split()
+        return all_skills[skill_name][level_name]
+
+    def write_level(self, level):
+        with open(self.level_path, 'w+') as skill_file:
+            skill_file.write(' '.join([level.skill.name, level.name]))
 
     def get_last_commit(self):
         with open(self.last_commit_path) as last_commit_file:

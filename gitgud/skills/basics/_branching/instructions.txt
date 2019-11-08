@@ -1,4 +1,4 @@
-This practice level will familiarize you with the concept of git branching!
+This practice skill will familiarize you with the concept of git branching!
 >>>
 Branching in git allows teammates to create separate "branching" commit nodes that are useful when teammates are working on separate portions of a project. Branching allows teammates to commit their changes on their portion of the project with needing to coordinate pulling new commits from others.
 >>>

@@ -1,4 +1,4 @@
-This level will familiarize you with the concept of git rebasing!
+This skill will familiarize you with the concept of git rebasing!
 >>>
 Rebasing in git is an alternative way of combining two different branches (recall the last method: merging).
 >>>
