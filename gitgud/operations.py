@@ -76,7 +76,7 @@ class Operator:
         counter = len(commits)
         for name, parents, branches, tags in commits:
             committime = dt.datetime.now(dt.timezone.utc).astimezone().replace(microsecond=0)
-            committime_offset = dt.timedelta(seconds = counter)
+            committime_offset = dt.timedelta(seconds = counter) + committime.utcoffset()
             committime_rfc = email.utils.format_datetime(committime - committime_offset)
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
