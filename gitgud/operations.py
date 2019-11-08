@@ -177,9 +177,12 @@ class Operator:
         }
         return tree
 
+    def read_level_file(self):
+        with open(self.level_path) as level_file:
+            return level_file.read()
+
     def get_level(self):
-        with open(self.level_path) as skill_file:
-            skill_name, level_name = skill_file.read().split()
+        skill_name, level_name = self.read_level_file().split()
         return all_skills[skill_name][level_name]
 
     def write_level(self, level):

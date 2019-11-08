@@ -91,9 +91,16 @@ class GitGud:
     def is_initialized(self):
         return self.file_operator is not None
 
-    def assert_initialized(self):
+    def assert_initialized(self, skip_level_check=False):
         if not self.is_initialized():
-            raise InitializationError("Git gud not initialized. Use \"git gud start\" to initialize")
+            raise InitializationError("Git gud has not been initialized. Use \"git gud start\" to initialize")
+
+        if not skip_level_check:
+            try:
+                self.file_operator.get_level()
+            except KeyError:
+                level_name = self.file_operator.read_level_file()
+                raise InitializationError("Currently loaded level does not exist: \"{}\"".format(level_name))
 
     def load_level(self, level):
         level.setup(self.file_operator)
@@ -165,12 +172,9 @@ class GitGud:
         show_tree()
 
     def handle_status(self, args):
-        if self.is_initialized():
-            level_name = self.file_operator.get_level().full_name()
-            print("Currently on level: \"{}\"".format(level_name))
-        else:
-            print("Git gud not initialized.")
-            print("Initialize using \"git gud start\"")
+        self.assert_initialized()
+        level_name = self.file_operator.get_level().full_name()
+        print("Currently on level: \"{}\"".format(level_name))
 
     def handle_instructions(self, args):
         self.assert_initialized()
@@ -221,9 +225,12 @@ class GitGud:
             print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
 
     def handle_skills(self, args):
-        cur_skill = self.file_operator.get_level().skill
-
-        print("Currently on skill: \"{}\"\n".format(cur_skill.name))
+        try:
+            cur_skill = self.file_operator.get_level().skill
+            print("Currently on skill: \"{}\"\n".format(cur_skill.name))
+            print()
+        except KeyError:
+            pass
         
         for skill in all_skills:
             # TODO Add description
@@ -236,7 +243,12 @@ class GitGud:
     def handle_levels(self, args):
         key_error_flag = False
         if args.skill_name is None:
-            skill = self.file_operator.get_level().skill
+            try:
+                skill = self.file_operator.get_level().skill
+            except KeyError:
+                skill_name = self.file_operator.read_level_file().split()[0]
+                print("Cannot find any levels in skill: \"{}\"".format(skill_name))
+                return
         else:
             try:
                 skill = all_skills[args.skill_name]
@@ -255,7 +267,7 @@ class GitGud:
             print(str(index + 1) + ": " + level.name)
 
     def handle_load(self, args):
-        self.assert_initialized()
+        self.assert_initialized(skip_level_check=True)
         if args.skill_name in all_skills:
             skill = all_skills[args.skill_name]
 
@@ -311,9 +323,8 @@ class GitGud:
         else:
             try:
                 self.command_dict[args.command](args)
-            except InitializationError:
-                print("Git gud has not been initialized. Initialize using \"git gud start\"")
-                pass
+            except InitializationError as error:
+                print(error)
 
 
 if __name__ == '__main__':
