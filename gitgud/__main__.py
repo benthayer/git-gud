@@ -11,6 +11,7 @@ from git.exc import InvalidGitRepositoryError
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
 from gitgud.skills import all_skills
+from gitgud.skills.util import print_all_complete
 from gitgud.hooks import all_hooks
 
 # TODO Add test suite so testing can be separate from main code
@@ -195,24 +196,13 @@ class GitGud:
     def handle_test(self, args):
         self.assert_initialized()
         level = self.file_operator.get_level()
-
-        if level.test(self.file_operator):
-            try:
-                if level.next_level.skill != level.skill:
-                    print("Level complete, you've completed this skill! `git gud progress` to advance to the next skill")
-                    print("Next skill is: {}".format(level.next_level.skill.name))
-                else :
-                    print("Level complete! `git gud progress` to advance to the next level")
-                    print("Next level is: {}".format(level.next_level.full_name()))
-            except AttributeError:
-                print("All levels completed!")
-        else:
-            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
+        level.test(self.file_operator)
 
     def handle_progress(self, args):
         self.assert_initialized()
 
         print("Progressing to next skill...")
+        print()
 
         level = self.file_operator.get_level()
 
@@ -220,9 +210,7 @@ class GitGud:
         if next_level is not None:
             self.load_level(next_level)
         else:
-            print("Wow! You've complete every level, congratulations!")
-            print("If you want to keep learning git, why not try contributing to git-gud by forking us at https://github.com/bthayer2365/git-gud/")
-            print("We're always looking for contributions and are more than happy to accept both pull requests and suggestions!")
+            print_all_complete()
 
     def handle_skills(self, args):
         try:

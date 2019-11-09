@@ -234,16 +234,6 @@ class NamedList:
         return self._name_dict.keys()
 
 
-class Skill(NamedList):
-    def __init__(self, name, levels):
-        self.name = name
-        self._name_dict = {level.name:index for index, level in enumerate(levels)}
-        self._items = levels
-
-        for level in levels:
-            level.skill = self
-
-
 class AllSkills(NamedList):
     def __init__(self, skills):
         self._name_dict = {skill.name: index for index, skill in enumerate(skills)}
@@ -256,11 +246,27 @@ class AllSkills(NamedList):
                 last_level = level
 
 
+class Skill(NamedList):
+    def __init__(self, name, levels):
+        self.name = name
+        self._name_dict = {level.name:index for index, level in enumerate(levels)}
+        self._items = levels
+
+        for level in levels:
+            level.skill = self
+
+
 class Level:
     def __init__(self, name):
         self.name = name
         self.skill = None
         self.next_level = None
+
+    def __repr__(self):
+        return "<{class_name}: '{full_name}'>".format(
+            class_name=type(self).__name__,
+            full_name=self.full_name()
+        )
 
     def full_name(self):
         return '{} {}'.format(self.skill.name, self.name)
@@ -278,6 +284,16 @@ class Level:
         pass
 
 
+def print_all_complete():
+    print("Wow! You've complete every level, congratulations!")
+
+    print("If you want to keep learning git, why not try contributing"
+          " to git-gud by forking the project at https://github.com/bthayer2365/git-gud/")
+
+    print("We're always looking for contributions and are more than"
+          " happy to accept both pull requests and suggestions!")
+
+
 class BasicLevel(Level):
     def __init__(self, name, path):
         super().__init__(name)
@@ -287,8 +303,7 @@ class BasicLevel(Level):
         self.goal_path = os.path.join(self.path, 'goal.txt')
         self.test_spec_path = os.path.join(self.path, 'test.spec')
 
-    def setup(self, file_operator):
-        print('Setting up level: "{}"'.format(self.full_name()))
+    def _setup(self, file_operator):
         commits, head = parse_spec(self.setup_spec_path)
         file_operator.create_tree(commits, head)
 
@@ -298,10 +313,19 @@ class BasicLevel(Level):
                 latest_commit = commit_name
 
         file_operator.write_last_commit(latest_commit)
+
+    def setup(self, file_operator):
+        print('Setting up level: "{}"'.format(self.full_name()))
+
+        self._setup(file_operator)
+
         print("Setup complete")
         print()
+        print("Goal:")
+        self.goal()
+        print()
         print("Type \"git gud instructions\" to view full instructions")
-        print("Type \"git gud goal\" to view goal")
+        print("Type \"git gud help\" for more help")
         print()
 
     def instructions(self):
@@ -315,13 +339,32 @@ class BasicLevel(Level):
                 else:
                     print(line.strip())
 
-    def goal(self):
+    def goal_str(self):
         with open(self.goal_path) as goal_file:
-            print(goal_file.read())
+            return goal_file.read()
 
-    def test(self, file_operator):
-        print('Testing completion for level: "{}"'.format(self.full_name()))
+    def goal(self):
+        print(self.goal_str())
+
+    def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
         test_tree = level_json(commits, head)
         level_tree = file_operator.get_current_tree()
         return test_skill(level_tree, test_tree)
+
+    def test(self, file_operator):
+        print('Testing completion for level: "{}"'.format(self.full_name()))
+        print()
+
+        if self._test(file_operator):
+            try:
+                if self.next_level.skill != self.skill:
+                    print("Level complete, you've completed all levels in this skill! `git gud progress` to advance to the next skill")
+                    print("Next skill is: {}".format(self.next_level.skill.name))
+                else:
+                    print("Level complete! `git gud progress` to advance to the next level")
+                    print("Next level is: {}".format(self.next_level.full_name()))
+            except AttributeError:
+                print_all_complete()
+        else:
+            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
