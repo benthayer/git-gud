@@ -3,7 +3,7 @@ import os
 
 cwd = os.getcwd()
 
-def write_Init(skill_name, skill_path, level_name):
+def write_init(skill_name, skill_path, level_name):
     # If skills/skill/__init__.py doesn't exist, create a basic version (no levels)
     if not os.path.exists(os.path.join(skill_path,"__init__.py")):
         with open(os.path.join(skill_path,"__init__.py"), 'w+') as fp:
@@ -15,7 +15,7 @@ def write_Init(skill_name, skill_path, level_name):
                 "    '{}',".format(skill_name),
                 "    [",
                 "    ]",
-                ")",
+                ")\n",
                 ])
             fp.write(level_setup)
         fp.close()
@@ -38,7 +38,7 @@ def write_Init(skill_name, skill_path, level_name):
             fp.write(filedata)
         fp.close()
         
-        write_Init(skill_name, skill_path, level_name)
+        write_init(skill_name, skill_path, level_name)
         return
     else:
         # Populate file with BasicLevel
@@ -53,6 +53,11 @@ def write_Init(skill_name, skill_path, level_name):
         with open(os.path.join(skill_path,"__init__.py"), 'w') as fp:
             fp.write(filedata)
         fp.close()
+    return
+
+def create_file(level_path,filename):
+    with open(os.path.join(level_path,filename),'a+'):
+        pass
     return
 
 def main():
@@ -83,27 +88,19 @@ def main():
             if not os.path.exists(level_path):
                 os.mkdir(level_path)
             
-            write_Init(skill_name,skill_path,level_name)
+            write_init(skill_name,skill_path,level_name)
             
             # Make instruction file
-            inst_path = os.path.join(level_path,"instructions.txt")
-            if not os.path.exists(inst_path):
-                open(inst_path,'a').close()
+            create_file(level_path, "instructions.txt")
             
             # Make goal file
-            goal_path = os.path.join(level_path,"goal.txt")
-            if not os.path.exists(goal_path):
-                open(goal_path,'a').close()
-            
+            create_file(level_path, "goal.txt")
+
             # Make setup file
-            setup_path = os.path.join(level_path,"setup.spec")
-            if not os.path.exists(setup_path):
-                open(setup_path,'a').close()
-    
+            create_file(level_path, "setup.txt")
+                
             # Make test file
-            test_path = os.path.join(level_path,"test.spec")
-            if not os.path.exists(test_path):
-                open(test_path,'a').close()
+            create_file(level_path, "test.txt")
     else:
         print("Error: Execute this script in the git-gud directory.")
 
