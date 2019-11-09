@@ -59,7 +59,6 @@ def create_file(level_path,filename):
     with open(os.path.join(level_path,filename),'a+'):
         pass
     print("Created: {}".format(filename))
-    return
 
 def main():
     # Obtain input arguments
