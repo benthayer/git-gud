@@ -18,12 +18,11 @@ def write_init(skill_name, skill_path, level_name):
                 ")\n",
                 ])
             fp.write(level_setup)
-        fp.close()
+    
         
         # Read file
         with open(os.path.join(os.path.join("gitgud","skills"),"__init__.py"), 'r') as fp:
             filedata = fp.read()
-        fp.close()
 
         # Add import statement
         replace = "from gitgud.skills.{0} import skill as {0}_skill\n\nfrom gitgud.skills.u".format(skill_name)
@@ -34,10 +33,10 @@ def write_init(skill_name, skill_path, level_name):
         filedata = filedata.replace("\n]", replace)
 
         # Write to file
-        with open(os.path.join(os.path.join("gitgud","skills"),"__init__.py"), 'w') as fp:
+        filepath = os.path.join(os.path.join("gitgud","skills"),"__init__.py")
+        with open(filepath, 'w') as fp:
             fp.write(filedata)
-            print("Added skill to skills/__init__.py")
-        fp.close()
+            print("Modified: Added skill to {}".format(filepath))
         
         write_init(skill_name, skill_path, level_name)
         return
@@ -45,22 +44,21 @@ def write_init(skill_name, skill_path, level_name):
         # Populate file with BasicLevel
         with open(os.path.join(skill_path,"__init__.py"), 'r') as fp:
             filedata = fp.read()
-        fp.close()
 
         replace = ",\n        BasicLevel('{0}', pkg_resources.resource_filename(__name__, '_{0}/'))\n    ]".format(level_name)
         filedata = filedata.replace("\n    ]", replace)
         filedata = filedata.replace("[,","[")
         
-        with open(os.path.join(skill_path,"__init__.py"), 'w') as fp:
+        filepath = os.path.join(skill_path,"__init__.py")
+        with open(filepath, 'w') as fp:
             fp.write(filedata)
-            print("Added level to skills/<skill_name>/__init__.py")
-        fp.close()
+            print("Modified: Added level to {}".format(filepath))
     return
 
 def create_file(level_path,filename):
     with open(os.path.join(level_path,filename),'a+'):
         pass
-    print("Created: {}\n".format(filename))
+    print("Created: {}".format(filename))
     return
 
 def main():
@@ -81,24 +79,24 @@ def main():
             if choice == 'n':
                 return
             
-            print("\nCreating Folders:\n")
+            print("\nCreating Folders:")
             # Make skill folder
             skill_path = os.path.join("gitgud","skills","{}".format(skill_name))
             if not os.path.exists(skill_path):
                 os.mkdir(skill_path)
-                print("Created Folder: {}\n".format(skill_name))
+                print("Created: {}".format(skill_name))
                   
                   
             # Make level folder
             level_path = os.path.join(skill_path,"_{}".format(level_name))
             if not os.path.exists(level_path):
                 os.mkdir(level_path)
-                print("Created Folder: {}\n".format(skill_name))
+                print("Created: {}".format(level_name))
             
-            print("\nModifying Init Files:\n")
+            print("\nModifying Init Files:")
             write_init(skill_name,skill_path,level_name)
             
-            print("\nCreating Files:\n")
+            print("\nCreating Files:")
             # Make instruction file
             create_file(level_path, "instructions.txt")
             
