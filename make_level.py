@@ -5,19 +5,18 @@ cwd = os.getcwd()
 
 def write_Init(skill_name, skill_path, level_name):
     # If skills/skill/__init__.py doesn't exist, create a basic version (no levels)
-    if not os.path.exists(join(skill_path,"__init__.py")):
+    if not os.path.exists(os.path.join(skill_path,"__init__.py")):
         with open(os.path.join(skill_path,"__init__.py"), 'w+') as fp:
             level_setup = "\n".join([
                 "import pkg_resources\n",
                 "from gitgud.skills.util import BasicLevel",
                 "from gitgud.skills.util import Skill\n"
                 "skill = Skill(",
-                "\t'{}',".format(skill_name),
-                "\t[",
-                "\t]",
+                "    '{}',".format(skill_name),
+                "    [",
+                "    ]",
                 ")",
                 ])
-            level_setup = level_setup.replace("\t", " " * 4)
             fp.write(level_setup)
         fp.close()
         
@@ -31,9 +30,8 @@ def write_Init(skill_name, skill_path, level_name):
         filedata = filedata.replace("\nfrom gitgud.skills.u", replace)
         
         # Add to input array of Skill
-        replace = ",\n\t{}_skill\n]".format(skill_name)
+        replace = ",\n    {}_skill\n]".format(skill_name)
         filedata = filedata.replace("\n]", replace)
-        filedata = filedata.replace("\t", " " * 4)
 
         # Write to file
         with open(os.path.join(os.path.join("gitgud","skills"),"__init__.py"), 'w') as fp:
@@ -41,7 +39,6 @@ def write_Init(skill_name, skill_path, level_name):
         fp.close()
         
         write_Init(skill_name, skill_path, level_name)
-        print(fp.closed) #for debug, delete
         return
     else:
         # Populate file with BasicLevel
@@ -49,15 +46,13 @@ def write_Init(skill_name, skill_path, level_name):
             filedata = fp.read()
         fp.close()
 
-        replace = ",\n\t\tBasicLevel('{0}', pkg_resources.resource_filename(__name__, '_{0}/'))\n\t]".format(level_name)
-        filedata = filedata.replace("\n\t]", replace)
+        replace = ",\n        BasicLevel('{0}', pkg_resources.resource_filename(__name__, '_{0}/'))\n    ]".format(level_name)
+        filedata = filedata.replace("\n    ]", replace)
         filedata = filedata.replace("[,","[")
-        filedata = filedata.replace("\t", " " * 4)
         
         with open(os.path.join(skill_path,"__init__.py"), 'w') as fp:
             fp.write(filedata)
         fp.close()
-        print(fp.closed) #for debug, delete
     return
 
 def main():
@@ -66,7 +61,7 @@ def main():
     level_name = sys.argv[2]
     
     # Check if cwd is gitgud folder
-    if os.path.isdir(os.path.join(cwd, 'gitgud'))
+    if os.path.isdir(os.path.join(cwd, 'gitgud')):
             # Confirm choice to avoid making a mess
             print ("\n".join([
                             "skill_name: {}".format(skill_name),
