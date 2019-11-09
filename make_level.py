@@ -36,6 +36,7 @@ def write_init(skill_name, skill_path, level_name):
         # Write to file
         with open(os.path.join(os.path.join("gitgud","skills"),"__init__.py"), 'w') as fp:
             fp.write(filedata)
+            print("Added skill to skills/__init__.py")
         fp.close()
         
         write_init(skill_name, skill_path, level_name)
@@ -52,12 +53,14 @@ def write_init(skill_name, skill_path, level_name):
         
         with open(os.path.join(skill_path,"__init__.py"), 'w') as fp:
             fp.write(filedata)
+            print("Added level to skills/<skill_name>/__init__.py")
         fp.close()
     return
 
 def create_file(level_path,filename):
     with open(os.path.join(level_path,filename),'a+'):
         pass
+    print("Created: {}\n".format(filename))
     return
 
 def main():
@@ -78,18 +81,24 @@ def main():
             if choice == 'n':
                 return
             
+            print("\nCreating Folders:\n")
             # Make skill folder
             skill_path = os.path.join("gitgud","skills","{}".format(skill_name))
             if not os.path.exists(skill_path):
                 os.mkdir(skill_path)
-    
+                print("Created Folder: {}\n".format(skill_name))
+                  
+                  
             # Make level folder
             level_path = os.path.join(skill_path,"_{}".format(level_name))
             if not os.path.exists(level_path):
                 os.mkdir(level_path)
+                print("Created Folder: {}\n".format(skill_name))
             
+            print("\nModifying Init Files:\n")
             write_init(skill_name,skill_path,level_name)
             
+            print("\nCreating Files:\n")
             # Make instruction file
             create_file(level_path, "instructions.txt")
             
