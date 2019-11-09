@@ -1,5 +1,7 @@
 import os
 import shutil
+import datetime as dt
+import email.utils
 
 from glob import glob
 
@@ -71,8 +73,11 @@ class Operator:
         self.repo.delete_tag(*self.repo.tags)
 
         commit_objects = {}
-
+        counter = len(commits)
         for name, parents, branches, tags in commits:
+            committime = dt.datetime.now(dt.timezone.utc).astimezone().replace(microsecond=0)
+            committime_offset = dt.timedelta(seconds = counter) + committime.utcoffset()
+            committime_rfc = email.utils.format_datetime(committime - committime_offset)
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
@@ -81,7 +86,7 @@ class Operator:
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-                self.repo.index.commit(name, author=actor, committer=actor, parent_commits=parents)
+                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
             else:
                 # TODO GitPython octopus merge
                 self.repo.git.merge(*parents)
@@ -97,6 +102,7 @@ class Operator:
             for tag in tags:
                 self.repo.create_tag(tag, self.repo.head.commit)
             # TODO Log commit hash and info
+            counter = counter - 1
 
         # TODO Checkout using name
         head_is_commit = True
@@ -111,11 +117,10 @@ class Operator:
     # Parses commit msg for keywords (e.g. Revert)
     @staticmethod
     def parse_name(commit_msg):
-        if ("Revert" in commit_msg):
+        if "Revert" in commit_msg:
             commit_msg = commit_msg[8:-64]
             commit_msg += '-'
         return commit_msg
-                              
 
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json
@@ -177,9 +182,12 @@ class Operator:
         }
         return tree
 
+    def read_level_file(self):
+        with open(self.level_path) as level_file:
+            return level_file.read()
+
     def get_level(self):
-        with open(self.level_path) as skill_file:
-            skill_name, level_name = skill_file.read().split()
+        skill_name, level_name = self.read_level_file().split()
         return all_skills[skill_name][level_name]
 
     def write_level(self, level):

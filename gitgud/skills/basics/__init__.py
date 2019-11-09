@@ -4,7 +4,7 @@ from gitgud.skills.util import BasicLevel
 from gitgud.skills.util import Skill
 
 skill = Skill(
-    'intro',
+    'basics',
     [
         BasicLevel('committing', pkg_resources.resource_filename(__name__, '_committing/')),
         BasicLevel('branching', pkg_resources.resource_filename(__name__, '_branching/')),
