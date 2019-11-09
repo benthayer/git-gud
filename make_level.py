@@ -110,7 +110,7 @@ def main():
             if not os.path.exists(test_path):
                 open(test_path,'a').close()
     else:
-        print("Error: Execute this script in the gitgud directory.")
+        print("Error: Execute this script in the git-gud directory.")
 
 
 if __name__ == "__main__":
