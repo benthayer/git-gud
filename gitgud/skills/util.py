@@ -309,8 +309,11 @@ class BasicLevel(Level):
 
         latest_commit = '0'
         for commit_name, _, _, _ in commits:
-            if int(commit_name) > int(latest_commit):
-                latest_commit = commit_name
+            try:
+                if int(commit_name) > int(latest_commit):
+                    latest_commit = commit_name
+            except ValueError:
+                pass  # Commit is merge and doesn't have number
 
         file_operator.write_last_commit(latest_commit)
 

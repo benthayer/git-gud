@@ -88,6 +88,9 @@ class Operator:
                 self.add_file_to_index(name)
                 self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
             else:
+                assert name[0] == 'M'
+                int(name[1:])  # Fails if not a number
+
                 # TODO GitPython octopus merge
                 self.repo.git.merge(*parents)
                 # TODO GitPython amend commit
