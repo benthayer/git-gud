@@ -9,7 +9,8 @@ jobs:
 
     steps:
       - checkout
-      - run: python setup.py
+      - run: python3 -m pip install .
+      - run: python3 -m pip install pytest
       - run:
           name: Running tests
-          command: pytest .
+          command: python3 -m pytest .
