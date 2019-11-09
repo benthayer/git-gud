@@ -9,8 +9,15 @@ jobs:
 
     steps:
       - checkout
-      - run: python3 -m pip install .
-      - run: python3 -m pip install pytest
+      - run:
+          name: install
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install .
+            pip install pytest
       - run:
           name: Running tests
-          command: python3 -m pytest .
+          command: |
+            . venv/bin/activate
+            pytest .
