@@ -65,10 +65,15 @@ def main():
     skill_name = sys.argv[1]
     level_name = sys.argv[2]
     
-    # Check if cwd is git-gud folder
-    if cwd[-7:] == "git-gud":
+    # Check if cwd is gitgud folder
+    if os.path.isdir(os.path.join(cwd, 'gitgud'))
             # Confirm choice to avoid making a mess
-            print ("Confirm[y/n]: skill_name = \"{}\" & level_name = \"{}\"".format(skill_name,level_name))
+            print ("\n".join([
+                            "skill_name: {}".format(skill_name),
+                            "level_name: {}".format(level_name),
+                            "Confirm[y/n] "
+                            ]),
+                        end = '')
             choice = input().lower()
             if choice == 'n':
                 return
@@ -105,7 +110,7 @@ def main():
             if not os.path.exists(test_path):
                 open(test_path,'a').close()
     else:
-        print("Error: Execute this script in the git-gud directory.")
+        print("Error: Execute this script in the gitgud directory.")
 
 
 if __name__ == "__main__":
