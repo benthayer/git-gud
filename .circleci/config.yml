@@ -10,12 +10,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install
+          name: Set up environmetn
           command: |
             python3 -m venv venv
             . venv/bin/activate
             pip install .
             pip install pytest
+            git config --global user.name "CircleCI"
+            git config --global user.email "circleci@example.com"
       - run:
           name: Running tests
           command: |
