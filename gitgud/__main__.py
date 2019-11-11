@@ -34,17 +34,8 @@ class GitGud:
 
         self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
-        # TODO Add git gud help <command>, which would return the same output as git gud <command> -- help
-
-        # TODO Display help message for subcommand when it fails.
-        # ie `git gud load skill1 level1 random-input` should have output similar to `git gud load --help`
-        
-        # Use "git gud help" to print helps of all subcommands.
-        # "git gud help <command>" prints the description of the <command> but not help.
-        # TODO Add longer descriptions
-
         help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
-        start_parser = self.subparsers.add_parser('start', help='Git started!', description='Git started!')
+        init_parser = self.subparsers.add_parser('init', help='Git goin!', description='Initialize the direcotry with a git repository and load the first level of Git Gud.')
         status_parser = self.subparsers.add_parser('status', help='Print out the name of the current level', description='Print out the name of the current level')
         instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
         goal_parser = self.subparsers.add_parser('goal', help='Concisely show what needs to be done to complete the level.', description='Concisely show what needs to be done to complete the level.')
@@ -62,7 +53,7 @@ class GitGud:
 
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
-        start_parser.add_argument('--force', action='store_true')
+        init_parser.add_argument('--force', action='store_true')
 
         levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
 
@@ -73,7 +64,7 @@ class GitGud:
 
         self.command_dict = {
             'help': self.handle_help,
-            'start': self.handle_start,
+            'init': self.handle_init,
             'status': self.handle_status,
             'instructions': self.handle_instructions,
             'goal': self.handle_goal,
@@ -94,7 +85,7 @@ class GitGud:
 
     def assert_initialized(self, skip_level_check=False):
         if not self.is_initialized():
-            raise InitializationError("Git gud has not been initialized. Use \"git gud start\" to initialize")
+            raise InitializationError("Git gud has not been initialized. Use \"git gud init\" to initialize")
 
         if not skip_level_check:
             try:
@@ -118,7 +109,7 @@ class GitGud:
                 print('No such command exists: \"{}\"\n'.format(args.command_name))
                 self.parser.print_help()
 
-    def handle_start(self, args):
+    def handle_init(self, args):
         # Make sure it's safe to initialize
         if not args.force:
             # We aren't forcing
@@ -168,6 +159,8 @@ class GitGud:
                 hook_file.write('exit 0' + os.linesep)
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
+        print('Welcome to Git Gud!')
+        print()
 
         self.file_operator.get_level().setup(self.file_operator)
         show_tree()
