@@ -25,7 +25,7 @@ def create_alias(config_writer=None):
     python = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
     if config_writer is None:
-        config_writer = GitConfig().config_writer(config_skill='global')
+        config_writer = GitConfig().config_writer(config_level='global')
 
     try:
         config_writer.remove_option('alias', 'gud')
