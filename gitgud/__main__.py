@@ -222,14 +222,13 @@ class GitGud:
         
         skill_chars = max(len(skill.name) for skill in all_skills)
         skill_format_template = "Skill {{}} - {{:<{}}} :{{:>2}} level{{}}".format(skill_chars)
-        level_format_template = "{}    Level {{:>2}} : {{:<3}}".format(" " * (skill_chars))
+        level_format_template = "    Level {:>2} : {:<3}"
+        
         for i, skill in enumerate(all_skills):
             # TODO Add description
-            # 10 characters for the short IDs. 
             print(skill_format_template.format(i + 1, "\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
-            
+
             for index, level in enumerate(skill):
-                # " " * (characters allocated for ID - 6)
                 print(level_format_template.format(index + 1, level.name))
         
         print("\nLoad a level with \033[1mgit gud load\033[0m {\033[4mskill-number\033[0m|\033[4mskill-name\033[0m} [[\033[1m-\033[0m]{\033[4mlevel-number\033[0m|\033[4mlevel-name\033[0m}]")
