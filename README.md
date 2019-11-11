@@ -94,7 +94,7 @@ Some commands you'll want to learn and what they do:
   * Begin the specified level (it is optional to specify the level)
 * git gud commit
   * Commit an empty file with a unique name
-* git gud commit <name>
+* git gud commit <commit_name>
   * Commit an empty file with the specified name
 * git gud goal
   * Concisely prints out what is needed to complete the level
