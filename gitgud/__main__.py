@@ -53,7 +53,7 @@ class GitGud:
         test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
-        levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels in current skill or in other skill if specified')
+        levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
         load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description='Load a specific skill or level')
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
@@ -213,16 +213,17 @@ class GitGud:
             print_all_complete()
 
     def handle_skills(self, args):
-        try:
-            cur_skill = self.file_operator.get_level().skill
-            print("Currently on skill: \"{}\"\n".format(cur_skill.name))
-            print()
-        except KeyError:
-            pass
+        if self.is_initialized():
+            try:
+                cur_skill = self.file_operator.get_level().skill
+                print("Currently on skill: \"{}\"\n".format(cur_skill.name))
+                print()
+            except KeyError:
+                pass
         
         for skill in all_skills:
             # TODO Add description
-            # 10 characters for the short IDs. 
+            # 10 characters for the short IDs.
             print("Skill {:<10} :{:>2} level{}".format("\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
             for index, level in enumerate(skill):
                 # " " * (characters allocated for ID - 6)
@@ -231,6 +232,9 @@ class GitGud:
     def handle_levels(self, args):
         key_error_flag = False
         if args.skill_name is None:
+            if self.file_operator is None:
+                self.subparsers.choices['levels'].print_help()
+                return
             try:
                 skill = self.file_operator.get_level().skill
             except KeyError:
