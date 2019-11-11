@@ -10,22 +10,29 @@ def write_init(skill_name, skill_path, level_name):
             level_setup = "\n".join([
                 "import pkg_resources\n",
                 "from gitgud.skills.util import BasicLevel",
-                "from gitgud.skills.util import Skill\n"
+                "from gitgud.skills.util import Skill",
+                "",
                 "skill = Skill(",
                 "    '{}',".format(skill_name),
                 "    [",
                 "    ]",
-                ")\n",
+                ")",
+                ""
                 ])
             fp.write(level_setup)
     
         
         # Read file
-        with open(os.path.join(os.path.join("gitgud","skills"),"__init__.py"), 'r') as fp:
+        with open(os.path.join("gitgud","skills","__init__.py"), 'r') as fp:
             filedata = fp.read()
 
         # Add import statement
-        replace = "from gitgud.skills.{0} import skill as {0}_skill\n\nfrom gitgud.skills.u".format(skill_name)
+        replace = "\n".join([
+                            "from gitgud.skills.{0} import skill as {0}_skill".format(skill_name),
+                            "",
+                            "",
+                            "from gitgud.skills.u"
+                            ])
         filedata = filedata.replace("\nfrom gitgud.skills.u", replace)
         
         # Add to input array of Skill
@@ -33,10 +40,10 @@ def write_init(skill_name, skill_path, level_name):
         filedata = filedata.replace("\n]", replace)
 
         # Write to file
-        filepath = os.path.join(os.path.join("gitgud","skills"),"__init__.py")
+        filepath = os.path.join("gitgud","skills","__init__.py")
         with open(filepath, 'w') as fp:
             fp.write(filedata)
-            print("Modified: Added skill to {}".format(filepath))
+            print("Registered skill \"{}\" in {}".format(skill_name, filepath))
         
         write_init(skill_name, skill_path, level_name)
         return
@@ -52,20 +59,24 @@ def write_init(skill_name, skill_path, level_name):
         filepath = os.path.join(skill_path,"__init__.py")
         with open(filepath, 'w') as fp:
             fp.write(filedata)
-            print("Modified: Added level to {}".format(filepath))
+            print("Registered level \"{}\" in {}".format(level_name, filepath))
     return
 
-def create_file(level_path,filename):
-    with open(os.path.join(level_path,filename),'a+'):
+def create_level_file(level_path,filename):
+    filepath = os.path.join(level_path,filename)
+    with open(filepath,'a+'):
         pass
-    print("Created: {}".format(filename))
+    print("Created: {}".format(filepath))
 
 def main():
     # Obtain input arguments
-    skill_name = sys.argv[1]
-    level_name = sys.argv[2]
-    
-    # Check if cwd is gitgud folder
+    try:
+        skill_name = sys.argv[1]
+        level_name = sys.argv[2]
+    except:
+        print("Usage: \"python make_level.py <skill_name> <level_name>\"")
+        
+    # Check if current dir is ../gitgud directory. (i.e. dir of setup files)
     if os.path.isdir(os.path.join(cwd, 'gitgud')):
             # Confirm choice to avoid making a mess
             print ("\n".join([
@@ -83,30 +94,30 @@ def main():
             skill_path = os.path.join("gitgud","skills","{}".format(skill_name))
             if not os.path.exists(skill_path):
                 os.mkdir(skill_path)
-                print("Created: {}".format(skill_name))
+                print("Created: {}".format(skill_path))
                   
                   
             # Make level folder
             level_path = os.path.join(skill_path,"_{}".format(level_name))
             if not os.path.exists(level_path):
                 os.mkdir(level_path)
-                print("Created: {}".format(level_name))
+                print("Created: {}".format(level_path))
             
-            print("\nModifying Init Files:")
+            print("\nRegistering Level: {} {}".format(skill_name, level_name))
             write_init(skill_name,skill_path,level_name)
             
             print("\nCreating Files:")
             # Make instruction file
-            create_file(level_path, "instructions.txt")
+            create_level_file(level_path, "instructions.txt")
             
             # Make goal file
-            create_file(level_path, "goal.txt")
+            create_level_file(level_path, "goal.txt")
 
             # Make setup file
-            create_file(level_path, "setup.txt")
+            create_level_file(level_path, "setup.txt")
                 
             # Make test file
-            create_file(level_path, "test.txt")
+            create_level_file(level_path, "test.txt")
     else:
         print("Error: Execute this script in the git-gud directory.")
 
