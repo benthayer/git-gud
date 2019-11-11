@@ -28,7 +28,7 @@ Recap:
 1. Make sure we're using Python 3
 2. Install Git Gud
 3. Create and change into an empty directory for Git Gud to load the skills into
-4. Run `git gud start`
+4. Run `git gud init`
 5. Follow the instructions to git gud!
 
 For specific instructions, see below.
@@ -41,7 +41,7 @@ python --version # Must say Python 3, any minor version
 python -m  pip install git-gud
 mkdir test
 cd test
-git gud start # Initializes a git repository and lets us start using git gud from within this folder
+git gud init # Initializes a git repository and lets us start using git gud from within this folder
 ```
 
 ### Development install:  
@@ -55,7 +55,7 @@ python -m pip install -e . # Installs in edit mode so we can change files withou
 cd ..
 mkdir test
 cd test
-git gud start # Initializes a git repository and lets us start using git gud from within this folder
+git gud init # Initializes a git repository and lets us start using git gud from within this folder
 ```
 
 Once it's installed, you can access all the features that Git Gud has to offer.
