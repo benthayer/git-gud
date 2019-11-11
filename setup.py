@@ -33,7 +33,12 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=[
-        'gitgud'
+        'gitgud',
+        'gitgud.hooks',
+        'gitgud.skills',
+        'gitgud.skills.basics',
+        'gitgud.skills.extras',
+        'gitgud.skills.rampup',
     ],
     python_requires='>=3.0',
     install_requires=[

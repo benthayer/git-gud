@@ -9,8 +9,14 @@ jobs:
 
     steps:
       - checkout
-      - run: python3 -m pip install .
-      - run: python3 -m pip install pytest
+      - run:
+          name: Set up environment
+          command: |
+            pip3 install --user .
+            pip3 install --user pytest
+            git config --global user.name "CircleCI"
+            git config --global user.email "circleci@example.com"
       - run:
           name: Running tests
-          command: python3 -m pytest .
+          command: |
+            python3 -m pytest .
