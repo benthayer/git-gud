@@ -312,5 +312,9 @@ class GitGud:
                 print(error)
 
 
-if __name__ == '__main__':
+def main():
     GitGud().parse()
+
+
+if __name__ == '__main__':
+    main()
