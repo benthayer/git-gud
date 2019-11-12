@@ -76,7 +76,7 @@ class Operator:
         counter = len(commits)
         for name, parents, branches, tags in commits:
             committime = dt.datetime.now(dt.timezone.utc).astimezone().replace(microsecond=0)
-            committime_offset = dt.timedelta(seconds = counter) + committime.utcoffset()
+            committime_offset = dt.timedelta(seconds=counter) + committime.utcoffset()
             committime_rfc = email.utils.format_datetime(committime - committime_offset)
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
@@ -88,11 +88,14 @@ class Operator:
                 self.add_file_to_index(name)
                 self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
             else:
-                # TODO GitPython octopus merge
-                self.repo.git.merge(*parents)
-                # TODO GitPython amend commit
-                self.repo.git.commit('--amend', '-m', name,
-                                     '--author="{}"'.format(actor_string))
+                assert name[0] == 'M'
+                int(name[1:])  # Fails if not a number
+
+                # To handle octopus merges, we merge each branch into the index one by one, then commit
+                for parent in parents[1:]:
+                    merge_base = self.repo.merge_base(parents[0], parent)
+                    self.repo.index.merge_tree(parent, base=merge_base)
+                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
 
             commit_objects[name] = self.repo.head.commit
 
