@@ -46,8 +46,8 @@ def test_getitem_NL():
 
 def test_setitem_NL():
     nltest = NamedList(['foo', 'bar', 'baz'], [51, 72, 93])
-    nltest[2] = -21
-    assert nltest[2] == -21
+    nltest['qux'] = -21
+    assert nltest['qux'] == -21
 
 def test_init_NL():
     nltest = NamedList(['foo', 'bar'], [511, 522])
