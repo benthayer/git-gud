@@ -28,7 +28,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "git-gud=gitgud:__main__.main"
+            "git-gud=gitgud.__main__:main"
         ]
     }
 )

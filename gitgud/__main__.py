@@ -35,12 +35,12 @@ class GitGud:
         self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
         help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
-        init_parser = self.subparsers.add_parser('init', help='Git goin!', description='Initialize the direcotry with a git repository and load the first level of Git Gud.')
+        init_parser = self.subparsers.add_parser('init', help='Init Git Gud and load first level', description='Initialize the direcotry with a git repository and load the first level of Git Gud.')
         status_parser = self.subparsers.add_parser('status', help='Print out the name of the current level', description='Print out the name of the current level')
         instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
         goal_parser = self.subparsers.add_parser('goal', help='Concisely show what needs to be done to complete the level.', description='Concisely show what needs to be done to complete the level.')
         reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
-        reload_parser = self.subparsers.add_parser('reload', help='Reset the current level. Reload command is an alias for reset command.', description='Reset the current level. Reload command is an alias for reset command.')
+        reload_parser = self.subparsers.add_parser('reload', help='Alias for reset', description='Reset the current level. Reload command is an alias for reset command.')
         test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
@@ -49,7 +49,7 @@ class GitGud:
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
-        contrib_parser = self.subparsers.add_parser('contributors', help='Show all the contributors of the project', description='Show all the contributors of the project')
+        contrib_parser = self.subparsers.add_parser('contributors', help='Show project contributors webpage', description='Show all the contributors of the project')
 
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
