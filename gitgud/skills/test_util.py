@@ -30,8 +30,8 @@ def test_goal():
             os.path.isfile(level.goal_path)
 
 def test_contains():
-    assert all_skills.contains(all_skills[1])
-    assert all_skills[1].contains(all_skills[1][2])
+    assert all_skills[1] in all_skills
+    assert all_skills[1][2] in all_skills[1]
 
 def test_len():
     assert len(all_skills[0]) == 4
