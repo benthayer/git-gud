@@ -231,7 +231,7 @@ class GitGud:
             for index, level in enumerate(skill):
                 print(level_format_template.format(index + 1, level.name))
         
-        print("\nLoad a level with \033[1mgit gud load\033[0m {\033[4mskill-number\033[0m|\033[4mskill-name\033[0m} [[\033[1m-\033[0m]{\033[4mlevel-number\033[0m|\033[4mlevel-name\033[0m}]")
+        print("\nLoad a level with `git gud load`")
         
     def handle_levels(self, args):
         key_error_flag = False
