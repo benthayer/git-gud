@@ -206,18 +206,6 @@ class GitGud:
             print_all_complete()
 
     def handle_skills(self, args):
-<<<<<<< HEAD
-<<<<<<< HEAD
-        try:
-            cur_skill = self.file_operator.get_level().skill
-            print("Currently on skill: \"{}\"".format(cur_skill.name))
-            print()
-        except KeyError:
-            pass
-=======
-=======
-
->>>>>>> 22e43c6eda0bdcdb73d023816b5a2c7e05893790
         if self.is_initialized():
             try:
                 cur_skill = self.file_operator.get_level().skill
@@ -225,31 +213,14 @@ class GitGud:
                 print()
             except KeyError:
                 pass
-<<<<<<< HEAD
->>>>>>> upstream/master
         
-=======
->>>>>>> 22e43c6eda0bdcdb73d023816b5a2c7e05893790
         skill_chars = max(len(skill.name) for skill in all_skills)
         skill_format_template = "Skill {{}} - {{:<{}}} :{{:>2}} level{{}}".format(skill_chars)
         level_format_template = "    Level {:>2} : {:<3}"
         
         for i, skill in enumerate(all_skills):
             # TODO Add description
-<<<<<<< HEAD
-<<<<<<< HEAD
             print(skill_format_template.format(i + 1, "\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
-=======
-            # 10 characters for the short IDs.
-            print("Skill {:<10} :{:>2} level{}".format("\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
-            for index, level in enumerate(skill):
-                # " " * (characters allocated for ID - 6)
-                print("{}Level {:>2} : {:<10}".format(" " * 4, index + 1, level.name))
->>>>>>> upstream/master
-=======
-            print(skill_format_template.format(i + 1, "\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
-
->>>>>>> 22e43c6eda0bdcdb73d023816b5a2c7e05893790
 
             for index, level in enumerate(skill):
                 print(level_format_template.format(index + 1, level.name))
