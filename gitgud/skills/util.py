@@ -226,7 +226,7 @@ class NamedList:
             return key in self._name_dict.keys()
         else:
             return key in self._items()
-
+    
     def values(self):
         return self._items
     

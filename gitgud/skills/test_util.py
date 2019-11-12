@@ -29,10 +29,25 @@ def test_goal():
         for level in skill:
             os.path.isfile(level.goal_path)
 
-def test_contains():
+def test_contains_NL():
     assert all_skills[1] in all_skills
     assert all_skills[1][2] in all_skills[1]
 
-def test_len():
+def test_len_NL():
     assert len(all_skills[0]) == 4
 
+def test_iter_NL():
+    ['' for skill in all_skills]
+
+def test_getitem_NL():
+    nltest = NamedList(['foo', 'bar', 'baz'], [5, 7, 9])
+    assert nltest[0] == 5
+    assert nltest['baz'] == 9
+
+def test_setitem_NL():
+    nltest = NamedList(['foo', 'bar', 'baz'], [51, 72, 93])
+    nltest[2] = -21
+    assert nltest[2] == -21
+
+def test_init_NL():
+    nltest = NamedList(['foo', 'bar'], [511, 522])
