@@ -5,31 +5,19 @@ from gitgud.skills import all_skills
 
 
 def test_load(gg):
-
-    dash_temp = 'git gud load {}-{}'
-    skill_temp = 'git gud load {}'
-    nodash_temp = 'git gud load {} {}'
-    twoargs_test = [dash_temp, nodash_temp]
-    for i, skill in enumerate(all_skills):
-        for temp in twoargs_test:
-            for j, level in enumerate(skill):
-                subprocess.call(temp.format(i + 1, j + 1), shell=True)
-                assert all_skills[i][j] == gg.file_operator.get_level()
-                
-                subprocess.call(temp.format(i + 1, level.name), shell=True)
-                assert all_skills[i][j] == gg.file_operator.get_level()
-                
-                
-                subprocess.call(temp.format(skill.name, level.name), shell=True)
-                assert all_skills[i][j] == gg.file_operator.get_level()
-
-                
-                subprocess.call(temp.format(skill.name, j + 1), shell=True)
-                assert all_skills[i][j] == gg.file_operator.get_level()
-        
-        subprocess.call('git gud load {}'.format(i + 1), shell=True)
-        assert all_skills[i][0] == gg.file_operator.get_level()
-        
-        subprocess.call('git gud load {}'.format(skill.name), shell=True)
-        assert all_skills[skill.name][0] == gg.file_operator.get_level()
-
+    
+    load_tests = {
+        'git gud load 1':all_skills[0][0],
+        'git gud load rampup':all_skills["rampup"][0],
+        'git gud load 2 detaching':all_skills[1]["detaching"],
+        'git gud load rampup 4':all_skills["rampup"][3],
+        'git gud load 1-3':all_skills[0][2],
+        'git gud load 3-octopus':all_skills[2]["octopus"],
+        'git gud load basics-4':all_skills["basics"][3]   
+    }
+    
+    for command in load_tests:
+        subprocess.call(command, shell=True)
+        assert load_tests[command] == gg.file_operator.get_level()
+    
+    
