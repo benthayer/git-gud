@@ -29,7 +29,7 @@ pip install -e . # Installs in edit mode so we can change files without needing 
 cd ..
 mkdir test
 cd test
-git gud start # Initializes a git repository and lets us start using the git gud command from within this folder
+git gud init # Initializes a git repository and lets us start using the git gud command from within this folder
 ```
 Once you have the code downloaded, I would recommend having two terminals open at all times, one in the test directory you just created, and one in the git-gud directory. 
 This allows you to both work with your code and test your code at the same time.
@@ -40,7 +40,7 @@ It's important to know that when you run `import git`, you're not actually impor
 If you're writing something advanced, chances are you'll have to interact with that library. 
 The project is located [here](https://github.com/gitpython-developers/GitPython) and the project's documentation can be found [here](https://gitpython.readthedocs.io/en/stable/).
 #### The `gitgud` module
-Git Gud is written in Python and stuctured like a Python module. 
+Git Gud is written in Python and structured like a Python module.
 Python modules can be run and provide a good amount of flexibility. 
 Python also comes with PyPi, a package manager. 
 This makes it easy to install Git Gud, even if you aren't the most technical. 
@@ -55,7 +55,7 @@ Because `gitgud` has sub-modules, it's known as as a package, and therefore can 
 
 #### The `git gud` alias
 This project is not actually affiliated with Git, although we're able to run as a Git subcommand by creating what's known as an  alias within Git. 
-If you were to do this from the command line, the command to run would be `git config --local alias.gud " ! python -m gitgud"`. 
+If you were to do this from the command line, the command to run would be `git config --global alias.gud " ! python -m gitgud"`. 
 This goes into the repository's `.git/` folder and finds the `.git/config` file. 
 In that file, there's a section called "[alias]" that is created and lists our command as `gud = "! C:/path/to/python.exe -m gitgud"` on Windows or `gud = "! /path/to/python -m gitgud"` on Mac/Linux
 

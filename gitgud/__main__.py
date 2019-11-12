@@ -34,35 +34,26 @@ class GitGud:
 
         self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
-        # TODO Add git gud help <command>, which would return the same output as git gud <command> -- help
-
-        # TODO Display help message for subcommand when it fails.
-        # ie `git gud load skill1 level1 random-input` should have output similar to `git gud load --help`
-        
-        # Use "git gud help" to print helps of all subcommands.
-        # "git gud help <command>" prints the description of the <command> but not help.
-        # TODO Add longer descriptions
-
         help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
-        start_parser = self.subparsers.add_parser('start', help='Git started!', description='Git started!')
+        init_parser = self.subparsers.add_parser('init', help='Init Git Gud and load first level', description='Initialize the direcotry with a git repository and load the first level of Git Gud.')
         status_parser = self.subparsers.add_parser('status', help='Print out the name of the current level', description='Print out the name of the current level')
         instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
         goal_parser = self.subparsers.add_parser('goal', help='Concisely show what needs to be done to complete the level.', description='Concisely show what needs to be done to complete the level.')
         reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
-        reload_parser = self.subparsers.add_parser('reload', help='Reset the current level. Reload command is an alias for reset command.', description='Reset the current level. Reload command is an alias for reset command.')
+        reload_parser = self.subparsers.add_parser('reload', help='Alias for reset', description='Reset the current level. Reload command is an alias for reset command.')
         test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
-        levels_parser = self.subparsers.add_parser('levels', help='List levels', description='List levels in current skill or in other skill if specified')
+        levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
         load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description='Load a specific skill or level')
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
-        contrib_parser = self.subparsers.add_parser('contributors', help='Show all the contributors of the project', description='Show all the contributors of the project')
+        contrib_parser = self.subparsers.add_parser('contributors', help='Show project contributors webpage', description='Show all the contributors of the project')
 
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
-        start_parser.add_argument('--force', action='store_true')
+        init_parser.add_argument('--force', action='store_true')
 
         levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
 
@@ -73,7 +64,7 @@ class GitGud:
 
         self.command_dict = {
             'help': self.handle_help,
-            'start': self.handle_start,
+            'init': self.handle_init,
             'status': self.handle_status,
             'instructions': self.handle_instructions,
             'goal': self.handle_goal,
@@ -94,7 +85,7 @@ class GitGud:
 
     def assert_initialized(self, skip_level_check=False):
         if not self.is_initialized():
-            raise InitializationError("Git gud has not been initialized. Use \"git gud start\" to initialize")
+            raise InitializationError("Git gud has not been initialized. Use \"git gud init\" to initialize")
 
         if not skip_level_check:
             try:
@@ -118,7 +109,7 @@ class GitGud:
                 print('No such command exists: \"{}\"\n'.format(args.command_name))
                 self.parser.print_help()
 
-    def handle_start(self, args):
+    def handle_init(self, args):
         # Make sure it's safe to initialize
         if not args.force:
             # We aren't forcing
@@ -168,6 +159,8 @@ class GitGud:
                 hook_file.write('exit 0' + os.linesep)
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
+        print('Welcome to Git Gud!')
+        print()
 
         self.file_operator.get_level().setup(self.file_operator)
         show_tree()
@@ -213,13 +206,14 @@ class GitGud:
             print_all_complete()
 
     def handle_skills(self, args):
-        try:
-            cur_skill = self.file_operator.get_level().skill
-            print("Currently on skill: \"{}\"".format(cur_skill.name))
-            print()
-        except KeyError:
-            pass
-        
+
+        if self.is_initialized():
+            try:
+                cur_skill = self.file_operator.get_level().skill
+                print("Currently on skill: \"{}\"\n".format(cur_skill.name))
+                print()
+            except KeyError:
+                pass
         skill_chars = max(len(skill.name) for skill in all_skills)
         skill_format_template = "Skill {{}} - {{:<{}}} :{{:>2}} level{{}}".format(skill_chars)
         level_format_template = "    Level {:>2} : {:<3}"
@@ -227,6 +221,7 @@ class GitGud:
         for i, skill in enumerate(all_skills):
             # TODO Add description
             print(skill_format_template.format(i + 1, "\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
+
 
             for index, level in enumerate(skill):
                 print(level_format_template.format(index + 1, level.name))
@@ -236,6 +231,9 @@ class GitGud:
     def handle_levels(self, args):
         key_error_flag = False
         if args.skill_name is None:
+            if self.file_operator is None:
+                self.subparsers.choices['levels'].print_help()
+                return
             try:
                 skill = self.file_operator.get_level().skill
             except KeyError:
@@ -331,5 +329,9 @@ class GitGud:
                 print(error)
 
 
-if __name__ == '__main__':
+def main():
     GitGud().parse()
+
+
+if __name__ == '__main__':
+    main()
