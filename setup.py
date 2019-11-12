@@ -24,7 +24,7 @@ with open('README.md') as readme:
 
 setup(
     name='git-gud',
-    version='0.1',
+    version='0.2',
     url='https://github.com/bthayer2365/git-gud/',
     description='A tool to learn git',
     author='Ben Thayer',
