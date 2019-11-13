@@ -1,16 +1,19 @@
-This is a practice skill to get you started with the format of `git gud`.
+This is a practice level to get you started with the format of "git gud".
 Hit enter to advance.
 >>>
-Great! You just advanced through the first part of the first set of instructions!
+You are currently reading the instructions. As long as you see the ">>>", you are reading the instructions.
+ You won't be able to enter any commands until you're done reading the instructions.
 >>>
-As you progress, `git gud` will guide you through the relevant commands in both `git` and `git gud`.
-Let's start out by writing some commits.
+As you progress, "git gud" will guide you through the relevant commands in both "git" and "git gud".
 >>>
-`git gud` offers a special command to facilitate creating example commits faster.
-By running `git gud commit`, `git gud` will automatically create a new file, add that file to the git index and commit it. Try it out!
+The first command we'll introduce you to is "git gud commit".
+ "git gud commit" is a special command that does does three things.
+  1) It creates a new file
+  2) It adds that file to git
+  3) It commits the new file
+ Whenever git gud does something for you, it will let you know what actions/commands it is simulating.
 >>>
-When you're done, run `git gud test` to see if you've completed this level.
-You'll run this command to check future levels as well.
-Hit enter to start!
->>>
-Now, let's start using git!
+Now look below. Since there's no more ">>>", we're back in the normal command line, and you can type in commands again.
+
+To complete this level, commit twice using "git gud commit"
+When you're done, run "git gud test" to see if you've completed this level.
