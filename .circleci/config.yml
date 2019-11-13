@@ -19,4 +19,5 @@ jobs:
       - run:
           name: Running tests
           command: |
+            export PATH=$PATH:$HOME/.local/bin
             python3 -m pytest .
