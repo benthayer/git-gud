@@ -324,7 +324,7 @@ class BasicLevel(Level):
 
         print("Setup complete")
         print()
-        print("Goal:")
+        print("Simulating: git gud goal")
         self.goal()
         print()
         print("Type \"git gud instructions\" to view full instructions")
