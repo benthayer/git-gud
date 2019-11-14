@@ -328,6 +328,7 @@ class BasicLevel(Level):
         self.goal()
         print()
         print("Type \"git gud instructions\" to view full instructions")
+        print("Type \"git gud test\" to test for level completion")
         print("Type \"git gud help\" for more help")
         print()
 
