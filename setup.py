@@ -27,7 +27,7 @@ setup(
         'gitgud.skills.extras': ['_*/*'],
         'gitgud.skills.rampup': ['_*/*'],
     },
-    python_requires='>=3.0',
+    python_requires='>=3.5',
     install_requires=[
         'gitpython',
     ],
