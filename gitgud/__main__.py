@@ -159,27 +159,7 @@ class GitGud:
                 hook_file.write('exit 0' + os.linesep)
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
-        print('''Welcome to Git Gud, a command line tool designed to help you
-                 learn how to use the popular version control system known as 
-                 Git!
-
-                 To use the tool, remember these important commands:
-
-                 git gud instructions: Displays instructions for the current
-                 level - if you're unsure what to do next, use this!
-
-                 git gud commit: git gud automates the commit process for you to
-                 simplify things (you'll learn about commits first)
-
-                 git gud test: Once you've completed the current level's goals,
-                 use this to check completion.
-
-                 git gud progress: Whether you've completed the current level or
-                 just want to move on to the next level, use this to proceed!
-
-                 For more information on Git Gud, including a full list of 
-                 commands, checkout https://github.com/bthayer2365/git-gud
-        ''')
+        print(open('welcome.txt').read())
         print()
 
         self.file_operator.get_level().setup(self.file_operator)
