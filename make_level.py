@@ -89,7 +89,9 @@ def main():
             if choice == 'n':
                 return
             
-            print("\nCreating Folders:")
+            print()
+            print("Creating Folders:")
+            print()
             # Make skill folder
             skill_path = os.path.join("gitgud","skills","{}".format(skill_name))
             if not os.path.exists(skill_path):
@@ -103,10 +105,14 @@ def main():
                 os.mkdir(level_path)
                 print("Created: {}".format(level_path))
             
-            print("\nRegistering Level: {} {}".format(skill_name, level_name))
+            print()
+            print("Registering Level: {} {}".format(skill_name, level_name))
+            print()
             write_init(skill_name,skill_path,level_name)
             
-            print("\nCreating Files:")
+            print()
+            print("Creating Files:")
+            print()
             # Make instruction file
             create_level_file(level_path, "instructions.txt")
             
