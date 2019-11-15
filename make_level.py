@@ -130,7 +130,9 @@ def main():
         
     # Make test file
     create_level_file(level_path, "test.txt")
-
+    
+    print()
+    print("Done.")
 
 if __name__ == "__main__":
     main()
