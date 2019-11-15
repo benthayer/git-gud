@@ -75,6 +75,7 @@ def main():
         level_name = sys.argv[2]
     except:
         print("Usage: \"python make_level.py <skill_name> <level_name>\"")
+        return
         
     # Check if current dir is ../gitgud directory. (i.e. dir of setup files)
     if os.path.isdir(os.path.join(cwd, 'gitgud')):
