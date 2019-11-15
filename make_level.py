@@ -77,56 +77,59 @@ def main():
         print("Usage: \"python make_level.py <skill_name> <level_name>\"")
         return
         
-    # Check if current dir is ../gitgud directory. (i.e. dir of setup files)
-    if os.path.isdir(os.path.join(cwd, 'gitgud')):
-            # Confirm choice to avoid making a mess
-            print ("\n".join([
-                            "skill_name: {}".format(skill_name),
-                            "level_name: {}".format(level_name),
-                            "Confirm[y/n] "
-                            ]),
-                        end = '')
-            choice = input().lower()
-            if choice == 'n':
-                return
-            
-            print()
-            print("Creating Folders:")
-            print()
-            # Make skill folder
-            skill_path = os.path.join("gitgud","skills","{}".format(skill_name))
-            if not os.path.exists(skill_path):
-                os.mkdir(skill_path)
-                print("Created: {}".format(skill_path))
-                  
-                  
-            # Make level folder
-            level_path = os.path.join(skill_path,"_{}".format(level_name))
-            if not os.path.exists(level_path):
-                os.mkdir(level_path)
-                print("Created: {}".format(level_path))
-            
-            print()
-            print("Registering Level: {} {}".format(skill_name, level_name))
-            print()
-            write_init(skill_name,skill_path,level_name)
-            
-            print()
-            print("Creating Files:")
-            print()
-            # Make instruction file
-            create_level_file(level_path, "instructions.txt")
-            
-            # Make goal file
-            create_level_file(level_path, "goal.txt")
-
-            # Make setup file
-            create_level_file(level_path, "setup.txt")
-                
-            # Make test file
-            create_level_file(level_path, "test.txt")
-    else:
+    # Check if current dir isn't ../gitgud directory. (i.e. dir of setup files)
+    if not os.path.isdir(os.path.join(cwd, 'gitgud')):
         print("Error: Execute this script in the git-gud directory.")
+        return
+    
+    # Executed if above statement doesn't terminate program
+   
+    # Confirm choice to avoid making a mess
+    print ("\n".join([
+                    "skill_name: {}".format(skill_name),
+                    "level_name: {}".format(level_name),
+                    "Confirm[y/n] "
+                    ]),
+                end = '')
+    choice = input().lower()
+    if choice == 'n':
+        return
+            
+    print()
+    print("Creating Folders:")
+    print()
+    # Make skill folder
+    skill_path = os.path.join("gitgud","skills","{}".format(skill_name))
+    if not os.path.exists(skill_path):
+        os.mkdir(skill_path)
+        print("Created: {}".format(skill_path))
+          
+          
+    # Make level folder
+    level_path = os.path.join(skill_path,"_{}".format(level_name))
+    if not os.path.exists(level_path):
+        os.mkdir(level_path)
+        print("Created: {}".format(level_path))
+            
+    print()
+    print("Registering Level: {} {}".format(skill_name, level_name))
+    print()
+    write_init(skill_name,skill_path,level_name)
+            
+    print()
+    print("Creating Files:")
+    print()
+    # Make instruction file
+    create_level_file(level_path, "instructions.txt")
+            
+    # Make goal file
+    create_level_file(level_path, "goal.txt")
+
+    # Make setup file
+    create_level_file(level_path, "setup.txt")
+        
+    # Make test file
+    create_level_file(level_path, "test.txt")
 
 
 if __name__ == "__main__":
