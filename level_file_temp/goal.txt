@@ -1,1 +1,0 @@
-In this file, write a short explanation to the user/player what the goal of the level is (e.g. "Merge commits 1 and 2 to complete the level!").

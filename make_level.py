@@ -113,9 +113,10 @@ def write_test(skill_name, skill_path, level_name):
             fp.write(filedata)
             print("Added entry for {}".format(level_name))
 
+
 def create_level_file(level_path, filename):
     filepath = os.path.join(level_path, filename)
-    copyfile("level_file_temp/{}".format(filename), "{}".format(filepath))
+    copyfile("level_file_templates/{}".format(filename), "{}".format(filepath))
     print("Created: {}".format(filepath))
 
 
@@ -199,8 +200,7 @@ def main():
     print()
     print("Creating Test Cases:")
     write_test(skill_name, skill_path, level_name)
-    
-    
+
     print()
     print("Creating Files:")
     create_level_file(level_path, "instructions.txt")

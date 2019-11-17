@@ -4,7 +4,7 @@
 4 : 1 (child-of-1)
 5 (tag:child-of-4)
 6
-7 : 3 6 (merge-3-and-6)
+M1 : 3 6 (merge-3-and-6)
 8
 -8 (reverted-8)
 9 (changes-to-be-made-by-player)
