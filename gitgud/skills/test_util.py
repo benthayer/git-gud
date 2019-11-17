@@ -45,7 +45,8 @@ def test_iter_NL():
 
 
 def test_len_NL():
-    assert len(all_skills[0]) == 4
+    nltest = NamedList(['foo', 'bar', 'baz'], [51, 72, 93])
+    assert len(nltest) == 3
 
 
 def test_setitem_NL():
