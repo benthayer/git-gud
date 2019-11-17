@@ -66,7 +66,7 @@ def write_init(skill_name, skill_path, level_name):
 
 
 def write_test(skill_name, skill_path, level_name):
-    if not os.path.exists(os.path.join(skill_path, "test_levels.py"))
+    if not os.path.exists(os.path.join(skill_path, "test_levels.py")):
         with open(os.path.join(skill_path, "test_levels.py"), 'w+') as fp:
             test_setup = "\n".join([
                 "import pytest",
@@ -90,23 +90,28 @@ def write_test(skill_name, skill_path, level_name):
                 "    simulate(gg, level, commands)"
             ])
             fp.write(test_setup)
+            print("Added entry for {}".format(level_name))
     else:
-        with open(os.path.join(skill_path, "test_levels.py", 'w+') as fp):
+        with open(os.path.join(skill_path, "test_levels.py"), 'r') as fp:
             filedata = fp.read()
         
         replace = "\n".join([
             "    ), (",
             "        skill[\'{}\'], [".format(level_name),
-            "            "
+            "            ",
             "        ]",
             "    )",
             "]"
         ])
         
-        filedata.replace("\n".join([
+        filedata = filedata.replace("\n".join([
             "    )",
             "]"
         ]), replace)
+        
+        with open(os.path.join(skill_path, "test_levels.py"), 'w') as fp:
+            fp.write(filedata)
+            print("Added entry for {}".format(level_name))
 
 def create_level_file(level_path, filename):
     filepath = os.path.join(level_path, filename)
@@ -190,6 +195,11 @@ def main():
     print()
     print("Registering Level: {} {}".format(skill_name, level_name))
     write_init(skill_name, skill_path, level_name)
+    
+    print()
+    print("Creating Test Cases:")
+    write_test(skill_name, skill_path, level_name)
+    
     
     print()
     print("Creating Files:")
