@@ -288,7 +288,7 @@ def print_all_complete():
     print("Wow! You've complete every level, congratulations!")
 
     print("If you want to keep learning git, why not try contributing"
-          " to git-gud by forking the project at https://github.com/bthayer2365/git-gud/")
+          " to git-gud by forking the project at https://github.com/benthayer/git-gud/")
 
     print("We're always looking for contributions and are more than"
           " happy to accept both pull requests and suggestions!")

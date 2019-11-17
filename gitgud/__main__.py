@@ -166,9 +166,16 @@ class GitGud:
         show_tree()
 
     def handle_status(self, args):
-        self.assert_initialized()
-        level_name = self.file_operator.get_level().full_name()
-        print("Currently on level: \"{}\"".format(level_name))
+        if self.is_initialized():
+            try:
+                level = self.file_operator.get_level()
+                print("Currently on level: \"{}\"".format(level.full_name()))
+            except KeyError:
+                level_name = self.file_operator.read_level_file()
+                print("Currently on unregistered level: \"{}\"".format(level_name))
+        else:
+            print("Git gud not initialized.")
+            print("Initialize using \"git gud init\"")
 
     def handle_instructions(self, args):
         self.assert_initialized()
@@ -228,6 +235,7 @@ class GitGud:
             if self.file_operator is None:
                 self.subparsers.choices['levels'].print_help()
                 return
+
             try:
                 skill = self.file_operator.get_level().skill
             except KeyError:
