@@ -197,7 +197,7 @@ class NamedList:
     # names is a list populated with type str, items is a list populated with any type 
     def __init__(self, names, items):
         assert len(names) == len(items)
-        self._name_dict = {name:index for index, name in enumerate(names)}
+        self._name_dict = {name: index for index, name in enumerate(names)}
         self._items = items
     
     def __getitem__(self, query):
@@ -225,7 +225,7 @@ class NamedList:
         if isinstance(key, str):
             return key in self._name_dict.keys()
         else:
-            return key in self._items()
+            return key in self._items
 
     def values(self):
         return self._items
