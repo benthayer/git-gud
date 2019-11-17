@@ -33,7 +33,12 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=[
-        'gitgud'
+        'gitgud',
+        'gitgud.skills.basics': ['_*/*'],
+        'gitgud.skills.extras': ['_*/*'],
+        'gitgud.skills.rampup': ['_*/*'],
+        'git-gud.make_level.py',
+        'git-gud.level_file_temp'
     ],
     python_requires='>=3.0',
     install_requires=[
