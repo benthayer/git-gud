@@ -60,7 +60,7 @@ def write_init(skill_name, skill_path, level_name):
         filepath = os.path.join(skill_path,"__init__.py")
         with open(filepath, 'w') as fp:
             fp.write(filedata)
-            print("Registered level \"{}\" in {}".format(level_name, filepath))
+            print("Registered Level \"{}\" in {}".format(level_name, filepath))
     return
 
 def create_level_file(level_path,filename):
@@ -123,10 +123,11 @@ def main():
     # Write new lines to file
     with open("setup.py",'w') as fp:
         fp.write(filedata)
+        print()
         print("Registered Package: {}".format(skill_name))
+        print()
 
     
-    print()
     print("Creating Folders:")
     print()
     # Make skill folder
@@ -141,25 +142,14 @@ def main():
     if not os.path.exists(level_path):
         os.mkdir(level_path)
         print("Created: {}".format(level_path))
-            
-    print()
+    
     print("Registering Level: {} {}".format(skill_name, level_name))
-    print()
     write_init(skill_name,skill_path,level_name)
             
-    print()
     print("Creating Files:")
-    print()
-    # Make instruction file
     create_level_file(level_path, "instructions.txt")
-            
-    # Make goal file
     create_level_file(level_path, "goal.txt")
-
-    # Make setup file
     create_level_file(level_path, "setup.spec")
-        
-    # Make test file
     create_level_file(level_path, "test.spec")
     
     print()
