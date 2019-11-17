@@ -82,8 +82,38 @@ def main():
         print("Error: Execute this script in the git-gud directory.")
         return
     
-    # Executed if above statement doesn't terminate program
-   
+    # Register package
+    
+    # Read setup.py
+    with open("setup.py", 'r') as fp:
+        filedata = fp.read()
+    
+    # Update desired lines
+    replace1 = "\n".join([
+                          "        \'gitgud.skills.{}\',".format(skill_name),
+                          "    ],",
+                          "    package_data"
+                        ])
+    replace2 = "\n".join([
+                          "        \'gitgud.skills.{}\': ['_*/*'],".format(skill_name),
+                          "    },",
+                          "    python_requires"
+                        ])
+    filedata = filedata.replace("\n".join([
+                                           "    ],",
+                                           "    package_data"
+                                          ])
+                                , replace1)
+    filedata = filedata.replace("\n".join([
+                                           "    },",
+                                           "    python_requires"
+                                          ])
+                                , replace2)
+    
+    # Write new lines to file
+    with open("setup.py",'w') as fp:
+        fp.write(filedata)
+    
     # Confirm choice to avoid making a mess
     print ("\n".join([
                     "skill_name: {}".format(skill_name),
