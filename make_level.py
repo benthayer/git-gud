@@ -9,7 +9,8 @@ def write_init(skill_name, skill_path, level_name):
     if not os.path.exists(os.path.join(skill_path,"__init__.py")):
         with open(os.path.join(skill_path,"__init__.py"), 'w+') as fp:
             level_setup = "\n".join([
-                "import pkg_resources\n",
+                "import pkg_resources",
+                "",
                 "from gitgud.skills.util import BasicLevel",
                 "from gitgud.skills.util import Skill",
                 "",
@@ -29,11 +30,11 @@ def write_init(skill_name, skill_path, level_name):
 
         # Add import statement
         replace = "\n".join([
-                            "from gitgud.skills.{0} import skill as {0}_skill".format(skill_name),
-                            "",
-                            "",
-                            "from gitgud.skills.u"
-                            ])
+        "from gitgud.skills.{0} import skil{0}_skill".format(skill_name),
+        "",
+        "",
+        "from gitgud.skills.u"
+        ])
         filedata = filedata.replace("\nfrom gitgud.skills.u", replace)
         
         # Add to input array of Skill
