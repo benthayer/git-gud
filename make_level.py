@@ -61,7 +61,7 @@ def write_init(skill_name, skill_path, level_name):
         filepath = os.path.join(skill_path, "__init__.py")
         with open(filepath, 'w') as fp:
             fp.write(filedata)
-            print("Registered Level \"{}\" in {}".format(level_name, filepath))
+            print("Registered level \"{}\" in {}".format(level_name, filepath))
     return
 
 
@@ -132,7 +132,6 @@ def main():
         print()
 
     print("Creating Folders:")
-    print()
     # Make skill folder
     skill_path = os.path.join("gitgud", "skills", "{}".format(skill_name))
     if not os.path.exists(skill_path):
@@ -144,10 +143,12 @@ def main():
     if not os.path.exists(level_path):
         os.mkdir(level_path)
         print("Created: {}".format(level_path))
-
+    
+    print()
     print("Registering Level: {} {}".format(skill_name, level_name))
     write_init(skill_name, skill_path, level_name)
-
+    
+    print()
     print("Creating Files:")
     create_level_file(level_path, "instructions.txt")
     create_level_file(level_path, "goal.txt")
