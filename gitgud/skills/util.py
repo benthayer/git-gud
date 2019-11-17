@@ -322,13 +322,13 @@ class BasicLevel(Level):
 
         self._setup(file_operator)
 
-        print("Setup complete")
+        print('Setup complete')
         print()
-        print("Goal:")
+        print('Goal:')
         self.goal()
         print()
-        print("Type \"git gud instructions\" to view full instructions")
-        print("Type \"git gud help\" for more help")
+        print('Type "git gud instructions" to view full instructions')
+        print('Type "git gud help" for more help')
         print()
 
     def instructions(self):
@@ -338,7 +338,7 @@ class BasicLevel(Level):
         with open(self.instructions_path) as instructions_file:
             for line in instructions_file:
                 if line[:3] == '>>>':
-                    input(">>>")
+                    input('>>>')
                 else:
                     print(line.strip())
 
@@ -362,12 +362,13 @@ class BasicLevel(Level):
         if self._test(file_operator):
             try:
                 if self.next_level.skill != self.skill:
-                    print("Level complete, you've completed all levels in this skill! `git gud progress` to advance to the next skill")
+                    print("Level complete, you've completed all levels in this skill!")
+                    print('"git gud progress" to advance to the next skill')
                     print("Next skill is: {}".format(self.next_level.skill.name))
                 else:
-                    print("Level complete! `git gud progress` to advance to the next level")
-                    print("Next level is: {}".format(self.next_level.full_name()))
+                    print('Level complete! "git gud progress" to advance to the next level')
+                    print('Next level is: {}'.format(self.next_level.full_name()))
             except AttributeError:
                 print_all_complete()
         else:
-            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
+            print('Level not complete, keep trying. "git gud reset" to start from scratch.')

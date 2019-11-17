@@ -41,7 +41,7 @@ class GitGud:
         goal_parser = self.subparsers.add_parser('goal', help='Concisely show what needs to be done to complete the level.', description='Concisely show what needs to be done to complete the level.')
         reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
         reload_parser = self.subparsers.add_parser('reload', help='Alias for reset', description='Reset the current level. Reload command is an alias for reset command.')
-        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
+        test_parser = self.subparsers.add_parser('test', help="Test to see if you've successfully completed the current level", description="Test to see if you've successfully completed the current level")
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
         levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
@@ -85,14 +85,14 @@ class GitGud:
 
     def assert_initialized(self, skip_level_check=False):
         if not self.is_initialized():
-            raise InitializationError("Git gud has not been initialized. Use \"git gud init\" to initialize")
+            raise InitializationError('Git gud has not been initialized. Use "git gud init" to initialize')
 
         if not skip_level_check:
             try:
                 self.file_operator.get_level()
             except KeyError:
                 level_name = self.file_operator.read_level_file()
-                raise InitializationError("Currently loaded level does not exist: \"{}\"".format(level_name))
+                raise InitializationError('Currently loaded level does not exist: "{}"'.format(level_name))
 
     def load_level(self, level):
         level.setup(self.file_operator)
@@ -106,7 +106,7 @@ class GitGud:
             try:
                 self.subparsers.choices[args.command_name].print_help()
             except KeyError:
-                print('No such command exists: \"{}\"\n'.format(args.command_name))
+                print('No such command exists: "{}"\n'.format(args.command_name))
                 self.parser.print_help()
 
     def handle_init(self, args):
@@ -169,13 +169,13 @@ class GitGud:
         if self.is_initialized():
             try:
                 level = self.file_operator.get_level()
-                print("Currently on level: \"{}\"".format(level.full_name()))
+                print('Currently on level: "{}"'.format(level.full_name()))
             except KeyError:
                 level_name = self.file_operator.read_level_file()
-                print("Currently on unregistered level: \"{}\"".format(level_name))
+                print('Currently on unregistered level: "{}"'.format(level_name))
         else:
             print("Git gud not initialized.")
-            print("Initialize using \"git gud init\"")
+            print('Initialize using "git gud init"')
 
     def handle_instructions(self, args):
         self.assert_initialized()
@@ -216,7 +216,7 @@ class GitGud:
         if self.is_initialized():
             try:
                 cur_skill = self.file_operator.get_level().skill
-                print("Currently on skill: \"{}\"\n".format(cur_skill.name))
+                print('Currently on skill: "{}"'.format(cur_skill.name))
                 print()
             except KeyError:
                 pass
@@ -240,21 +240,21 @@ class GitGud:
                 skill = self.file_operator.get_level().skill
             except KeyError:
                 skill_name = self.file_operator.read_level_file().split()[0]
-                print("Cannot find any levels in skill: \"{}\"".format(skill_name))
+                print('Cannot find any levels in skill: "{}"'.format(skill_name))
                 return
         else:
             try:
                 skill = all_skills[args.skill_name]
             except KeyError:
-                print("There is no skill \"{}\".".format(args.skill_name))
-                print("You may run \"git gud skills\" to print all the skills. \n")
+                print('There is no skill "{}".'.format(args.skill_name))
+                print('You may run "git gud skills" to print all the skills. \n')
                 skill = self.file_operator.get_level().skill
                 key_error_flag = True
         
         if key_error_flag or args.skill_name is None:
-            print("Levels in the current skill \"{}\" : \n".format(skill.name))
+            print('Levels in the current skill "{}" : \n'.format(skill.name))
         else:
-            print("Levels for skill \"{}\" : \n".format(skill.name))
+            print('Levels for skill "{}" : \n'.format(skill.name))
 
         for index, level in enumerate(skill):
             print(str(index + 1) + ": " + level.name)
@@ -269,12 +269,12 @@ class GitGud:
                     level = skill[args.level_name]
                     self.load_level(level)
                 else:
-                    print("Level \"{}\" does not exist".format(args.level_name))
+                    print('Level "{}" does not exist'.format(args.level_name))
                     print("To view levels/skills, use git gud levels or git gud skills")
             else:
                 self.load_level(skill[0])
         else:
-            print("Skill \"{}\" does not exist".format(args.skill_name))
+            print('Skill "{}" does not exist'.format(args.skill_name))
             print("To view levels/skills, use git gud levels or git gud skills")
 
     def handle_commit(self, args):
@@ -290,9 +290,9 @@ class GitGud:
             except ValueError:
                 pass
 
-        print("Simulating: Create file \"{}\"".format(commit_name))
-        print("Simulating: git add {}".format(commit_name))
-        print("Simulating: git commit -m \"{}\"".format(commit_name))
+        print('Simulating: Create file "{}"'.format(commit_name))
+        print('Simulating: git add {}'.format(commit_name))
+        print('Simulating: git commit -m "{}"'.format(commit_name))
 
         commit = self.file_operator.add_and_commit(commit_name)
         print("New Commit: {}".format(commit.hexsha[:7]))
@@ -306,7 +306,7 @@ class GitGud:
         show_tree()
 
     def handle_contrib(self, args):
-        contrib_website = "https://github.com/bthayer2365/git-gud/graphs/contributors"
+        contrib_website = "https://github.com/benthayer/git-gud/graphs/contributors"
         webbrowser.open_new(contrib_website)
 
     def parse(self):
