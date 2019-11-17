@@ -65,6 +65,49 @@ def write_init(skill_name, skill_path, level_name):
     return
 
 
+def write_test(skill_name, skill_path, level_name):
+    if not os.path.exists(os.path.join(skill_path, "test_levels.py"))
+        with open(os.path.join(skill_path, "test_levels.py"), 'w+') as fp:
+            test_setup = "\n".join([
+                "import pytest",
+                "",
+                "from gitgud.skills.testing import simulate",
+                "",
+                "from . import skill",
+                "",
+                "",
+                "level_tests = [",
+                "    (",
+                "        skill[\'{}\'], [".format(level_name),
+                "            ",
+                "        ]",
+                "    )",
+                "]",
+                "",
+                "",
+                "@pytest.mark.parametrize('level,commands', level_tests)",
+                "def test_level(gg, level, commands):",
+                "    simulate(gg, level, commands)"
+            ])
+            fp.write(test_setup)
+    else:
+        with open(os.path.join(skill_path, "test_levels.py", 'w+') as fp):
+            filedata = fp.read()
+        
+        replace = "\n".join([
+            "    ), (",
+            "        skill[\'{}\'], [".format(level_name),
+            "            "
+            "        ]",
+            "    )",
+            "]"
+        ])
+        
+        filedata.replace("\n".join([
+            "    )",
+            "]"
+        ]), replace)
+
 def create_level_file(level_path, filename):
     filepath = os.path.join(level_path, filename)
     copyfile("level_file_temp/{}".format(filename), "{}".format(filepath))
