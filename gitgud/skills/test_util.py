@@ -4,7 +4,7 @@ from gitgud.skills import all_skills
 from gitgud.skills.util import Skill, Level, NamedList
 
 
-def test_access():
+def test_skill_access():
     all_skills[0]
     all_skills['basics']
     all_skills['basics'][0]
