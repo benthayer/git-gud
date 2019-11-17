@@ -10,7 +10,6 @@ def test_load(gg):
         ('git gud load rampup', all_skills["rampup"][0]),
         ('git gud load 2 detaching', all_skills[1]["detaching"]),
         ('git gud load rampup 4', all_skills["rampup"][3]),
-        ('git gud load 1-3', all_skills[0][2]),
         ('git gud load 3-octopus', all_skills[2]["octopus"]),
         ('git gud load basics-4', all_skills["basics"][3])
     ]
