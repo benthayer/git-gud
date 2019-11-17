@@ -39,8 +39,6 @@ setup(
         'gitgud.skills.basics',
         'gitgud.skills.extras',
         'gitgud.skills.rampup',
-        'git-gud.make_level.py',
-        'git-gud.level_file_temp'
     ],
     package_data={
         'gitgud.skills.basics': ['_*/*'],
