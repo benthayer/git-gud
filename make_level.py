@@ -1,5 +1,6 @@
 import sys
 import os
+from shutil import copyfile
 
 cwd = os.getcwd()
 
@@ -64,8 +65,7 @@ def write_init(skill_name, skill_path, level_name):
 
 def create_level_file(level_path,filename):
     filepath = os.path.join(level_path,filename)
-    with open(filepath,'a+'):
-        pass
+    copyfile("level_file_temp/{}".format(filename), "{}".format(filepath))
     print("Created: {}".format(filepath))
 
 def main():
@@ -126,10 +126,10 @@ def main():
     create_level_file(level_path, "goal.txt")
 
     # Make setup file
-    create_level_file(level_path, "setup.txt")
+    create_level_file(level_path, "setup.spec")
         
     # Make test file
-    create_level_file(level_path, "test.txt")
+    create_level_file(level_path, "test.spec")
     
     print()
     print("Done.")
