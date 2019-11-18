@@ -258,7 +258,7 @@ class GitGud:
 
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
-        argset = args.skill_name.split("-", 1)
+        argset = [s.strip() for s in args.skill_name.split("-", 1)]
 
         if len(argset) == 2:
             args.skill_name, args.level_name = tuple(argset)
