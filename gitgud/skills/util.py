@@ -224,6 +224,8 @@ class NamedList:
     def __contains__(self, key):
         if isinstance(key, str):
             return key in self._name_dict.keys()
+        elif isinstance(key,  int):
+            return key in range(len(self._name_dict.keys()))
         else:
             return key in self._items
 
