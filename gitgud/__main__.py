@@ -258,12 +258,19 @@ class GitGud:
 
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
-        argset = [s.strip() for s in args.skill_name.split("-", 1)]
 
-        if len(argset) == 2:
-            args.skill_name, args.level_name = tuple(argset)
+        argskillset = args.skill_name.split("-", 1)
+        
+        # Set up args.level_name and args.skill_name
+        if args.level_name:
+            if args.skill_name is "-":
+                # Replace the dash with the current skill's name.
+                args.skill_name = self.file_operator.get_level().skill.name
         else:
-            args.skill_name, args.level_name = argset[0], None
+            if len(argskillset) == 2:
+                args.skill_name, args.level_name = tuple(argskillset)
+            else:
+                args.skill_name, args.level_name = argskillset[0], None
 
         skill_to_load = self.file_operator.get_level().skill.name
         if args.skill_name.isnumeric():
@@ -284,10 +291,10 @@ class GitGud:
                     level = skill[level_to_load]
                     self.load_level(level)
             else:
-                print("Level \"{}\" does not exist".format(args.level_name))
+                print('Level "{}" does not exist'.format(args.level_name))
                 print("To view levels/skills, use git gud levels or git gud skills")
         else:
-            print("Skill \"{}\" does not exist".format(args.skill_name))
+            print('Skill "{}" does not exist'.format(args.skill_name))
             print("To view levels/skills, use git gud levels or git gud skills")
 
 
