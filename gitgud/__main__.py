@@ -85,14 +85,14 @@ class GitGud:
 
     def assert_initialized(self, skip_level_check=False):
         if not self.is_initialized():
-            raise InitializationError("Git gud has not been initialized. Use \"git gud init\" to initialize")
+            raise InitializationError('Git gud has not been initialized. Use "git gud init" to initialize')
 
         if not skip_level_check:
             try:
                 self.file_operator.get_level()
             except KeyError:
                 level_name = self.file_operator.read_level_file()
-                raise InitializationError("Currently loaded level does not exist: \"{}\"".format(level_name))
+                raise InitializationError('Currently loaded level does not exist: "{}"'.format(level_name))
 
     def load_level(self, level):
         level.setup(self.file_operator)
@@ -106,7 +106,7 @@ class GitGud:
             try:
                 self.subparsers.choices[args.command_name].print_help()
             except KeyError:
-                print('No such command exists: \"{}\"\n'.format(args.command_name))
+                print('No such command exists: "{}"\n'.format(args.command_name))
                 self.parser.print_help()
 
     def handle_init(self, args):
@@ -168,7 +168,7 @@ class GitGud:
     def handle_status(self, args):
         self.assert_initialized()
         level_name = self.file_operator.get_level().full_name()
-        print("Currently on level: \"{}\"".format(level_name))
+        print('Currently on level: "{}"'.format(level_name))
 
     def handle_instructions(self, args):
         self.assert_initialized()
@@ -215,12 +215,12 @@ class GitGud:
                 pass
         
         skill_chars = max(len(skill.name) for skill in all_skills)
-        skill_format_template = "Skill {{}} - {{:<{}}} :{{:>2}} level{{}}".format(skill_chars)
+        skill_format_template = 'Skill {{}} - "{{:<{}}}" :{{:>2}} level{{}}'.format(skill_chars)
         level_format_template = "    Level {:>2} : {:<3}"
         
         for i, skill in enumerate(all_skills):
             # TODO Add description
-            print(skill_format_template.format(i + 1, "\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
+            print(skill_format_template.format(i + 1, skill.name, len(skill), ("", "s")[len(skill) > 1]))
 
             for index, level in enumerate(skill):
                 print(level_format_template.format(index + 1, level.name))
@@ -237,21 +237,21 @@ class GitGud:
                 skill = self.file_operator.get_level().skill
             except KeyError:
                 skill_name = self.file_operator.read_level_file().split()[0]
-                print("Cannot find any levels in skill: \"{}\"".format(skill_name))
+                print('Cannot find any levels in skill: "{}"'.format(skill_name))
                 return
         else:
             try:
                 skill = all_skills[args.skill_name]
             except KeyError:
-                print("There is no skill \"{}\".".format(args.skill_name))
-                print("You may run \"git gud skills\" to print all the skills. \n")
+                print('There is no skill "{}".'.format(args.skill_name))
+                print('You may run "git gud skills" to print all the skills. \n')
                 skill = self.file_operator.get_level().skill
                 key_error_flag = True
         
         if key_error_flag or args.skill_name is None:
-            print("Levels in the current skill \"{}\" : \n".format(skill.name))
+            print('Levels in the current skill "{}" : \n'.format(skill.name))
         else:
-            print("Levels for skill \"{}\" : \n".format(skill.name))
+            print('Levels for skill "{}" : \n'.format(skill.name))
 
         for index, level in enumerate(skill):
             print(str(index + 1) + ": " + level.name)
@@ -311,9 +311,9 @@ class GitGud:
             except ValueError:
                 pass
 
-        print("Simulating: Create file \"{}\"".format(commit_name))
+        print('Simulating: Create file "{}"'.format(commit_name))
         print("Simulating: git add {}".format(commit_name))
-        print("Simulating: git commit -m \"{}\"".format(commit_name))
+        print('Simulating: git commit -m "{}"'.format(commit_name))
 
         commit = self.file_operator.add_and_commit(commit_name)
         print("New Commit: {}".format(commit.hexsha[:7]))
