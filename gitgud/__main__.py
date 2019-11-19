@@ -14,8 +14,6 @@ from gitgud.skills import all_skills
 from gitgud.skills.util import print_all_complete
 from gitgud.hooks import all_hooks
 
-# TODO Add test suite so testing can be separate from main code
-
 
 def show_tree():
     print("Simulating: git log --graph --oneline --all ")
@@ -28,7 +26,7 @@ class InitializationError(Exception):
 
 class GitGud:
     def __init__(self):
-        self.file_operator = get_operator()  # Only gets operator if in a valid gitgud repo
+        self.file_operator = get_operator()  # Only gets operator if Git Gud has been initialized
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 

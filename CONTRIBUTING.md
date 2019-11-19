@@ -23,7 +23,7 @@ I am committed to that goal and more than happy to help to you learn to code and
 
 ## Download and Setup
 ```
-git clone https://github.com/bthayer2365/git-gud
+git clone https://github.com/benthayer/git-gud
 cd git-gud
 pip install -e . # Installs in edit mode so we can change files without needing to reinstall
 cd ..

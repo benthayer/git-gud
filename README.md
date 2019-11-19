@@ -10,7 +10,7 @@ The first skill covers the basics and introduces you to a few of the fundamental
 The goal is to make this project contributor-friendly and to have levels covering every git skill.
 If there's something Git Gud doesn't teach you, we encourage you to open an issue and we'll try to make levels that teach that concept/command.
 If you're interested in contributing, the project is intentionally structured in a way that makes it easy for you to get your first pull request.
-Don't forget, the best way to learn about Git (or anything) is to actually use it! For more information, check out the [contributors file](https://github.com/bthayer2365/git-gud/blob/master/CONTRIBUTING.md).
+Don't forget, the best way to learn about Git (or anything) is to actually use it! For more information, check out the [contributors file](https://github.com/benthayer/git-gud/blob/master/CONTRIBUTING.md).
 
 There is also another project we recommend trying out.
 It is called ["Learn Git Branching"](https://learngitbranching.js.org), and it can teach you some of the things Git Gud teaches, and with a nice visual interface.
@@ -48,7 +48,7 @@ git gud init # Initializes a git repository and lets us start using git gud from
 Use this method if you'd like to contribute to this repository.  
 Open up a command line and type the following in. Make sure you're in the directory you want your local copy of Git Gud to be in.
 ```
-git clone https://github.com/bthayer2365/git-gud
+git clone https://github.com/benthayer/git-gud
 cd git-gud
 python --version # Must say Python 3, any minor version
 python -m pip install -e . # Installs in edit mode so we can change files without needing to reinstall
