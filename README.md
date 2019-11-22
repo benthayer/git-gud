@@ -90,7 +90,7 @@ Some commands you'll want to learn and what they do:
   * Displays all levels in the specified skill
 * git gud load <skill_name>
   * Begin the first level of the specified skill
-* git gud load <skill_name> <level_name>
+* git gud load <skill_name> <level_name> / git gud load <skill_name>-<level_name> / git gud load <skill_name> / git gud load -<level_name>
   * Begin the specified level (it is optional to specify the level)
 * git gud commit
   * Commit an empty file with a unique name
