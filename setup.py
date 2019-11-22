@@ -6,8 +6,8 @@ with open('README.md') as readme:
 
 setup(
     name='git-gud',
-    version='0.2.1',
-    url='https://github.com/bthayer2365/git-gud/',
+    version='0.2.4',
+    url='https://github.com/benthayer/git-gud/',
     description='A tool to learn git',
     author='Ben Thayer',
     author_email='ben@benthayer.com',
@@ -22,7 +22,12 @@ setup(
         'gitgud.skills.extras',
         'gitgud.skills.rampup',
     ],
-    python_requires='>=3.0',
+    package_data={
+        'gitgud.skills.basics': ['_*/*'],
+        'gitgud.skills.extras': ['_*/*'],
+        'gitgud.skills.rampup': ['_*/*'],
+    },
+    python_requires='>=3.5',
     install_requires=[
         'gitpython',
     ],

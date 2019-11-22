@@ -14,8 +14,6 @@ from gitgud.skills import all_skills
 from gitgud.skills.util import print_all_complete
 from gitgud.hooks import all_hooks
 
-# TODO Add test suite so testing can be separate from main code
-
 
 def show_tree():
     print("Simulating: git log --graph --oneline --all ")
@@ -28,7 +26,7 @@ class InitializationError(Exception):
 
 class GitGud:
     def __init__(self):
-        self.file_operator = get_operator()  # Only gets operator if in a valid gitgud repo
+        self.file_operator = get_operator()  # Only gets operator if Git Gud has been initialized
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
@@ -41,7 +39,7 @@ class GitGud:
         goal_parser = self.subparsers.add_parser('goal', help='Concisely show what needs to be done to complete the level.', description='Concisely show what needs to be done to complete the level.')
         reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
         reload_parser = self.subparsers.add_parser('reload', help='Alias for reset', description='Reset the current level. Reload command is an alias for reset command.')
-        test_parser = self.subparsers.add_parser('test', help='Test to see if you\'ve successfully completed the current level', description='Test to see if you\'ve successfully completed the current level')
+        test_parser = self.subparsers.add_parser('test', help="Test to see if you've successfully completed the current level", description="Test to see if you've successfully completed the current level")
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
         levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
@@ -166,9 +164,16 @@ class GitGud:
         show_tree()
 
     def handle_status(self, args):
-        self.assert_initialized()
-        level_name = self.file_operator.get_level().full_name()
-        print('Currently on level: "{}"'.format(level_name))
+        if self.is_initialized():
+            try:
+                level = self.file_operator.get_level()
+                print('Currently on level: "{}"'.format(level.full_name()))
+            except KeyError:
+                level_name = self.file_operator.read_level_file()
+                print('Currently on unregistered level: "{}"'.format(level_name))
+        else:
+            print("Git gud not initialized.")
+            print('Initialize using "git gud init"')
 
     def handle_instructions(self, args):
         self.assert_initialized()
@@ -209,7 +214,7 @@ class GitGud:
         if self.is_initialized():
             try:
                 cur_skill = self.file_operator.get_level().skill
-                print('Currently on skill: "{}"\n'.format(cur_skill.name))
+                print('Currently on skill: "{}"'.format(cur_skill.name))
                 print()
             except KeyError:
                 pass
@@ -233,6 +238,7 @@ class GitGud:
             if self.file_operator is None:
                 self.subparsers.choices['levels'].print_help()
                 return
+
             try:
                 skill = self.file_operator.get_level().skill
             except KeyError:
@@ -307,7 +313,7 @@ class GitGud:
                 pass
 
         print('Simulating: Create file "{}"'.format(commit_name))
-        print("Simulating: git add {}".format(commit_name))
+        print('Simulating: git add {}'.format(commit_name))
         print('Simulating: git commit -m "{}"'.format(commit_name))
 
         commit = self.file_operator.add_and_commit(commit_name)
@@ -322,7 +328,7 @@ class GitGud:
         show_tree()
 
     def handle_contrib(self, args):
-        contrib_website = "https://github.com/bthayer2365/git-gud/graphs/contributors"
+        contrib_website = "https://github.com/benthayer/git-gud/graphs/contributors"
         webbrowser.open_new(contrib_website)
 
     def parse(self):

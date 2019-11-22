@@ -23,7 +23,7 @@ I am committed to that goal and more than happy to help to you learn to code and
 
 ## Download and Setup
 ```
-git clone https://github.com/bthayer2365/git-gud
+git clone https://github.com/benthayer/git-gud
 cd git-gud
 pip install -e . # Installs in edit mode so we can change files without needing to reinstall
 cd ..
@@ -33,6 +33,11 @@ git gud init # Initializes a git repository and lets us start using the git gud 
 ```
 Once you have the code downloaded, I would recommend having two terminals open at all times, one in the test directory you just created, and one in the git-gud directory. 
 This allows you to both work with your code and test your code at the same time.
+
+## Testing
+
+Tests are an important part of the development process. To make sure you don't fail the test cases, you simply have to run `pytest .` from the `git-gud/` directory (the root of this repo). That'll run all tests and you can make sure that you haven't broken anything. Additionally, once you push, CircleCI will run tests and will show the results directly on GitHub. If you're fixing a bug, you should probably add a test that fails if that bug is present.
+
 
 ## Project Layout
 #### `GitPython`
