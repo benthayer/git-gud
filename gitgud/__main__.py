@@ -273,18 +273,13 @@ class GitGud:
                 args.skill_name, args.level_name = argskillset[0], None
 
         skill_to_load = self.file_operator.get_level().skill.name
-        if args.skill_name.isnumeric():
-            skill_to_load = int(args.skill_name) - 1
-        elif args.skill_name:
+        if args.skill_name:
             skill_to_load = args.skill_name
         
-        level_to_load = 0
+        level_to_load = '1'
         if args.level_name:
-            if args.level_name.isnumeric():
-                level_to_load = int(args.level_name) - 1
-            else:
-                level_to_load = args.level_name
-
+            level_to_load = args.level_name
+        
         if skill_to_load in all_skills:
             skill = all_skills[skill_to_load]
             if level_to_load in skill:
