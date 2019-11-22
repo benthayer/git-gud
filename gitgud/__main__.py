@@ -45,7 +45,7 @@ class GitGud:
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
         levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
-        load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description='Load a specific skill or level')
+        load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description='Load a specific skill or level (specify at least one)')
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
@@ -147,7 +147,7 @@ class GitGud:
         with open(self.file_operator.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
         with open(self.file_operator.level_path, 'w+') as level_file:
-            level_file.write(all_skills[0][0].full_name())
+            level_file.write(all_skills["1"]["1"].full_name())
 
         python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
@@ -279,10 +279,10 @@ class GitGud:
         level_to_load = '1'
         if args.level_name:
             level_to_load = args.level_name
-        
-        if skill_to_load in all_skills:
+
+        if skill_to_load in all_skills.keys():
             skill = all_skills[skill_to_load]
-            if level_to_load in skill:
+            if level_to_load in skill.keys():
                     level = skill[level_to_load]
                     self.load_level(level)
             else:
