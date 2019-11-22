@@ -204,6 +204,10 @@ class NamedList:
         if isinstance(query, int):
             return self._items[query]
         elif isinstance(query, str):
+            if query.isnumeric():
+                if int(query) == 0:
+                    raise KeyError
+                return self._items[int(query) - 1]
             return self._items[self._name_dict[query]]
         else:
             raise ValueError('Bad key type.')
@@ -223,6 +227,8 @@ class NamedList:
 
     def __contains__(self, key):
         if isinstance(key, str):
+            if key.isnumeric():
+                return key in self.keys(str)
             return key in self._name_dict.keys()
         elif isinstance(key,  int):
             return key in range(len(self._name_dict.keys()))
@@ -232,8 +238,11 @@ class NamedList:
     def values(self):
         return self._items
     
-    def keys(self):
-        return self._name_dict.keys()
+    def keys(self, keytype): # return the numbers, or return the names?
+        if keytype is str:
+            return {keytype(int(k) + 1) for k in self._name_dict.values()}
+        return {keytype(k) for k in self._name_dict.values()}
+        
 
 
 class AllSkills(NamedList):
@@ -250,9 +259,8 @@ class AllSkills(NamedList):
 
 class Skill(NamedList):
     def __init__(self, name, levels):
+        super().__init__([level.name for level in levels], levels)
         self.name = name
-        self._name_dict = {level.name:index for index, level in enumerate(levels)}
-        self._items = levels
 
         for level in levels:
             level.skill = self
