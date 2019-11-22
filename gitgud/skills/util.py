@@ -201,13 +201,12 @@ class NamedList:
         self._items = items
     
     def __getitem__(self, query):
-        if isinstance(query, int):
-            return self._items[query]
-        elif isinstance(query, str):
+        if isinstance(query, str):
             if query.isnumeric():
-                if int(query) == 0:
+                if 0 < int(query) <= len(self):
+                    return self._items[int(query) - 1]
+                else:
                     raise KeyError
-                return self._items[int(query) - 1]
             return self._items[self._name_dict[query]]
         else:
             raise ValueError('Bad key type.')
@@ -225,30 +224,20 @@ class NamedList:
         else:
             raise TypeError
 
-    def __contains__(self, key):
-        if isinstance(key, str):
-            if key.isnumeric():
-                return key in self.keys(str)
-            return key in self._name_dict.keys()
-        elif isinstance(key,  int):
-            return key in range(len(self._name_dict.keys()))
-        else:
-            return key in self._items
+    def __contains__(self, item):
+        return item in self._items
 
     def values(self):
         return self._items
     
-    def keys(self, keytype): # return the numbers, or return the names?
-        if keytype is str:
-            return {keytype(int(k) + 1) for k in self._name_dict.values()}
-        return {keytype(k) for k in self._name_dict.values()}
+    def keys(self): 
+        return set([str(int(k) + 1) for k in self._name_dict.values()]) | set(self._name_dict.keys())
         
 
 
 class AllSkills(NamedList):
     def __init__(self, skills):
-        self._name_dict = {skill.name: index for index, skill in enumerate(skills)}
-        self._items = skills
+        super().__init__([skill.name for skill in skills], skills)
         last_level = None
         for skill in self:
             for level in skill:
