@@ -209,7 +209,7 @@ class NamedList:
                     raise KeyError
             return self._items[self._name_dict[query]]
         else:
-            raise ValueError('Bad key type.')
+            raise KeyError
 
     def __iter__(self):
         return self._items.__iter__()
@@ -230,8 +230,10 @@ class NamedList:
     def values(self):
         return self._items
     
-    def keys(self): 
-        return set([str(int(k) + 1) for k in self._name_dict.values()]) | set(self._name_dict.keys())
+    def keys(self):
+        set_indices = { str(i) for i in range(1, len(self) + 1) }
+        set_names = set(self._name_dict.keys())
+        return set_indices | set_names
         
 
 
