@@ -7,7 +7,7 @@ from gitgud.skills.util import Skill, Level
 def test_access():
     all_skills[0]
     all_skills['basics']
-    all_skills['basics'][0]
+    all_skills['basics']['1']
     all_skills['basics']['committing']
 
 
