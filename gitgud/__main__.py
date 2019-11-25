@@ -30,9 +30,17 @@ class GitGud:
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
+        load_description = \
+            "Load a specific skill or level. This command can be used in several ways." \
+            "" \
+            "Examples include:" \
+            "" \
+            "" \
+            "All of these load the same level"
+
         self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
-        help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
+        help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands')
         init_parser = self.subparsers.add_parser('init', help='Init Git Gud and load first level', description='Initialize the direcotry with a git repository and load the first level of Git Gud.')
         status_parser = self.subparsers.add_parser('status', help='Print out the name of the current level', description='Print out the name of the current level')
         instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
@@ -43,7 +51,7 @@ class GitGud:
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
         levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
-        load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description='Load a specific skill or level (specify at least one)')
+        load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description=load_description)
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
