@@ -36,7 +36,7 @@ def test_init_NL():
 
 def test_getitem_NL():
     nltest = NamedList(['foo', 'bar', 'baz'], [5, 7, 9])
-    assert nltest[0] == 5
+    assert nltest['1'] == 5
     assert nltest['baz'] == 9
 
 
@@ -56,5 +56,5 @@ def test_setitem_NL():
 
 
 def test_contains_NL():
-    assert all_skills[1] in all_skills
-    assert all_skills[1][2] in all_skills[1]
+    assert all_skills['1'] in all_skills
+    assert all_skills['1']['1'] in all_skills['1']
