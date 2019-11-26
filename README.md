@@ -25,11 +25,10 @@ If we were in another directory, it would delete all our files! But don't worry,
 
 Recap:
 
-1. Make sure we're using Python 3
-2. Install Git Gud
-3. Create and change into an empty directory for Git Gud to load the skills into
-4. Run `git gud init`
-5. Follow the instructions to git gud!
+1. Install Git Gud using Python 3
+2. Create and change into an empty directory for Git Gud to load the skills into
+3. Run `git gud init`
+4. Follow the instructions to git gud!
 
 For specific instructions, see below.
 
@@ -37,8 +36,7 @@ For specific instructions, see below.
 Use this method if all you're looking to do is to use Git Gud.
 Open up a command line and type the following in.
 ```
-python --version # Must say Python 3, any minor version
-python -m  pip install git-gud
+pip3 install git-gud
 mkdir test
 cd test
 git gud init # Initializes a git repository and lets us start using git gud from within this folder
@@ -50,8 +48,7 @@ Open up a command line and type the following in. Make sure you're in the direct
 ```
 git clone https://github.com/benthayer/git-gud
 cd git-gud
-python --version # Must say Python 3, any minor version
-python -m pip install -e . # Installs in edit mode so we can change files without needing to reinstall
+pip3 install -e . # Installs in edit mode so we can change files without needing to reinstall
 cd ..
 mkdir test
 cd test
@@ -71,7 +68,7 @@ There will be several levels within each skill. Complete all of them to complete
 Some commands you'll want to learn and what they do:
 * python -m gitgud start 
   * Creates a git repository and gets you started on the first level!
-  * Lets you use `git gud <command>` instead of `python -m gitgud <command>`
+  * Lets you use `git gud <command>` instead of `python3 -m gitgud <command>`
 * git gud status
   * Shows the level you are currently working on
 * git gud instructions
