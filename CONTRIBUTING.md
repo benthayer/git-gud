@@ -25,7 +25,7 @@ I am committed to that goal and more than happy to help to you learn to code and
 ```
 git clone https://github.com/benthayer/git-gud
 cd git-gud
-pip install -e . # Installs in edit mode so we can change files without needing to reinstall
+pip3 install -e . # Installs in edit mode so we can change files without needing to reinstall
 cd ..
 mkdir test
 cd test
@@ -58,16 +58,18 @@ The `gitgud` module also has modules inside it.
 These "sub-modules" can be imported by running `import gitgud.X` and come in both types: files and folders. 
 Because `gitgud` has sub-modules, it's known as as a package, and therefore can be installed with the `pip` package manager.
 
-#### The `git gud` alias
-This project is not actually affiliated with Git, although we're able to run as a Git subcommand by creating what's known as an  alias within Git. 
-If you were to do this from the command line, the command to run would be `git config --global alias.gud " ! python -m gitgud"`. 
-This goes into the repository's `.git/` folder and finds the `.git/config` file. 
-In that file, there's a section called "[alias]" that is created and lists our command as `gud = "! C:/path/to/python.exe -m gitgud"` on Windows or `gud = "! /path/to/python -m gitgud"` on Mac/Linux
+#### The `git-gud` entrypoint
+This project is not affiliated with Git, although we're able to run as a Git subcommand by adding an entrypoint that Git will be able to look for an run.
+When installing Git Gud, it creates an executable called `git-gud` in Python's bin folder that can be run directly by typing in `git-gud`.
+Because of the name, you can also type in `git gud` and Git will be able to find the executable and act as if Git Gud is a valid Git subcommand.
+The entrypoint is defined in `setup.py` and specifies a function for Python to run.
+The function we specify "is" the program.
+It is defined in `gitgud/__main__.py`
 
 #### `__main__.py`
 As with any program, it starts with `main`. 
 In our case, `main` is `gitgud\__main__.py`. 
-When you run `python -m gitgud`, Python looks for a file that it can run. 
+When you run `python3 -m gitgud`, Python looks for a file that it can run. 
 Specifically, it looks for `__main__.py`. 
 If `__main__.py` isn't present, then Python can't run the module as if it were a command. 
 Instead, it'll think of `gitgud` exclusively as a package that can be imported.
