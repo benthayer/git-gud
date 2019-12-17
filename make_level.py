@@ -30,8 +30,7 @@ def write_init(skill_name, skill_path, level_name):
 
         # Add import statement
         replace = "\n".join([
-            "from gitgud.skills.{0} import skil{0}_skill".format(skill_name),
-            "",
+            "from gitgud.skills.{0} import skill as {0}_skill".format(skill_name),
             "",
             "from gitgud.skills.u"
         ])
@@ -54,10 +53,9 @@ def write_init(skill_name, skill_path, level_name):
         with open(os.path.join(skill_path, "__init__.py"), 'r') as fp:
             filedata = fp.read()
 
-        replace = ",\n        BasicLevel('{0}', pkg_resources.resource_filename(__name__, '_{0}/'))\n    ]".format(level_name)
+        replace = ",\n        BasicLevel('{level_name}', pkg_resources.resource_filename(__name__, '_{level_name}/'))\n    ]".format(level_name=level_name)
         filedata = filedata.replace("\n    ]", replace)
         filedata = filedata.replace("[,", "[")
-
         filepath = os.path.join(skill_path, "__init__.py")
         with open(filepath, 'w') as fp:
             fp.write(filedata)
@@ -65,7 +63,7 @@ def write_init(skill_name, skill_path, level_name):
     return
 
 
-def write_test(skill_name, skill_path, level_name):
+def write_test(skill_name, skill_path, level_name, level_path):
     if not os.path.exists(os.path.join(skill_path, "test_levels.py")):
         with open(os.path.join(skill_path, "test_levels.py"), 'w+') as fp:
             test_setup = "\n".join([
@@ -79,7 +77,8 @@ def write_test(skill_name, skill_path, level_name):
                 "level_tests = [",
                 "    (",
                 "        skill[\'{}\'], [".format(level_name),
-                "            ",
+                "            #Example: \'git gud commit\',",
+                "            #         \'git merge example\'",
                 "        ]",
                 "    )",
                 "]",
@@ -87,28 +86,30 @@ def write_test(skill_name, skill_path, level_name):
                 "",
                 "@pytest.mark.parametrize('level,commands', level_tests)",
                 "def test_level(gg, level, commands):",
-                "    simulate(gg, level, commands)"
+                "    simulate(gg, level, commands)",
+                ""
             ])
             fp.write(test_setup)
-            print("Added entry for {}".format(level_name))
+            print("Added entry for {}".format(level_path))
     else:
         with open(os.path.join(skill_path, "test_levels.py"), 'r') as fp:
             filedata = fp.read()
-        
+
         replace = "\n".join([
             "    ), (",
             "        skill[\'{}\'], [".format(level_name),
-            "            ",
+            "            #Example: \'git gud commit\',",
+            "            #         \'git merge example\'",
             "        ]",
             "    )",
             "]"
         ])
-        
+
         filedata = filedata.replace("\n".join([
             "    )",
             "]"
         ]), replace)
-        
+
         with open(os.path.join(skill_path, "test_levels.py"), 'w') as fp:
             fp.write(filedata)
             print("Added entry for {}".format(level_name))
@@ -192,14 +193,14 @@ def main():
     if not os.path.exists(level_path):
         os.mkdir(level_path)
         print("Created: {}".format(level_path))
-    
+
     print()
     print("Registering Level: {} {}".format(skill_name, level_name))
     write_init(skill_name, skill_path, level_name)
-    
+
     print()
     print("Creating Test Cases:")
-    write_test(skill_name, skill_path, level_name)
+    write_test(skill_name, skill_path, level_name, level_path)
 
     print()
     print("Creating Files:")
