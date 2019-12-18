@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import webbrowser
+import json
 
 import argparse
 
@@ -19,6 +20,21 @@ def show_tree():
     print("Simulating: git log --graph --oneline --all ")
     subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
 
+def init_tracking_json()
+    if os.path.exists(os.path.join(getcwd(), ".git"))
+        with open(".git/gud/commits.json", w) as fp:
+            
+
+def track_commits(commit_name, commit_hash):
+    # Assumes that .git/gud/commits.json has been initialized by 'git gud load'
+    if os.path.exists(".git/gud/commits.json"):
+        with open(".git/gud/commits.json") as fp:
+            commit_dict = json.loads(f)
+        commit_dict[commit_name] = commit_hash
+        with open(".git/gud/commits.json", w) as fp:
+            json.dump(commit_dict, fp)
+    else:
+        print("uh oh something borken")
 
 class InitializationError(Exception):
     pass
@@ -293,6 +309,7 @@ class GitGud:
         print('Simulating: git commit -m "{}"'.format(commit_name))
 
         commit = self.file_operator.add_and_commit(commit_name)
+        track_commits(self, commit_name, commit.hexsha[:7])
         print("New Commit: {}".format(commit.hexsha[:7]))
 
         # Check if the newest commit is greater than the last_commit, if yes, then write
