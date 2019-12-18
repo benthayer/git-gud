@@ -1,22 +1,4 @@
 from setuptools import setup
-from setuptools.command.develop import develop
-from setuptools.command.install import install
-
-
-class PostDevelopCommand(develop):
-    """Post-installation for development mode."""
-    def run(self):
-        from gitgud import create_alias
-        create_alias()
-        develop.run(self)
-
-
-class PostInstallCommand(install):
-    """Post-installation for installation mode."""
-    def run(self):
-        from gitgud import create_alias
-        create_alias()
-        install.run(self)
 
 
 with open('README.md') as readme:
@@ -24,8 +6,8 @@ with open('README.md') as readme:
 
 setup(
     name='git-gud',
-    version='0.1',
-    url='https://github.com/bthayer2365/git-gud/',
+    version='0.2.4',
+    url='https://github.com/benthayer/git-gud/',
     description='A tool to learn git',
     author='Ben Thayer',
     author_email='ben@benthayer.com',
@@ -49,8 +31,9 @@ setup(
     install_requires=[
         'gitpython',
     ],
-    cmdclass={
-        'develop': PostDevelopCommand,
-        'install': PostInstallCommand,
+    entry_points={
+        "console_scripts": [
+            "git-gud=gitgud.__main__:main"
+        ]
     }
 )

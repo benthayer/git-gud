@@ -9,7 +9,8 @@ level_tests = [
     (
         skill['detaching'], [  # User would instead check out the commit hash using only one command
             'git checkout bugFix',
-            'git checkout @',
+            'git checkout @^',
+            'git checkout @{1}',
         ]
     ), (
         skill['relrefs1'], [

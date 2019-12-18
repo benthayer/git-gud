@@ -197,7 +197,7 @@ class NamedList:
     # names is a list populated with type str, items is a list populated with any type 
     def __init__(self, names, items):
         assert len(names) == len(items)
-        self._name_dict = {name:index for index, name in enumerate(names)}
+        self._name_dict = {name: index for index, name in enumerate(names)}
         self._items = items
     
     def __getitem__(self, query):
@@ -225,7 +225,7 @@ class NamedList:
         if isinstance(key, str):
             return key in self._name_dict.keys()
         else:
-            return key in self._items()
+            return key in self._items
 
     def values(self):
         return self._items
@@ -288,7 +288,7 @@ def print_all_complete():
     print("Wow! You've complete every level, congratulations!")
 
     print("If you want to keep learning git, why not try contributing"
-          " to git-gud by forking the project at https://github.com/bthayer2365/git-gud/")
+          " to git-gud by forking the project at https://github.com/benthayer/git-gud/")
 
     print("We're always looking for contributions and are more than"
           " happy to accept both pull requests and suggestions!")
@@ -309,8 +309,11 @@ class BasicLevel(Level):
 
         latest_commit = '0'
         for commit_name, _, _, _ in commits:
-            if int(commit_name) > int(latest_commit):
-                latest_commit = commit_name
+            try:
+                if int(commit_name) > int(latest_commit):
+                    latest_commit = commit_name
+            except ValueError:
+                pass  # Commit is merge and doesn't have number
 
         file_operator.write_last_commit(latest_commit)
 
@@ -319,13 +322,13 @@ class BasicLevel(Level):
 
         self._setup(file_operator)
 
-        print("Setup complete")
+        print('Setup complete')
         print()
-        print("Goal:")
+        print('Goal:')
         self.goal()
         print()
-        print("Type \"git gud instructions\" to view full instructions")
-        print("Type \"git gud help\" for more help")
+        print('Type "git gud instructions" to view full instructions')
+        print('Type "git gud help" for more help')
         print()
 
     def instructions(self):
@@ -335,7 +338,7 @@ class BasicLevel(Level):
         with open(self.instructions_path) as instructions_file:
             for line in instructions_file:
                 if line[:3] == '>>>':
-                    input(">>>")
+                    input('>>>')
                 else:
                     print(line.strip())
 
@@ -359,12 +362,13 @@ class BasicLevel(Level):
         if self._test(file_operator):
             try:
                 if self.next_level.skill != self.skill:
-                    print("Level complete, you've completed all levels in this skill! `git gud progress` to advance to the next skill")
+                    print("Level complete, you've completed all levels in this skill!")
+                    print('"git gud progress" to advance to the next skill')
                     print("Next skill is: {}".format(self.next_level.skill.name))
                 else:
-                    print("Level complete! `git gud progress` to advance to the next level")
-                    print("Next level is: {}".format(self.next_level.full_name()))
+                    print('Level complete! "git gud progress" to advance to the next level')
+                    print('Next level is: {}'.format(self.next_level.full_name()))
             except AttributeError:
                 print_all_complete()
         else:
-            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
+            print('Level not complete, keep trying. "git gud reset" to start from scratch.')
