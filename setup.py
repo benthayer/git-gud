@@ -6,8 +6,8 @@ with open('README.md') as readme:
 
 setup(
     name='git-gud',
-    version='0.2.2',
-    url='https://github.com/bthayer2365/git-gud/',
+    version='0.2.4',
+    url='https://github.com/benthayer/git-gud/',
     description='A tool to learn git',
     author='Ben Thayer',
     author_email='ben@benthayer.com',
