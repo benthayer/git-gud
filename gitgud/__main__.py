@@ -30,14 +30,38 @@ class GitGud:
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
-        load_description = \
-            "Load a specific skill or level. This command can be used in several ways." \
-            "" \
-            "Examples include:" \
-            "" \
-            "" \
-            "All of these load the same level"
+        load_description = '\n'.join([
+            "Load a specific skill or level. This command can be used in several ways.",
+            "\n",
+            "============Basic Usage\n",
+            "These two commands are the simplest commands to load a level on a certain skill, and are completely identical in functionality:\n",
+            "   git gud load <skill> <level>",
+            "   git gud load <skill>-<level>\n",
+            "<skill> and <level> could either be the actual name of the skill/level, or it can be the number of the skill/level.",
+            "Running `git gud skills` will help you find the number and name associated with each skill/level.\n",
 
+            "Here are a few example uses, which all load the same level:\n",
+            "   git gud load basics branching",
+            "   git gud load basics-2",
+            "   git gud load 1 branching",
+            "\n",
+            "============Additional Commands\n",
+            "`git gud load` supports additional shortcut commands that may make it easier for you to navigate through levels and skills.\n",
+            "======Loading a level on the current skill\n",
+            "This command loads the specified level of the current skill.\n",
+            "   git gud load -<level>\n",
+            "<level> MUST be the number of the level in order for this command to work.",
+            "Here is an example use, which loads the third level on the current skill:\n",
+            "   git gud load -3",
+            "\n",
+            "======Loading the first level on a skill\n",
+            "This command loads the first level on the specified skill:\n",
+            "   git gud load <skill>\n",
+            "<skill> may be either the name or the number of the skill.",
+            "Here are some example uses, which both load the first level of the first skill:\n",
+            "   git gud load basics",
+            "   git gud load 1",
+        ])
         self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
         help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands')
@@ -51,7 +75,7 @@ class GitGud:
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
         levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
-        load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description=load_description)
+        load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description=load_description, formatter_class=argparse.RawDescriptionHelpFormatter)
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
