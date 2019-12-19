@@ -2,7 +2,6 @@ import os
 import sys
 import subprocess
 import webbrowser
-import json
 
 import argparse
 
@@ -11,6 +10,8 @@ from git.exc import InvalidGitRepositoryError
 
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
+from gitgud.operations import init_tracking_json
+from gitgud.operations import track_commits
 from gitgud.skills import all_skills
 from gitgud.skills.util import print_all_complete
 from gitgud.hooks import all_hooks
@@ -19,22 +20,6 @@ from gitgud.hooks import all_hooks
 def show_tree():
     print("Simulating: git log --graph --oneline --all ")
     subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
-
-def init_tracking_json()
-    if os.path.exists(os.path.join(getcwd(), ".git"))
-        with open(".git/gud/commits.json", w) as fp:
-            
-
-def track_commits(commit_name, commit_hash):
-    # Assumes that .git/gud/commits.json has been initialized by 'git gud load'
-    if os.path.exists(".git/gud/commits.json"):
-        with open(".git/gud/commits.json") as fp:
-            commit_dict = json.loads(f)
-        commit_dict[commit_name] = commit_hash
-        with open(".git/gud/commits.json", w) as fp:
-            json.dump(commit_dict, fp)
-    else:
-        print("uh oh something borken")
 
 class InitializationError(Exception):
     pass
@@ -280,12 +265,14 @@ class GitGud:
 
             if args.level_name is not None:
                 if args.level_name in all_skills[args.skill_name]:
+                    init_tracking_json()
                     level = skill[args.level_name]
                     self.load_level(level)
                 else:
                     print('Level "{}" does not exist'.format(args.level_name))
                     print("To view levels/skills, use git gud levels or git gud skills")
             else:
+                init_tracking_json()
                 self.load_level(skill[0])
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
@@ -309,7 +296,7 @@ class GitGud:
         print('Simulating: git commit -m "{}"'.format(commit_name))
 
         commit = self.file_operator.add_and_commit(commit_name)
-        track_commits(self, commit_name, commit.hexsha[:7])
+        track_commits(commit_name, commit.hexsha[:7])
         print("New Commit: {}".format(commit.hexsha[:7]))
 
         # Check if the newest commit is greater than the last_commit, if yes, then write
