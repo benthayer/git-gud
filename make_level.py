@@ -78,7 +78,7 @@ def write_test(skill_name, skill_path, level_name, level_path):
                 "    (",
                 "        skill[\'{}\'], [".format(level_name),
                 "            #Example: \'git gud commit\',",
-                "            #         \'git merge example\'",
+                "            #Example: \'git merge example\'",
                 "        ]",
                 "    )",
                 "]",
