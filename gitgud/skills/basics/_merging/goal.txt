@@ -1,0 +1,1 @@
+Commit on a new branch named bugFix, commit on master, then merge bugFix into master

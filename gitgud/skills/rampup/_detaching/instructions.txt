@@ -1,0 +1,18 @@
+This skill will introduce the idea of detaching your HEAD!
+>>>
+Don't worry, we don't mean your head; we mean the head of your commit tree. First, what is the HEAD of a commit tree?
+>>>
+The HEAD is used to refer to the commit that is currently checked out. The HEAD is often used by git commands that make changes to the working tree.
+>>>
+The HEAD usually points to the commit that you are working on top of. Normally, the HEAD points to the branch that you have checked out. In this way, when bugFix is updated, HEAD is updated as well.
+Example: HEAD -> bugFix -> C1   //HEAD points to bugFix.
+         HEAD -> bugFix -> C2   //A commit moved bugFix to C2, HEAD effectively points to C2
+>>>
+    What if we HEAD to point at a commit rather than a branch?
+    (e.g., HEAD -> C1 instead of HEAD -> bugFix -> C1)
+>>>
+In comes the concept of detaching HEAD. Simply use "git checkout <commit_hash>" to modify HEAD so that it points to the commit instead of the branch.
+>>>
+The commit hash is a unique identifier for each commit node. Use "git gud show-tree" to see the git commit tree. The hashes look something like: "d6ba740...". Since each commit hash is unique, you only need to type the first four characters of the hash to refer to the commit. (e.g. "git checkout d6ba" will detach the HEAD onto the commit of that hash)
+>>>
+Congratulations! You've learned how to detach HEADs in git. Try using "git gud show-tree" to see how the HEAD changes before and after a detach. Use what you've learned to move the HEAD from master to commit 4.

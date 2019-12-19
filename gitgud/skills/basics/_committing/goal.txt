@@ -1,0 +1,1 @@
+Commit twice using "git gud commit"

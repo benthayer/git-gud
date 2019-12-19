@@ -1,0 +1,9 @@
+Now that you are a master with the ^ specification, let's learn how to use the ~ specification.
+>>>
+The ~ specification is used much the same way as the ^ specification; although it can be more concise than the ^ specification. The usage of the ~ specification is this: "git checkout HEAD~<num>".
+>>>
+Using this command will place the HEAD pointer at the commit node that is <num> commits in the past. So, if I want to check out the node 5 commits before HEAD, I would use: "git checkout HEAD~5". Just like ^, this command also works with other types of references like branch names, commit hashes and tags, instead of just HEAD
+>>>
+The difference between ^ and ~ is that ~ allows you to rewind generations of commits in the past, while ^ refers to a specific parent. Essentially, the ~ specification is equivalent to "^1." This means that ^ is most often used to refer to commits in a merge while ~ is used to quickly refer to commits of the past.
+>>>
+Easy right? Use what you've learned about the ~ specification to move the head to commit 3. (Hint: use bugFix!)

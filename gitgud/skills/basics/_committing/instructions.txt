@@ -1,0 +1,16 @@
+This is a practice skill to get you started with the format of `git gud`.
+Hit enter to advance.
+>>>
+Great! You just advanced through the first part of the first set of instructions!
+>>>
+As you progress, `git gud` will guide you through the relevant commands in both `git` and `git gud`.
+Let's start out by writing some commits.
+>>>
+`git gud` offers a special command to facilitate creating example commits faster.
+By running `git gud commit`, `git gud` will automatically create a new file, add that file to the git index and commit it. Try it out!
+>>>
+When you're done, run `git gud test` to see if you've completed this level.
+You'll run this command to check future levels as well.
+Hit enter to start!
+>>>
+Now, let's start using git!
