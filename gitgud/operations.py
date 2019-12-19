@@ -2,6 +2,7 @@ import os
 import shutil
 import datetime as dt
 import email.utils
+import json
 
 from glob import glob
 
@@ -86,7 +87,8 @@ class Operator:
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
+                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
+                track_commits(name, commit_obj.hexsha[:7])
             else:
                 assert name[0] == 'M'
                 int(name[1:])  # Fails if not a number
@@ -95,7 +97,9 @@ class Operator:
                 for parent in parents[1:]:
                     merge_base = self.repo.merge_base(parents[0], parent)
                     self.repo.index.merge_tree(parent, base=merge_base)
-                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
+                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
+                track_commits(name, commit_obj.hexsha[:7])
+                
 
             commit_objects[name] = self.repo.head.commit
 
@@ -215,3 +219,22 @@ def get_operator():
         if os.path.isdir(gg_path):
             return Operator(path)
     return None
+
+def init_tracking_json():
+    if os.path.exists(os.path.join(os.getcwd(), ".git")):
+        with open(".git/gud/commits.json", 'w') as fp:
+            json.dump({}, fp)
+    else:
+        print("ERROR: Wrong directory :C")
+            
+
+def track_commits(commit_num, commit_hash):
+    # Assumes that .git/gud/commits.json has been initialized by 'git gud load'
+    if os.path.exists(".git/gud/commits.json"):
+        with open(".git/gud/commits.json") as fp:
+            commit_dict = json.load(fp)
+        commit_dict["C" + commit_num] = commit_hash
+        with open(".git/gud/commits.json", 'w') as fp:
+            json.dump(commit_dict, fp)
+    else:
+        print("uh oh someting borken")
