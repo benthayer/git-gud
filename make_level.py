@@ -57,11 +57,11 @@ def write_init(skill_name, skill_path, level_name):
 
 def write_test(skill_name, skill_path, level_name, level_path):
     if not os.path.exists(os.path.join(skill_path, "test_levels.py")):
-        copyfile("ML_file_templates/test_levels.py", skill_path + "/test_levels.py")
+        copyfile("ML_file_templates/test_levels.txt", skill_path + "/test_levels.py")
         with open(os.path.join(skill_path, "test_levels.py"), 'r') as fp:
             new_test = fp.read()
             
-        new_test = new_test.replace("skill[]", "skill['" + level_name + "']")
+        new_test = new_test.replace("{}", level_name)
         
         with open(os.path.join(skill_path, "test_levels.py"), 'w') as fp:
             fp.write(new_test)
