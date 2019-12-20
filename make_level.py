@@ -32,9 +32,9 @@ def write_init(skill_name, skill_path, level_name):
         replace = "\n".join([
             "from gitgud.skills.{0} import skill as {0}_skill".format(skill_name),
             "",
-            "from gitgud.skills.u"
+            "from gitgud.skills.util import AllSkills"
         ])
-        filedata = filedata.replace("\nfrom gitgud.skills.u", replace)
+        filedata = filedata.replace("\nfrom gitgud.skills.util import AllSkills", replace)
 
         # Add to input array of Skill
         replace = ",\n    {}_skill\n]".format(skill_name)
