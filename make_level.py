@@ -141,10 +141,14 @@ def main():
         "level_name: {}".format(level_name),
         "Confirm[y/n] "
     ]), end='')
-
-    choice = input().lower()
-    if choice == 'n':
-        return
+    
+    choice = ''
+    while choice != 'y':
+        choice = input().lower()
+        if choice == 'n':
+            return
+        elif choice != 'y':
+            print("Confirm[y/n] ", end='')
 
     # Register package
     # Read setup.py
