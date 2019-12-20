@@ -8,7 +8,7 @@ cwd = os.getcwd()
 def write_init(skill_name, skill_path, level_name):
     # If skills/<new_skill>/__init__.py doesn't exist, create a basic version
     if not os.path.exists(os.path.join(skill_path, "__init__.py")):
-        copyfile("make_level_file_templates/__init__.py", skill_path + "/__init__.py")
+        copyfile("ML_file_templates/__init__.py", skill_path + "/__init__.py")
         with open(os.path.join(skill_path, "__init__.py"), 'r') as fp:
             level_setup = fp.read()
             
@@ -57,11 +57,11 @@ def write_init(skill_name, skill_path, level_name):
 
 def write_test(skill_name, skill_path, level_name, level_path):
     if not os.path.exists(os.path.join(skill_path, "test_levels.py")):
-        copyfile("make_level_file_templates/test_levels.py", skill_path + "/test_levels.py")
+        copyfile("ML_file_templates/test_levels.py", skill_path + "/test_levels.py")
         with open(os.path.join(skill_path, "test_levels.py"), 'r') as fp:
             new_test = fp.read()
             
-        new_test = new_test.replace("{}", level_name)
+        new_test = new_test.replace("skill[]", "skill['" + level_name + "']")
         
         with open(os.path.join(skill_path, "test_levels.py"), 'w') as fp:
             fp.write(new_test)
@@ -92,7 +92,7 @@ def write_test(skill_name, skill_path, level_name, level_path):
 
 def create_level_file(level_path, filename):
     filepath = os.path.join(level_path, filename)
-    copyfile("make_level_file_templates/{}".format(filename), "{}".format(filepath))
+    copyfile("ML_file_templates/{}".format(filename), "{}".format(filepath))
     print("Created: {}".format(filepath))
 
 
