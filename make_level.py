@@ -6,7 +6,7 @@ cwd = os.getcwd()
 
 
 def write_init(skill_name, skill_path, level_name):
-    # If skills/skill/__init__.py doesn't exist, create a basic version
+    # If skills/<new_skill>/__init__.py doesn't exist, create a basic version
     if not os.path.exists(os.path.join(skill_path, "__init__.py")):
         with open(os.path.join(skill_path, "__init__.py"), 'w+') as fp:
             level_setup = "\n".join([
@@ -24,19 +24,19 @@ def write_init(skill_name, skill_path, level_name):
                 ])
             fp.write(level_setup)
 
-        # Read file
+        # Read skills/__init__.py to add import statement, and add new skill to AllSkills
         with open(os.path.join("gitgud", "skills", "__init__.py"), 'r') as fp:
             filedata = fp.read()
 
-        # Add import statement
-        replace = "\n".join([
+        # Add import statement into skills/__init__.py
+        new_import = "\n".join([
             "from gitgud.skills.{0} import skill as {0}_skill".format(skill_name),
             "",
             "from gitgud.skills.util import AllSkills"
         ])
-        filedata = filedata.replace("\nfrom gitgud.skills.util import AllSkills", replace)
+        filedata = filedata.replace("\nfrom gitgud.skills.util import AllSkills", new_import)
 
-        # Add to input array of Skill
+        # Add skill to AllSkills
         replace = ",\n    {}_skill\n]".format(skill_name)
         filedata = filedata.replace("\n]", replace)
 
@@ -47,20 +47,19 @@ def write_init(skill_name, skill_path, level_name):
             print("Registered skill \"{}\" in {}".format(skill_name, filepath))
 
         write_init(skill_name, skill_path, level_name)
-        return
     else:
-        # Populate file with BasicLevel
-        with open(os.path.join(skill_path, "__init__.py"), 'r') as fp:
+        # Add level to skills/<new_skill>/__init__.py
+        filepath = os.path.join(skill_path, "__init__.py")
+        with open(filepath, 'r') as fp:
             filedata = fp.read()
 
         replace = ",\n        BasicLevel('{level_name}', pkg_resources.resource_filename(__name__, '_{level_name}/'))\n    ]".format(level_name=level_name)
         filedata = filedata.replace("\n    ]", replace)
         filedata = filedata.replace("[,", "[")
-        filepath = os.path.join(skill_path, "__init__.py")
+
         with open(filepath, 'w') as fp:
             fp.write(filedata)
             print("Registered level \"{}\" in {}".format(level_name, filepath))
-    return
 
 
 def write_test(skill_name, skill_path, level_name, level_path):
@@ -98,8 +97,8 @@ def write_test(skill_name, skill_path, level_name, level_path):
         replace = "\n".join([
             "    ), (",
             "        skill[\'{}\'], [".format(level_name),
-            "            #Example: \'git gud commit\',",
-            "            #         \'git merge example\'",
+            "            \'git gud commit\',  # Example, change to solution for your level",
+            "            \'git merge example\'",
             "        ]",
             "    )",
             "]"
