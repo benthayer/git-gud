@@ -159,7 +159,7 @@ def main():
     ])
 
     replace2 = "\n".join([
-        "        \'gitgud.skills.{}\'['_*/*'],".format(skill_name),
+        "        \'gitgud.skills.{}\': ['_*/*'],".format(skill_name),
         "    },",
         "    python_requires"
     ])
