@@ -130,7 +130,12 @@ def main():
     with open("setup.py", 'r') as fp:
         filedata = fp.read()
 
-    # Update desired lines
+    # Check if skill is already registered.
+    skill_exists = False
+    if "gitgud.skills.{}".format(skill_name) in filedata:
+        skill_exists = True
+
+    # Concatenate potential entry
     replace1 = "\n".join([
         "        \'gitgud.skills.{}\',".format(skill_name),
         "    ],",
@@ -143,15 +148,17 @@ def main():
         "    python_requires"
     ])
 
-    filedata = filedata.replace("\n".join([
-        "    ],",
-        "    package_data"
-    ]), replace1)
+    # Register new skill to setup.py
+    if not skill_exists:
+        filedata = filedata.replace("\n".join([
+            "    ],",
+            "    package_data"
+        ]), replace1)
 
-    filedata = filedata.replace("\n".join([
-        "    },",
-        "    python_requires"
-    ]), replace2)
+        filedata = filedata.replace("\n".join([
+            "    },",
+            "    python_requires"
+        ]), replace2)
 
     # Write new lines to file
     with open("setup.py", 'w') as fp:
