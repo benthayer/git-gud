@@ -11,7 +11,7 @@ from git.exc import InvalidGitRepositoryError
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
 from gitgud.operations import init_tracking_json
-from gitgud.operations import track_commits
+from gitgud.operations import track_commit
 from gitgud.skills import all_skills
 from gitgud.skills.util import print_all_complete
 from gitgud.hooks import all_hooks
@@ -265,14 +265,14 @@ class GitGud:
 
             if args.level_name is not None:
                 if args.level_name in all_skills[args.skill_name]:
-                    init_tracking_json()
+                    init_tracking_json(self.file_operator)
                     level = skill[args.level_name]
                     self.load_level(level)
                 else:
                     print('Level "{}" does not exist'.format(args.level_name))
                     print("To view levels/skills, use git gud levels or git gud skills")
             else:
-                init_tracking_json()
+                init_tracking_json(self.file_operator)
                 self.load_level(skill[0])
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
@@ -296,7 +296,7 @@ class GitGud:
         print('Simulating: git commit -m "{}"'.format(commit_name))
 
         commit = self.file_operator.add_and_commit(commit_name)
-        track_commits(commit_name, commit.hexsha[:7])
+        track_commit(self.file_operator, commit_name, commit.hexsha[:7])
         print("New Commit: {}".format(commit.hexsha[:7]))
 
         # Check if the newest commit is greater than the last_commit, if yes, then write
