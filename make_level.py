@@ -8,10 +8,13 @@ cwd = os.getcwd()
 def write_init(skill_name, skill_path, level_name):
     # If skills/<new_skill>/__init__.py doesn't exist, create a basic version
     if not os.path.exists(os.path.join(skill_path, "__init__.py")):
-        copyfile("make_level_file_templates/__init__.py", "{}/__init__.py".format(skill_path))
-        with open(os.path.join(skill_path, "__init__.py"), 'w+') as fp:
+        copyfile("make_level_file_templates/__init__.py", skill_path + "/__init__.py")
+        with open(os.path.join(skill_path, "__init__.py"), 'r') as fp:
             level_setup = fp.read()
-            level_setup = level_setup.replace("{}", skill_name)
+            
+        level_setup = level_setup.replace("{}", skill_name)
+        
+        with open(os.path.join(skill_path, "__init__.py"), 'w') as fp:
             fp.write(level_setup)
 
         # Read skills/__init__.py to add import statement, and add new skill to AllSkills
@@ -54,31 +57,35 @@ def write_init(skill_name, skill_path, level_name):
 
 def write_test(skill_name, skill_path, level_name, level_path):
     if not os.path.exists(os.path.join(skill_path, "test_levels.py")):
-        copyfile("make_level_file_templates/test_levels.py", "{}/test_levels.py".format(skill_path))
-        with open(os.path.join(skill_path, "test_levels.py"), 'w+') as fp:
+        copyfile("make_level_file_templates/test_levels.py", skill_path + "/test_levels.py")
+        with open(os.path.join(skill_path, "test_levels.py"), 'r') as fp:
             new_test = fp.read()
-            new_test = new_test.replace("{}", level_name)
+            
+        new_test = new_test.replace("{}", level_name)
+        
+        with open(os.path.join(skill_path, "test_levels.py"), 'w') as fp:
             fp.write(new_test)
             print("Added entry for {}".format(level_path))
     else:
-        with open(os.path.join(skill_path, "test_levels.py"), 'w+') as fp:
+        with open(os.path.join(skill_path, "test_levels.py"), 'r') as fp:
             filedata = fp.read()
 
-            replace = "\n".join([
-                "    ), (",
-                "        skill[\'{}\'], [".format(level_name),
-                "            \'git gud commit\',  # Example, change to solution for your level",
-                "            \'git merge example\'",
-                "        ]",
-                "    )",
-                "]"
-            ])
+        replace = "\n".join([
+            "    ), (",
+            "        skill[\'{}\'], [".format(level_name),
+            "            \'git gud commit\',  # Examples, change to solution for your level",
+            "            \'git merge example\'",
+            "        ]",
+            "    )",
+            "]"
+        ])
 
-            filedata = filedata.replace("\n".join([
-                "    )",
-                "]"
-            ]), replace)
+        filedata = filedata.replace("\n".join([
+            "    )",
+            "]"
+        ]), replace)
 
+        with open(os.path.join(skill_path, "test_levels.py"), 'w') as fp:
             fp.write(filedata)
             print("Added entry for {}".format(level_name))
 
