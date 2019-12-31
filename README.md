@@ -1,6 +1,6 @@
 # Git Gud
 
-[![demo](https://asciinema.org/a/bNwZf8ZCVqSV4f7ivQqwjFPuq.svg)](https://asciinema.org/a/bNwZf8ZCVqSV4f7ivQqwjFPuq?autoplay=1)
+![Demonstration](./git-gud-preview-v1.gif)
 
 ## What is it?
 Git Gud is a command line tool to help you learn how to use git.
