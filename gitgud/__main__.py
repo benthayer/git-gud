@@ -161,6 +161,7 @@ class GitGud:
         print('Welcome to Git Gud!')
         print()
 
+        init_tracking_json(self.file_operator)
         self.file_operator.get_level().setup(self.file_operator)
         show_tree()
 
@@ -189,6 +190,7 @@ class GitGud:
 
         level = self.file_operator.get_level()
         print("Resetting...")
+        init_tracking_json(self.file_operator)
         level.setup(self.file_operator)
         show_tree()
 
