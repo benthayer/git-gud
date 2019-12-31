@@ -221,12 +221,11 @@ def get_operator():
     return None
 
 def init_tracking_json(file_operator):
-    if os.path.exists(os.path.join(file_operator.git_path, "gud", "commits.json")):
-        with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
-            json.dump({}, fp)
-    else:
-        print("ERROR: Wrong directory :C")
-   
+    print("Creating: Commit Tracker")
+    with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
+        json.dump({}, fp)
+        print("Successfully created")
+        print()
 
 def track_commit(file_operator, commit_num, commit_hash):
     # Assumes that .git/gud/commits.json has been initialized by 'git gud load'
@@ -237,4 +236,4 @@ def track_commit(file_operator, commit_num, commit_hash):
         with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
             json.dump(commit_dict, fp)
     else:
-        print("uh oh someting borken")
+        print("ERROR: Commit tracker does not exist!")
