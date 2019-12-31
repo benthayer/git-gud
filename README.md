@@ -1,4 +1,7 @@
 # Git Gud
+
+![Demonstration](./git-gud-preview-v1.gif)
+
 ## What is it?
 Git Gud is a command line tool to help you learn how to use git.
 It is structured like a game to make the learning experience more fun.
