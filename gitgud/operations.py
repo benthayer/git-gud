@@ -155,6 +155,9 @@ class Operator:
                 "id": branch.name
             }
 
+        # Record commits referenced by detached HEAD.
+        commits.add(repo.head.commit)
+
         for tag in repo.tags:
             commit_name = tag.commit.message.strip()
             tree['tags'][tag.name] = {
