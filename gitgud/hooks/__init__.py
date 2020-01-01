@@ -2,5 +2,6 @@
 all_hooks = [
     # ('git-hook-name', 'modulename')
     ('post-rewrite', 'postrewrite'),
+    ('commit-msg', 'commitmsg'),
     ('post-merge', 'postmerge')
 ]
