@@ -6,16 +6,25 @@ from gitgud.operations import get_operator
 file_operator = get_operator()
 commit_obj = file_operator.repo.head.commit
 
-if os.path.exists(os.path.join(file_operator.git_path, "gud", "commits.json")):
-    with open(os.path.join(file_operator.git_path, "gud", "commits.json")) as fp:
+# Count the number of merge commits that already exist.
+tree = file_operator.get_current_tree()
+num_merges = 0
+for key in tree['commits']:
+    if "M" in key:
+        num_merges = num_merges + 1
+
+new_merge = "M" + str(num_merges)
+if os.path.exists(file_operator.commits_json_path):
+    with open(file_operator.commits_json_path) as fp:
         commit_dict = json.load(fp)
 
-        commit_dict["M"] = commit_obj.hexsha[:7]
+        commit_dict[new_merge] = commit_obj.hexsha[:7]
         
-    with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
+    with open(file_operator.commits_json_path, 'w') as fp:
         json.dump(commit_dict, fp)
 else:
     print("ERROR: Commit tracker does not exist!")
 
 
-RENAME MERGE COMMIT PRIOR TO TRACKING, THEN USE NAME IN DICT.
+
+
