@@ -23,6 +23,7 @@ class Operator:
 
         self.git_path = os.path.join(self.path, '.git')
         self.commits_json_path = os.path.join(self.path, '.git', 'gud', 'commits.json')
+        self.rebase_info_path = os.path.join(self.path, '.git', 'gud', 'rebase_info.json')
         self.hooks_path = os.path.join(self.path, '.git', 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
