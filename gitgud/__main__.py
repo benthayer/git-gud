@@ -21,6 +21,7 @@ def show_tree():
     print("Simulating: git log --graph --oneline --all ")
     subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
 
+
 class InitializationError(Exception):
     pass
 
@@ -236,7 +237,6 @@ class GitGud:
             if self.file_operator is None:
                 self.subparsers.choices['levels'].print_help()
                 return
-
             try:
                 skill = self.file_operator.get_level().skill
             except KeyError:

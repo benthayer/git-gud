@@ -220,12 +220,14 @@ def get_operator():
             return Operator(path)
     return None
 
+
 def init_tracking_json(file_operator):
     print("Creating: Commit Tracker")
     with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
         json.dump({}, fp)
         print("Successfully created")
         print()
+
 
 def track_commit(file_operator, commit_num, commit_hash):
     # Assumes that .git/gud/commits.json has been initialized by 'git gud load'
