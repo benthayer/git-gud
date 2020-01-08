@@ -1,25 +1,8 @@
 ## So, you want to be a contributor?
 You're in luck! 
-Git Gud was intentionally designed to make it easy for you to contribute! 
-If the only thing you want to do is to make a level that tests to see if you can modify the tree in a simple way, then there's already the `BasicLevel` class to deal with that.
-If you want to do something more complicated, just throw out the idea.
-The easiest way to contribute is to open up an issue.
-Even though you're not writing code, GitHub still counts issues as contributions!
+Git Gud was intentionally designed to make it easy for you to contribute! If you have an idea or an issue, add an issue and we can get to work.
 
-Once you write your first issue, I'll respond and we can figure out how to design a skill, add your feature, or fix your problem.
-If you want to end it there, you can, but I encourage you to continue. 
-A Pull Request might just be a couple lines of code away, and I'll be happy to help you through any issues you encounter!  
-
-If you feel like your issue is too complicated for you to solve, but you'd still like to write code, just say so. 
-I can point you towards the files you need or other code that does something similar. 
-If you're still not sure, then I'm happy to write some code to get you started.
-
-Remember: Everyone, including me, was a noob at some point. 
-Don't be worried about wasting my time because you're not. 
-Contributing is called contributing because it is exactly that. 
-Any code you write makes the project more complete and any issues you submit opens up the opportunity for others to contribute and to make the project better. 
-I started this project because I wanted to help people learn git and programming. 
-I am committed to that goal and more than happy to help to you learn to code and to submit a pull request.
+If you want to get to work on a level, take a look at the existing levels and you should get a feel for how we create levels.
 
 ## Download and Setup
 ```
