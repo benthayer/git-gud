@@ -3,21 +3,12 @@
 ![Demonstration](./git-gud-preview-v1.gif)
 
 ## What is it?
-Git Gud is a command line tool to help you learn how to use git.
-It is structured like a game to make the learning experience more fun.
-It contains a series of levels, which are sorted by skills.
-If you complete all the levels in a skill, then you've completed the skill.
-It's as simple as that. Each skill has a common theme.
-The first skill covers the basics and introduces you to a few of the fundamental concepts of git, namely commits, branches, and merging/rebasing. Subsequent skills get more advanced.
+Git Gud is a command line game to help you learn how to use git in a fun way.
+As levels progress, you will know more and more about git, and eventually become a git grandmaster!
 
-The goal is to make this project contributor-friendly and to have levels covering every git skill.
-If there's something Git Gud doesn't teach you, we encourage you to open an issue and we'll try to make levels that teach that concept/command.
-If you're interested in contributing, the project is intentionally structured in a way that makes it easy for you to get your first pull request.
-Don't forget, the best way to learn about Git (or anything) is to actually use it! For more information, check out the [contributors file](https://github.com/benthayer/git-gud/blob/master/CONTRIBUTING.md).
+If something's missing feel free to add an issue, or if you're interested, view the [contributors file](https://github.com/benthayer/git-gud/blob/master/CONTRIBUTING.md) and add something yourself! The project is intentially structured to make it very easy to add new levels!
 
-There is also another project we recommend trying out.
-It is called ["Learn Git Branching"](https://learngitbranching.js.org), and it can teach you some of the things Git Gud teaches, and with a nice visual interface.
-Git Gud differentiates itself by (eventually) having more skills and the ability to test you on all the concepts there are.
+If you're more of a visual learner, you should start with ["Learn Git Branching"](https://learngitbranching.js.org), and and then give Git Gud a try. Learn Git Branching is more visual, but with Git Gud, you're actually using git to complete the levels.
 
 ## How do I use it?
 First, no matter what, you'll need Python 3.
