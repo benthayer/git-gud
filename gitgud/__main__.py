@@ -30,9 +30,45 @@ class GitGud:
 
         self.parser = argparse.ArgumentParser(prog='git gud')
 
+        load_description = '\n'.join([
+            "Load a specific skill or level. This command can be used in several ways.",
+            "\n",
+            "============Basic Usage============",
+            "\n",
+            "These commands are the simplest commands to load a level on a certain skill, and are identical in functionality:",
+            "\n",
+            "   git gud load <skill> <level>",
+            "   git gud load <skill>-<level>",
+            "\n",
+            "<skill> and <level> could either be the name of the skill/level or the number of the skill/level.",
+            "Running `git gud skills` will help you find the number and name associated with each skill/level.",
+            "\n",
+            "Here are example uses which load the same level:",
+            "\n",
+            "   git gud load basics-2",
+            "   git gud load 1 branching",
+            "\n",
+            "============Additional Commands============",
+            "\n",
+            "`git gud load` supports additional shortcut commands to ease level navigation.",
+            "\n",
+            "======Loading the first level on a skill======",
+            "\n",
+            "This command loads the first level on the specified skill:",
+            "\n",
+            "   git gud load <skill>",
+            "\n",
+            "======Loading a level on the current skill======",
+            "\n",
+            "This command loads the specified level of the current skill.",
+            "NOTE: <level> MUST be a number in order for this command to work.",
+            "\n",
+            "   git gud load -<level>",
+            "\n",
+        ])
         self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
-        help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands') 
+        help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands')
         init_parser = self.subparsers.add_parser('init', help='Init Git Gud and load first level', description='Initialize the direcotry with a git repository and load the first level of Git Gud.')
         status_parser = self.subparsers.add_parser('status', help='Print out the name of the current level', description='Print out the name of the current level')
         instructions_parser = self.subparsers.add_parser('instructions', help='Show the instructions for the current level', description='Show the instructions for the current level')
@@ -43,7 +79,7 @@ class GitGud:
         progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
         levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
-        load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description='Load a specific skill or level')
+        load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description=load_description, formatter_class=argparse.RawDescriptionHelpFormatter)
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
@@ -145,7 +181,7 @@ class GitGud:
         with open(self.file_operator.last_commit_path, 'w+') as commit_file:
             commit_file.write('0')  # First commit will be 1
         with open(self.file_operator.level_path, 'w+') as level_file:
-            level_file.write(all_skills[0][0].full_name())
+            level_file.write(all_skills["1"]["1"].full_name())
 
         python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
@@ -219,14 +255,19 @@ class GitGud:
             except KeyError:
                 pass
         
-        for skill in all_skills:
+        skill_chars = max(len(skill.name) for skill in all_skills)
+        skill_format_template = 'Skill {{}} - "{{:<{}}}" :{{:>2}} level{{}}'.format(skill_chars)
+        level_format_template = "    Level {:>2} : {:<3}"
+        
+        for i, skill in enumerate(all_skills):
             # TODO Add description
-            # 10 characters for the short IDs.
-            print("Skill {:<10} :{:>2} level{}".format("\"" + skill.name + "\"", len(skill), ("", "s")[len(skill) > 1]))
-            for index, level in enumerate(skill):
-                # " " * (characters allocated for ID - 6)
-                print("{}Level {:>2} : {:<10}".format(" " * 4, index + 1, level.name))
+            print(skill_format_template.format(i + 1, skill.name, len(skill), ("", "s")[len(skill) > 1]))
 
+            for index, level in enumerate(skill):
+                print(level_format_template.format(index + 1, level.name))
+        
+        print("\nLoad a level with `git gud load`")
+        
     def handle_levels(self, args):
         key_error_flag = False
         if args.skill_name is None:
@@ -259,21 +300,40 @@ class GitGud:
 
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
-        if args.skill_name in all_skills:
-            skill = all_skills[args.skill_name]
 
-            if args.level_name is not None:
-                if args.level_name in all_skills[args.skill_name]:
-                    level = skill[args.level_name]
-                    self.load_level(level)
-                else:
-                    print('Level "{}" does not exist'.format(args.level_name))
-                    print("To view levels/skills, use git gud levels or git gud skills")
+        argskillset = args.skill_name.split("-", 1)
+        
+        # Set up args.level_name and args.skill_name
+        if args.level_name:
+            if args.skill_name is "-":
+                # Replace the dash with the current skill's name.
+                args.skill_name = self.file_operator.get_level().skill.name
+        else:
+            if len(argskillset) == 2:
+                args.skill_name, args.level_name = tuple(argskillset)
             else:
-                self.load_level(skill[0])
+                args.skill_name, args.level_name = argskillset[0], None
+
+        skill_to_load = self.file_operator.get_level().skill.name
+        if args.skill_name:
+            skill_to_load = args.skill_name
+        
+        level_to_load = '1'
+        if args.level_name:
+            level_to_load = args.level_name
+
+        if skill_to_load in all_skills.keys():
+            skill = all_skills[skill_to_load]
+            if level_to_load in skill.keys():
+                    level = skill[level_to_load]
+                    self.load_level(level)
+            else:
+                print('Level "{}" does not exist'.format(args.level_name))
+                print("To view levels/skills, use git gud levels or git gud skills")
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
             print("To view levels/skills, use git gud levels or git gud skills")
+
 
     def handle_commit(self, args):
         self.assert_initialized()

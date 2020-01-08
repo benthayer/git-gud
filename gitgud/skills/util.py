@@ -201,12 +201,15 @@ class NamedList:
         self._items = items
     
     def __getitem__(self, query):
-        if isinstance(query, int):
-            return self._items[query]
-        elif isinstance(query, str):
+        if isinstance(query, str):
+            if query.isnumeric():
+                if 0 < int(query) <= len(self):
+                    return self._items[int(query) - 1]
+                else:
+                    raise KeyError
             return self._items[self._name_dict[query]]
         else:
-            raise ValueError('Bad key type.')
+            raise KeyError
 
     def __iter__(self):
         return self._items.__iter__()
@@ -221,23 +224,22 @@ class NamedList:
         else:
             raise TypeError
 
-    def __contains__(self, key):
-        if isinstance(key, str):
-            return key in self._name_dict.keys()
-        else:
-            return key in self._items
+    def __contains__(self, item):
+        return item in self._items
 
     def values(self):
         return self._items
     
     def keys(self):
-        return self._name_dict.keys()
+        set_indices = { str(i) for i in range(1, len(self) + 1) }
+        set_names = set(self._name_dict.keys())
+        return set_indices | set_names
+        
 
 
 class AllSkills(NamedList):
     def __init__(self, skills):
-        self._name_dict = {skill.name: index for index, skill in enumerate(skills)}
-        self._items = skills
+        super().__init__([skill.name for skill in skills], skills)
         last_level = None
         for skill in self:
             for level in skill:
@@ -248,9 +250,8 @@ class AllSkills(NamedList):
 
 class Skill(NamedList):
     def __init__(self, name, levels):
+        super().__init__([level.name for level in levels], levels)
         self.name = name
-        self._name_dict = {level.name:index for index, level in enumerate(levels)}
-        self._items = levels
 
         for level in levels:
             level.skill = self
