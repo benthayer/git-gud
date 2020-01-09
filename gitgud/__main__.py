@@ -178,10 +178,6 @@ class GitGud:
 
         if not os.path.exists(self.file_operator.gg_path):
             os.mkdir(self.file_operator.gg_path)
-        with open(self.file_operator.last_commit_path, 'w+') as commit_file:
-            commit_file.write('0')  # First commit will be 1
-        with open(self.file_operator.level_path, 'w+') as level_file:
-            level_file.write(all_skills["1"]["1"].full_name())
 
         python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
@@ -196,8 +192,7 @@ class GitGud:
         print('Welcome to Git Gud!')
         print()
 
-        self.file_operator.get_level().setup(self.file_operator)
-        show_tree()
+        self.load_level(all_skills["1"]["1"])
 
     def handle_status(self, args):
         if self.is_initialized():
