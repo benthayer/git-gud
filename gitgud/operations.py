@@ -35,6 +35,7 @@ class Operator:
         # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
         self.add_file_to_index(name)
         commit = self.repo.index.commit(name, author=actor, committer=actor)
+        track_commit(self, name, commit.hexsha[:7])
 
         return commit
     
@@ -221,7 +222,7 @@ def get_operator():
     return None
 
 
-def init_tracking_json(file_operator):
+def clear_tracked_commits(file_operator):
     print("Creating: Commit Tracker")
     with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
         json.dump({}, fp)

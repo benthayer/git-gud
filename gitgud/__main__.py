@@ -10,8 +10,7 @@ from git.exc import InvalidGitRepositoryError
 
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
-from gitgud.operations import init_tracking_json
-from gitgud.operations import track_commit
+from gitgud.operations import clear_tracked_commits
 from gitgud.skills import all_skills
 from gitgud.skills.util import print_all_complete
 from gitgud.hooks import all_hooks
@@ -135,6 +134,7 @@ class GitGud:
     def load_level(self, level):
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
+        clear_tracked_commits(self.file_operator)
         show_tree()
 
     def handle_help(self, args):
@@ -223,9 +223,7 @@ class GitGud:
 
         level = self.file_operator.get_level()
         print("Resetting...")
-        init_tracking_json(self.file_operator)
-        level.setup(self.file_operator)
-        show_tree()
+        self.load_level(level)
 
     def handle_test(self, args):
         self.assert_initialized()
@@ -352,7 +350,6 @@ class GitGud:
         print('Simulating: git commit -m "{}"'.format(commit_name))
 
         commit = self.file_operator.add_and_commit(commit_name)
-        track_commit(self.file_operator, commit_name, commit.hexsha[:7])
         print("New Commit: {}".format(commit.hexsha[:7]))
 
         # Check if the newest commit is greater than the last_commit, if yes, then write
