@@ -1,4 +1,15 @@
 import sys
+import json
+
+from gitgud.operations import file_operator
+
+file_operator = get_operator()
+with open(file_operator.gg_path
+
+import os
+import sys
+import subprocess
+
 from gitgud.operations import get_operator
 
 file_operator = get_operator()
@@ -50,7 +61,10 @@ while len(rebasing_commits) > 0:
     if cur_commit not in rebase_to_commits:
         rebased_commits.add(cur_commit)
 
-print("Rebased commits:")
+amender = file_operator.repo.create_head('amender')
 for commit in rebased_commits:
-    commit.message = commit.message.strip() + "'"
-    print(commit.message.strip())
+    amender.commit = commit
+    subprocess.call(["GIT_EDITOR=" + os.path.join(file_operator.hooks_path, "rebasehandler.sh"), "git", "rebase", "-i", "--no-verify",  commit.message.strip() + "'"])
+    
+file_operator.repo.delete_head(amender)
+
