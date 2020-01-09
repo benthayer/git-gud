@@ -76,7 +76,6 @@ class GitGud:
         reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
         reload_parser = self.subparsers.add_parser('reload', help='Alias for reset', description='Reset the current level. Reload command is an alias for reset command.')
         test_parser = self.subparsers.add_parser('test', help="Test to see if you've successfully completed the current level", description="Test to see if you've successfully completed the current level")
-        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
         levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
         load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description=load_description, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -105,7 +104,6 @@ class GitGud:
             'reset': self.handle_reset,
             'reload': self.handle_reset,
             'test': self.handle_test,
-            'progress': self.handle_progress,
             'skills': self.handle_skills,
             'levels': self.handle_levels,
             'load': self.handle_load,
@@ -227,20 +225,6 @@ class GitGud:
         level = self.file_operator.get_level()
         level.test(self.file_operator)
 
-    def handle_progress(self, args):
-        self.assert_initialized()
-
-        print("Progressing to next skill...")
-        print()
-
-        level = self.file_operator.get_level()
-
-        next_level = level.next_level
-        if next_level is not None:
-            self.load_level(next_level)
-        else:
-            print_all_complete()
-
     def handle_skills(self, args):
         if self.is_initialized():
             try:
@@ -311,7 +295,18 @@ class GitGud:
 
         skill_to_load = self.file_operator.get_level().skill.name
         if args.skill_name:
-            skill_to_load = args.skill_name
+            if args.skill_name == "next":
+                print("Progressing to next skill...")
+                print()
+                level = self.file_operator.get_level()
+                next_level = level.next_level
+                if next_level is not None:
+                    self.load_level(next_level)
+                else:
+                    print_all_complete()
+                return
+            else:
+                skill_to_load = args.skill_name
         
         level_to_load = '1'
         if args.level_name:
