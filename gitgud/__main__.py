@@ -186,17 +186,27 @@ class GitGud:
         python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
         for git_hook_name, module_hook_name in all_hooks:
-            with open(os.path.join(self.file_operator.hooks_path, git_hook_name), 'w+') as hook_file:
-                if (git_hook_name == 'commit-msg'):
-                    pipeline = 'cat - |'
-                    passargs =' "$@"'
-                else:
-                    pipeline = ''
-                    passargs = ''
-                    
+            path = os.path.join(self.file_operator.hooks_path, git_hook_name)
+            if (git_hook_name == 'commit-msg'):
+                pipeline = 'cat - |'
+                passargs =' "$@"'
+            else:
+                pipeline = ''
+                passargs = ''
+                
+            with open(path, 'w+') as hook_file:
                 hook_file.write('#!/bin/sh' + os.linesep)
                 hook_file.write(pipeline + python_exec + ' -m gitgud.hooks.' + module_hook_name + passargs + os.linesep)
-                hook_file.write('exit 0' + os.linesep)
+                hook_file.write(
+                    "if [[ $? -ne 0 ]]" + os.linesep + "" \
+                    "then" + os.linesep + "" \
+                    "\t exit 1" + os.linesep+ "" \
+                    "fi" + os.linesep)
+
+            # Make the files executable
+            mode = os.stat(path).st_mode
+            mode |= (mode & 0o444) >> 2
+            os.chmod(path, mode
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
         print('Welcome to Git Gud!')
