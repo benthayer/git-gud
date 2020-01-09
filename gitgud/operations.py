@@ -230,8 +230,8 @@ def clear_tracked_commits(file_operator):
 
 def track_commit(file_operator, commit_label, commit_hash):
     # Assumes that .git/gud/commits.json has been initialized by 'git gud load'
-    if os.path.exists(os.path.join(file_operator.git_path, "gud", "commits.json")):
-        with open(os.path.join(file_operator.git_path, "gud", "commits.json")) as fp:
+    if os.path.exists(file_operator.commits_json_path):
+        with open(file_operator.commits_json_path) as fp:
             commit_dict = json.load(fp)
         
         if "M" in commit_label:
@@ -241,7 +241,7 @@ def track_commit(file_operator, commit_label, commit_hash):
         else:
             commit_dict["C" + commit_label] = commit_hash
             
-        with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
+        with open(file_operator.commits_json_path, 'w') as fp:
             json.dump(commit_dict, fp)
     else:
         print("ERROR: Commit tracker does not exist!")
