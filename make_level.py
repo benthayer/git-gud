@@ -8,7 +8,7 @@ cwd = os.getcwd()
 def write_init(skill_name, skill_path, level_name):
     # If skills/<new_skill>/__init__.py doesn't exist, create a basic version
     if not os.path.exists(os.path.join(skill_path, "__init__.py")):
-        copyfile("ML_file_templates/__init__.py", skill_path + "/__init__.py")
+        copyfile("level_file_templates/__init__.py", skill_path + "/__init__.py")
         with open(os.path.join(skill_path, "__init__.py"), 'r') as fp:
             level_setup = fp.read()
             
@@ -55,9 +55,9 @@ def write_init(skill_name, skill_path, level_name):
             print("Registered level \"{}\" in {}".format(level_name, filepath))
 
 
-def write_test(skill_name, skill_path, level_name, level_path):
+def write_test(skill_path, level_name, level_path):
     if not os.path.exists(os.path.join(skill_path, "test_levels.py")):
-        copyfile("ML_file_templates/test_levels.txt", skill_path + "/test_levels.py")
+        copyfile("level_file_templates/test_levels.txt", skill_path + "/test_levels.py")
         with open(os.path.join(skill_path, "test_levels.py"), 'r') as fp:
             new_test = fp.read()
             
@@ -92,19 +92,24 @@ def write_test(skill_name, skill_path, level_name, level_path):
 
 def create_level_file(level_path, filename):
     filepath = os.path.join(level_path, filename)
-    copyfile("ML_file_templates/{}".format(filename), "{}".format(filepath))
+    copyfile("level_file_templates/{}".format(filename), "{}".format(filepath))
     print("Created: {}".format(filepath))
 
 
 def main():
     # Obtain input arguments
     try:
+        if (len(sys.argv) != 3):
+            raise IndexError(len(sys.argv))
         skill_name = sys.argv[1]
         level_name = sys.argv[2]
-    except:
+    except IndexError as error:
+        error_name = type(error).__name__
+        num_args_received = int(str(error)) - 1
+        print(error_name + ": Requires 2 arguments, received {}.".format(num_args_received))
         print("Usage: \"python make_level.py <skill_name> <level_name>\"")
+        print()
         return
-
     # Check if current dir isn't ../gitgud directory. (i.e. dir of setup files)
     if not os.path.isdir(os.path.join(cwd, 'gitgud')):
         print("Error: Execute this script in the git-gud directory.")
@@ -121,6 +126,7 @@ def main():
     while choice != 'y':
         choice = input().lower()
         if choice == 'n':
+            print("Aborting, no changes made.")
             return
         elif choice != 'y':
             print("Confirm[y/n] ", end='')
@@ -130,26 +136,22 @@ def main():
     with open("setup.py", 'r') as fp:
         filedata = fp.read()
 
-    # Check if skill is already registered.
-    skill_exists = False
-    if "gitgud.skills.{}".format(skill_name) in filedata:
-        skill_exists = True
+    # Register skill if not already registered.
+    if not "gitgud.skills.{}".format(skill_name) in filedata:
+        # Concatenate potential entry
+        replace1 = "\n".join([
+            "        \'gitgud.skills.{}\',".format(skill_name),
+            "    ],",
+            "    package_data"
+        ])
 
-    # Concatenate potential entry
-    replace1 = "\n".join([
-        "        \'gitgud.skills.{}\',".format(skill_name),
-        "    ],",
-        "    package_data"
-    ])
+        replace2 = "\n".join([
+            "        \'gitgud.skills.{}\': ['_*/*'],".format(skill_name),
+            "    },",
+            "    python_requires"
+        ])
 
-    replace2 = "\n".join([
-        "        \'gitgud.skills.{}\': ['_*/*'],".format(skill_name),
-        "    },",
-        "    python_requires"
-    ])
-
-    # Register new skill to setup.py
-    if not skill_exists:
+        # Register new skill to setup.py
         filedata = filedata.replace("\n".join([
             "    ],",
             "    package_data"
@@ -160,12 +162,12 @@ def main():
             "    python_requires"
         ]), replace2)
 
-    # Write new lines to file
-    with open("setup.py", 'w') as fp:
-        fp.write(filedata)
-        print()
-        print("Registered Package: {}".format(skill_name))
-        print()
+        # Write new lines to file
+        with open("setup.py", 'w') as fp:
+            fp.write(filedata)
+            print()
+            print("Registered Package: {}".format(skill_name))
+            print()
 
     print("Creating Folders:")
     # Make skill folder
@@ -186,7 +188,7 @@ def main():
 
     print()
     print("Creating Test Cases:")
-    write_test(skill_name, skill_path, level_name, level_path)
+    write_test(skill_path, level_name, level_path)
 
     print()
     print("Creating Files:")
