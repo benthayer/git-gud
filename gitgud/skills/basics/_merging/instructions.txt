@@ -1,0 +1,22 @@
+This level is designed to help you learn how to merge.
+It will show the steps one at a time, and after the instructions, you can go and try it for yourself.
+>>>
+Make a new branch called bugFix by typing the command "git branch bugFix"
+>>> 
+Checkout the bugFix branch with "git checkout bugFix"
+>>>
+Commit once ("git gud commit")
+>>>
+Go back to master with "git checkout master"
+>>>
+Commit another time, this time on the master branch.
+ Use the command "git gud show-tree" to see the commit tree. This command simulates "git log --graph --oneline --all".
+ Take a note of what it looks like now so you can compare it to what the commit tree looks like after the merge.
+>>>
+Finally, merge the branch bugFix into master with "git merge bugFix".
+ Look at the tree again to see the changes made by the merge.
+ The merge has the "head" commits of both master and bugFix as it's "parent commits". Normal commits only have one
+ parent, but merges can have two parents.
+
+ Note: The initial commit is another kind of special commit. It doesn't have any parents!
+ Try it out now!

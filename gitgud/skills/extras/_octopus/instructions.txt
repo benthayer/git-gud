@@ -1,0 +1,9 @@
+In this skill, we're going to go over a feature only a few people know about and even fewer know how to use properly: the octopus merge!
+>>>
+Performing an octopus merge is very similar to creating a normal merge,
+ the only difference is the number of commits specified.
+An octopus merge can be a merge between 8 branches, but despite its' name,
+ it can also be less than that... or more! The only requirement is that there be more than two commits.
+>>>
+Remember: the branch that is currently checked out is always included in the merge!
+Run `git merge feature1 feature2` to create an octopus merge and complete the skill!

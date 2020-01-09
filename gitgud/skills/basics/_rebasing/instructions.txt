@@ -1,0 +1,13 @@
+This skill will familiarize you with the concept of git rebasing!
+>>>
+Rebasing in git is an alternative way of combining two different branches (recall the last method: merging).
+>>>
+In the current tree, you can see that our commit tree has two different branches, "master" and "bugFix", both diverging from node 1. Sometimes, when we're writing code, there's new code that we want to incorporate into our own, but we don't always want to use a merge. For this situation, there is rebasing.
+>>>
+Rebasing "bases" your code off of a different commit. When we started working on bugFix, we were only on commit 1. And our branch is "based" off of commit 1. Now, someone (perhaps us) has added two commits to the master branch, and we want them. Rebasing bugFix off of that new work can give us those changes. After checking out the bugFix branch, we run "git rebase master" in order to rebase bugFix off of master. Looking at the commit history, we can see that all of the commits from the master branch and bugFix branch. Just by looking at it, one wouldn't notice these branches were originally created in parallel!
+>>>
+Also: observe what happens if we now checkout master, and execute "git rebase bugFix". Since master is already the ancestor of bugFix, the branch reference simply moves up to the position of bugFix.
+>>>
+One last helpful tip: Use "git log --graph --oneline --all" before and after your rebase to observe the changes caused by the rebase command!
+>>>
+Phew, that was a lot! Now that we know the basics, try rebasing a branch by yourself!

@@ -1,0 +1,15 @@
+Now that we've learned how to detach the HEAD, let's learn easier ways to refer to a commit.
+>>>
+In the previous exercise, we learned that we only need 4-digits of a commit hash in order to reference a particular commit. This method made the process much easier than entering in a giant string of characters and numbers (e.g. fed2da64c0efc5293610bdd892f82a58e8cbc5d8). However, in this exercise we'll learn even more ways of referring to commits!
+>>>
+In particular there are two ways of referencing commits called "relative references." Relative refs are used to refer to a commit objects that are a couple commits behind your current commit. It should be noted that using relative refs are only efficient to use if the commit you are referring is nearby in the tree; otherwise, in many cases it may be faster to bring up the commit log and use the hash.
+>>>
+The ^ specification refers to the parent of the commit you specify. I.e., "git checkout bugFix^" will checkout the parent commit of bugFix! "^" is shorthand for "^1" meaning parent 1. To further illustrate this point, say commit "C" is the merge commit of "A" and "B." "C^2" refers to parent two of C, which is B. For an octopus merge, "^3" would refer to parent 3, and so on. The second specification is the "~" specification, which is used like "HEAD~5". It's used to point to a commit that is several commits prior to the commit that you specify. That specification will be covered in the next exercise. For now, let's take a look at the caret specification.
+>>>
+Note: On Windows, "^" is the character that allows you to let a command take up multiple lines. Instead, on Windows, we use ^^ which escapes the character and converts it to an actual ^.
+>>>
+The caret specification can be stacked. That is, you can use ^^ to refer to the grandparent commit (i.e. HEAD^^ = (HEAD^)^ or parent 1 of HEAD's parent 1. Obviously, the practicality of stacking ^ specifications drops off quickly; however, to refer to a parent or grandparent commit, the ^ specification works just fine.
+>>>
+Likewise, the ^ specification can be used on the HEAD. Using "git checkout HEAD^" allows us to move back one commit relative to the current commit we are on. Repeatedly using this command is a convenient way to move back in time!
+>>>
+Woohoo! You've learned how to use the caret specification to refer to commit objects. Use "git gud show-tree" to see the initial state of the commit history. Now, apply what you've learned about the ^ specification to checkout commit 4. (Hint: how is commit 4 related to HEAD?)

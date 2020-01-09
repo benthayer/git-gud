@@ -1,5 +1,7 @@
 import os
 import shutil
+import datetime as dt
+import email.utils
 
 from glob import glob
 
@@ -7,7 +9,7 @@ from git import Repo
 
 from gitgud import actor
 from gitgud import actor_string
-from gitgud.levels import all_levels
+from gitgud.skills import all_skills
 
 
 class Operator:
@@ -71,8 +73,11 @@ class Operator:
         self.repo.delete_tag(*self.repo.tags)
 
         commit_objects = {}
-
+        counter = len(commits)
         for name, parents, branches, tags in commits:
+            committime = dt.datetime.now(dt.timezone.utc).astimezone().replace(microsecond=0)
+            committime_offset = dt.timedelta(seconds=counter) + committime.utcoffset()
+            committime_rfc = email.utils.format_datetime(committime - committime_offset)
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
@@ -81,13 +86,16 @@ class Operator:
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-                self.repo.index.commit(name, author=actor, committer=actor, parent_commits=parents, skip_hooks=True)
+                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
             else:
-                # TODO GitPython octopus merge
-                self.repo.git.merge(*parents)
-                # TODO GitPython amend commit
-                self.repo.git.commit('--amend', '-m', name,
-                                     '--author="{}"'.format(actor_string))
+                assert name[0] == 'M'
+                int(name[1:])  # Fails if not a number
+
+                # To handle octopus merges, we merge each branch into the index one by one, then commit
+                for parent in parents[1:]:
+                    merge_base = self.repo.merge_base(parents[0], parent)
+                    self.repo.index.merge_tree(parent, base=merge_base)
+                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
 
             commit_objects[name] = self.repo.head.commit
 
@@ -97,11 +105,25 @@ class Operator:
             for tag in tags:
                 self.repo.create_tag(tag, self.repo.head.commit)
             # TODO Log commit hash and info
+            counter = counter - 1
 
         # TODO Checkout using name
+        head_is_commit = True
         for branch in self.repo.branches:
             if branch.name == head:
                 branch.checkout()
+                head_is_commit = False
+
+        if head_is_commit:
+            self.repo.git.checkout(commit_objects[head])
+
+    # Parses commit msg for keywords (e.g. Revert)
+    @staticmethod
+    def parse_name(commit_msg):
+        if "Revert" in commit_msg:
+            commit_msg = commit_msg[8:-64]
+            commit_msg += '-'
+        return commit_msg
 
     def get_current_tree(self):
         # Return a json object with the same structure as in level_json
@@ -110,7 +132,7 @@ class Operator:
 
         tree = {
             'branches': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
-            'tags': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
+            'tags': {},  # 'tag_name': {'target': 'commit_id', 'id': 'tag_name'}
             'commits': {},  # '2': {'parents': ['1'], 'id': '1'}
             'HEAD': {}  # 'target': 'branch_name', 'id': 'HEAD'
         }
@@ -121,6 +143,7 @@ class Operator:
         for branch in repo.branches:
             commits.add(branch.commit)
             commit_name = branch.commit.message.strip()
+            commit_name = self.parse_name(commit_name)
             tree['branches'][branch.name] = {
                 "target": commit_name,
                 "id": branch.name
@@ -143,8 +166,11 @@ class Operator:
         while len(visited) > 0:
             cur_commit = visited.pop()
             commit_name = cur_commit.message.strip()
+            # If revert detected, modifies commit_name; o/w nothing happens
+            commit_name = self.parse_name(commit_name)
+
             tree['commits'][commit_name] = {
-                'parents': [parent.message.strip() for parent in cur_commit.parents],
+                'parents': [self.parse_name(parent.message.strip()) for parent in cur_commit.parents],
                 'id': commit_name
             }
 
@@ -157,17 +183,19 @@ class Operator:
             'target': target,
             'id': 'HEAD'
         }
-
         return tree
 
-    def get_challenge(self):
+    def read_level_file(self):
         with open(self.level_path) as level_file:
-            level_name, challenge_name = level_file.read().split()
-        return all_levels[level_name].challenges[challenge_name]
+            return level_file.read()
 
-    def write_challenge(self, challenge):
-        with open(self.level_path, 'w+') as level_file:
-            level_file.write(' '.join([challenge.level.name, challenge.name]))
+    def get_level(self):
+        skill_name, level_name = self.read_level_file().split()
+        return all_skills[skill_name][level_name]
+
+    def write_level(self, level):
+        with open(self.level_path, 'w+') as skill_file:
+            skill_file.write(' '.join([level.skill.name, level.name]))
 
     def get_last_commit(self):
         with open(self.last_commit_path) as last_commit_file:

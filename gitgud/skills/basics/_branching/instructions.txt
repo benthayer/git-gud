@@ -1,0 +1,18 @@
+This practice skill will familiarize you with the concept of git branching!
+>>>
+Branching in git allows teammates to create separate "branching" commit nodes that are useful when teammates are working on separate portions of a project. Branching allows teammates to commit their changes on their portion of the project with needing to coordinate pulling new commits from others.
+>>>
+First, you're going to create a branch.
+Use "git branch <branch_name>" to create a branch off of the current commit.
+The goal specifies that we name our branch bugFix, so we'll run "git branch bugFix"
+>>>
+Next, you'll need to check out this new branch.
+For us, the command to do this is "git checkout bugFix"
+In general, the command is "git checkout <branch_name>"
+>>>
+After that, we want to create a commit on that new branch just to see what this whole branching thing is all about!
+Git Gud automates the committing process for you, so just type in "git gud commit" to make your commit.
+After doing that, notice how "git log" shows master on the previous commit. Neat!
+>>>
+Also, you should know: Creating a branch and checking it out can be done using one command "git checkout -b <branch_name>". This might speed things up in the future.
+
