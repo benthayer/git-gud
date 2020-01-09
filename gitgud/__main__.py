@@ -84,7 +84,8 @@ class GitGud:
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
         contrib_parser = self.subparsers.add_parser('contributors', help='Show project contributors webpage', description='Show all the contributors of the project')
-
+        issues_parser = self.subparsers.add_parser('issues', help='Show project issues webpage', description="Show all the issues for the project")
+        
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
         init_parser.add_argument('--force', action='store_true')
@@ -112,6 +113,7 @@ class GitGud:
             'commit': self.handle_commit,
             'show-tree': self.handle_show_tree,
             'contributors': self.handle_contrib,
+            'issues': self.handle_issues    
         }
 
     def is_initialized(self):
@@ -362,6 +364,10 @@ class GitGud:
         contrib_website = "https://github.com/benthayer/git-gud/graphs/contributors"
         webbrowser.open_new(contrib_website)
 
+    def handle_issues(self, args):
+        issues_website = "https://github.com/benthayer/git-gud/issues"
+        webbrowser.open_new(issues_website)
+    
     def parse(self):
         args, _ = self.parser.parse_known_args()
         if args.command is None:
