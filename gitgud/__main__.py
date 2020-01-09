@@ -132,9 +132,9 @@ class GitGud:
                 raise InitializationError('Currently loaded level does not exist: "{}"'.format(level_name))
 
     def load_level(self, level):
+        clear_tracked_commits(self.file_operator)
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
-        clear_tracked_commits(self.file_operator)
         show_tree()
 
     def handle_help(self, args):
