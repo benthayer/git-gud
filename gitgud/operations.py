@@ -223,10 +223,8 @@ def get_operator():
 
 
 def clear_tracked_commits(file_operator):
-    print("Creating: Commit Tracker")
     with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
         json.dump({}, fp)
-        print("Successfully created")
         print()
 
 
