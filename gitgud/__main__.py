@@ -206,7 +206,7 @@ class GitGud:
             # Make the files executable
             mode = os.stat(path).st_mode
             mode |= (mode & 0o444) >> 2
-            os.chmod(path, mode
+            os.chmod(path, mode)
 
         print('Git Gud successfully setup in {}'.format(os.getcwd()))
         print('Welcome to Git Gud!')
