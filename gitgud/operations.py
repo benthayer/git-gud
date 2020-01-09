@@ -224,7 +224,7 @@ def get_operator():
 
 
 def clear_tracked_commits(file_operator):
-    with open(self.commits_json_path, 'w') as fp:
+    with open(file_operator.commits_json_path, 'w') as fp:
         json.dump({}, fp)
 
 
