@@ -22,6 +22,7 @@ class Operator:
             self.repo = None
 
         self.git_path = os.path.join(self.path, '.git')
+        self.commits_json_path = os.path.join(self.path, '.git', 'gud', 'commits.json')
         self.hooks_path = os.path.join(self.path, '.git', 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
@@ -223,7 +224,7 @@ def get_operator():
 
 
 def clear_tracked_commits(file_operator):
-    with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
+    with open(self.commits_json_path, 'w') as fp:
         json.dump({}, fp)
 
 
