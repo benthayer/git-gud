@@ -225,7 +225,6 @@ def get_operator():
 def clear_tracked_commits(file_operator):
     with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
         json.dump({}, fp)
-        print()
 
 
 def track_commit(file_operator, commit_num, commit_hash):
