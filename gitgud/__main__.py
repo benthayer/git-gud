@@ -288,7 +288,7 @@ class GitGud:
                 # Replace the dash with the current skill's name.
                 args.skill_name = self.file_operator.get_level().skill.name
         else:
-            if len(argskillset) == 2:
+            if len(argskillset) == 2:   
                 args.skill_name, args.level_name = tuple(argskillset)
             else:
                 args.skill_name, args.level_name = argskillset[0], None
