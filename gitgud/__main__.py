@@ -295,25 +295,25 @@ class GitGud:
 
         skill_to_load = self.file_operator.get_level().skill.name
         if args.skill_name:
-            if args.skill_name.lower() == "next":
-                print("Progressing to next skill...")
-                print()
+            if args.skill_name.lower() in {"next", "prev", "previous"}:
+                query = args.skill_name.lower()
                 level = self.file_operator.get_level()
-                next_level = level.next_level
-                if next_level is not None:
-                    self.load_level(next_level)
+
+                print("Loading the {} skill...\n".format(query))
+                
+                if query == "next":
+                    level_to_load = level.next_level
                 else:
-                    print_all_complete()
-                return
-            elif args.skill_name.lower() in {"prev", "previous"}:
-                print("Loading the previous skill...")
-                print()
-                level = self.file_operator.get_level()
-                prev_level = level.prev_level
-                if prev_level is not None:
-                    self.load_level(prev_level)
+                    level_to_load = level.prev_level
+                
+                if level_to_load is not None:
+                    self.load_level(level_to_load)
                 else:
-                    print("You are already at the first level!")
+                    if query == "next":
+                        print_all_complete()
+                    else:
+                        print("Already on the first level; reloading first level...\n")
+                        self.load_level(all_skills["1"]["1"])
                 return
             else:
                 skill_to_load = args.skill_name
