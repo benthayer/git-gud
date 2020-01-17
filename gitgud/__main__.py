@@ -305,6 +305,8 @@ class GitGud:
         for index, level in enumerate(skill):
             print(str(index + 1) + ": " + level.name)
 
+        print('\nTo see levels in all skills, run "git gud skills".')
+
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
 
