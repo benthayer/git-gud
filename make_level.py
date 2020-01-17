@@ -100,16 +100,21 @@ def main():
     # Obtain input arguments
     try:
         if (len(sys.argv) != 3):
-            raise IndexError(len(sys.argv))
+            raise Exception(len(sys.argv))
         skill_name = sys.argv[1]
         level_name = sys.argv[2]
-    except IndexError as error:
-        error_name = type(error).__name__
-        num_args_received = int(str(error)) - 1
-        print(error_name + ": Requires 2 arguments, received {}.".format(num_args_received))
+    except Exception as error:
+        error_int = int(str(error))
+        if error_int > 3:
+            error_name = "TooManyArgs: "
+        elif error_int < 3:
+            error_name = "TooFewArgs: "
+        num_args_received = error_int - 1
+        print(error_name + "Requires 2 arguments, received {}.".format(num_args_received))
         print("Usage: \"python make_level.py <skill_name> <level_name>\"")
         print()
         return
+        
     # Check if current dir isn't ../gitgud directory. (i.e. dir of setup files)
     if not os.path.isdir(os.path.join(cwd, 'gitgud')):
         print("Error: Execute this script in the git-gud directory.")
