@@ -10,7 +10,6 @@ from git.exc import InvalidGitRepositoryError
 
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
-from gitgud.operations import clear_tracked_commits
 from gitgud.skills import all_skills
 from gitgud.skills.util import print_all_complete
 from gitgud.hooks import all_hooks
@@ -132,7 +131,6 @@ class GitGud:
                 raise InitializationError('Currently loaded level does not exist: "{}"'.format(level_name))
 
     def load_level(self, level):
-        clear_tracked_commits(self.file_operator)
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
         show_tree()
