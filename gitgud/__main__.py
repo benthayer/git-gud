@@ -312,8 +312,7 @@ class GitGud:
                     if query == "next":
                         print_all_complete()
                     else:
-                        print("Already on the first level; reloading first level...\n")
-                        self.load_level(all_skills["1"]["1"])
+                        print('Already on the first level. To reload the level, use "git gud reload".\n')
                 return
             else:
                 skill_to_load = args.skill_name
