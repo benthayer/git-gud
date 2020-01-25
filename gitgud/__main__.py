@@ -298,14 +298,15 @@ class GitGud:
             if args.skill_name.lower() in {"next", "prev", "previous"}:
                 query = args.skill_name.lower()
                 level = self.file_operator.get_level()
-
-                print("Loading the {} skill...\n".format(query))
-                
+                                
                 if query == "next":
                     level_to_load = level.next_level
                 else:
+                    query = "previous"
                     level_to_load = level.prev_level
                 
+                print("Loading the {} skill...\n".format(query))
+
                 if level_to_load is not None:
                     self.load_level(level_to_load)
                 else:
