@@ -368,10 +368,10 @@ class BasicLevel(Level):
             try:
                 if self.next_level.skill != self.skill:
                     print("Level complete, you've completed all levels in this skill!")
-                    print('"git gud progress" to advance to the next skill')
+                    print('"git gud load next" to advance to the next skill')
                     print("Next skill is: {}".format(self.next_level.skill.name))
                 else:
-                    print('Level complete! "git gud progress" to advance to the next level')
+                    print('Level complete! "git gud load next" to advance to the next level')
                     print('Next level is: {}'.format(self.next_level.full_name()))
             except AttributeError:
                 print_all_complete()

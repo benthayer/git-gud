@@ -71,7 +71,7 @@ Some commands you'll want to learn and what they do:
   * Will reset the current level in case you mess up
 * git gud test
   * Tests to see if the current level is complete. If it congratulates you, you've successfully completed the level and you can move on! (You can also move on anyways)
-* git gud progress
+* git gud load next
   * Takes you to the next level
 * git gud skills
   * Displays all skills
