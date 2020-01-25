@@ -245,7 +245,9 @@ class AllSkills(NamedList):
             for level in skill:
                 if last_level is not None:
                     last_level.next_level = level
+                level.prev_level = last_level
                 last_level = level
+
 
 
 class Skill(NamedList):
@@ -262,6 +264,7 @@ class Level:
         self.name = name
         self.skill = None
         self.next_level = None
+        self.prev_level = None
 
     def __repr__(self):
         return "<{class_name}: '{full_name}'>".format(
