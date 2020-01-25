@@ -305,11 +305,12 @@ class GitGud:
                     query = "previous"
                     level_to_load = level.prev_level
                 
-                print("Loading the {} skill...\n".format(query))
+                print("Loading the {} level...\n".format(query))
 
                 if level_to_load is not None:
                     self.load_level(level_to_load)
                 else:
+                    print('To view levels/skills, use "git gud levels" or "git gud skills"\n')
                     if query == "next":
                         print_all_complete()
                     else:
@@ -329,10 +330,10 @@ class GitGud:
                     self.load_level(level)
             else:
                 print('Level "{}" does not exist'.format(args.level_name))
-                print("To view levels/skills, use git gud levels or git gud skills")
+                print('To view levels/skills, use "git gud levels" or "git gud skills"\n')
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
-            print("To view levels/skills, use git gud levels or git gud skills")
+            print('To view levels/skills, use "git gud levels" or "git gud skills"\n')
 
 
     def handle_commit(self, args):
