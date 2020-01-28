@@ -102,7 +102,8 @@ def main():
     # Obtain input arguments
     num_args = len(sys.argv) - 1
     if num_args == 2:
-        pass
+        skill_name = sys.argv[1]
+        level_name = sys.argv[2]
     else:
         if num_args > 3:
             error_message = "Too many arguments: "
@@ -191,7 +192,7 @@ def main():
 
     print()
     print("Creating Test Case:")
-    write_test(skill_path, level_name, level_path)
+    write_test(skill_path, level_name)
 
     print()
     print("Creating Files:")
