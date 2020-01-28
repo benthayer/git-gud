@@ -91,6 +91,21 @@ Currently, the majority of levels are constructed using `gitgud.skills.util.Basi
 This is because  many of the levels are simple enough that they fall into the common structure of starting with a bunch of commits in a certain order and then in some way modifying the branches and ordering of those commits, or creating new ones.
 If you're making your own level, you may want to consider using this class.
 
+### Creating a skill/level
+Creating a skill or level is as easy as running the 'make_level.py' script and filling in the generated template documents. To use the skill/level creator, use the 'make_level.py' script located in the directory containing 'gitgud'. This script can create a skill or level. If you pass the name of a skill that already exists, the level will be created within that existing directory (no duplicate skill directories will be created).
+
+The usage of the script is as follows: "python make_level.py <skill_name> <level_name>". 
+
+The script will register the new skill/level to the relevant files (you do not have to worry about this). Additionally, it will create the skill/level directory and template files. 
+
+The template files are:
+    *skills/test_levels.py
+    *skills/<skill_name>/<level_name>/goal.txt
+    *skills/<skill_name>/<level_name>/instructions.txt
+    *skills/<skill_name>/<level_name>/setup.spec
+    *skills/<skill_name>/<level_name>/test.spec
+Fill these files out as specified in the documents.
+
 #### `.spec` files
 `.spec` files are something I created in order to more easily specify a git tree. 
 They exist to make creating a new skill extremely easy.
