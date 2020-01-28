@@ -183,9 +183,16 @@ class GitGud:
 
         for git_hook_name, module_hook_name in all_hooks:
             path = os.path.join(self.file_operator.hooks_path, git_hook_name)
+            if (git_hook_name == 'commit-msg'):
+                pipeline = 'cat - |'
+                passargs =' "$@"'
+            else:
+                pipeline = ''
+                passargs = ''
+                
             with open(path, 'w+') as hook_file:
                 hook_file.write('#!/bin/sh' + os.linesep)
-                hook_file.write('' + python_exec + ' -m gitgud.hooks.' + module_hook_name + " $@" + os.linesep)
+                hook_file.write(pipeline + python_exec + ' -m gitgud.hooks.' + module_hook_name + passargs + os.linesep)
                 hook_file.write(
                     "if [[ $? -ne 0 ]]" + os.linesep + "" \
                     "then" + os.linesep + "" \
@@ -193,7 +200,6 @@ class GitGud:
                     "fi" + os.linesep)
 
             # Make the files executable
-
             mode = os.stat(path).st_mode
             mode |= (mode & 0o444) >> 2
             os.chmod(path, mode)
@@ -229,8 +235,7 @@ class GitGud:
 
         level = self.file_operator.get_level()
         print("Resetting...")
-        level.setup(self.file_operator)
-        show_tree()
+        self.load_level(level)
 
     def handle_test(self, args):
         self.assert_initialized()
@@ -265,7 +270,6 @@ class GitGud:
             if self.file_operator is None:
                 self.subparsers.choices['levels'].print_help()
                 return
-
             try:
                 skill = self.file_operator.get_level().skill
             except KeyError:

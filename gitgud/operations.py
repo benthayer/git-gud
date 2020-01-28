@@ -2,6 +2,7 @@ import os
 import shutil
 import datetime as dt
 import email.utils
+import json
 
 from glob import glob
 
@@ -86,7 +87,7 @@ class Operator:
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
+                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
             else:
                 assert name[0] == 'M'
                 int(name[1:])  # Fails if not a number
@@ -95,9 +96,10 @@ class Operator:
                 for parent in parents[1:]:
                     merge_base = self.repo.merge_base(parents[0], parent)
                     self.repo.index.merge_tree(parent, base=merge_base)
-                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
+                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
+                
 
-            commit_objects[name] = self.repo.head.commit
+            commit_objects[name] = commit_obj
 
             for branch in branches:
                 self.repo.create_head(branch, self.repo.head.commit)
