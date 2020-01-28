@@ -55,19 +55,21 @@ def write_init(skill_name, skill_path, level_name):
             print("Registered level \"{}\" in {}".format(level_name, filepath))
 
 
-def write_test(skill_path, level_name, level_path):
-    if not os.path.exists(os.path.join(skill_path, "test_levels.py")):
-        copyfile("level_file_templates/test_levels.txt", skill_path + "/test_levels.py")
-        with open(os.path.join(skill_path, "test_levels.py"), 'r') as fp:
+def write_test(skill_path, level_name):
+    test_levels_path = os.path.join(skill_path, "test_levels.py")
+    if not os.path.exists(test_levels_path):
+        copyfile("level_file_templates/test_levels.py", test_levels_path)
+        with open(test_levels_path, 'r') as fp:
             new_test = fp.read()
             
         new_test = new_test.replace("{}", level_name)
         
-        with open(os.path.join(skill_path, "test_levels.py"), 'w') as fp:
+        with open(test_levels_path, 'w') as fp:
             fp.write(new_test)
-            print("Added entry for {}".format(level_path))
+            print("Created file: {}".format(test_levels_path))
+            print('Created test case "{}" in {}'.format(level_name, test_levels_path))
     else:
-        with open(os.path.join(skill_path, "test_levels.py"), 'r') as fp:
+        with open(test_levels_path, 'r') as fp:
             filedata = fp.read()
 
         replace = "\n".join([
@@ -85,9 +87,9 @@ def write_test(skill_path, level_name, level_path):
             "]"
         ]), replace)
 
-        with open(os.path.join(skill_path, "test_levels.py"), 'w') as fp:
+        with open(test_levels_path, 'w') as fp:
             fp.write(filedata)
-            print("Added entry for {}".format(level_name))
+            print('Created test case "{}" in {}'.format(level_name, test_levels_path))
 
 
 def create_level_file(level_path, filename):
@@ -98,19 +100,15 @@ def create_level_file(level_path, filename):
 
 def main():
     # Obtain input arguments
-    try:
-        if (len(sys.argv) != 3):
-            raise Exception(len(sys.argv))
-        skill_name = sys.argv[1]
-        level_name = sys.argv[2]
-    except Exception as error:
-        error_int = int(str(error))
-        if error_int > 3:
-            error_name = "TooManyArgs: "
-        elif error_int < 3:
-            error_name = "TooFewArgs: "
-        num_args_received = error_int - 1
-        print(error_name + "Requires 2 arguments, received {}.".format(num_args_received))
+    num_args = len(sys.argv) - 1
+    if num_args == 2:
+        pass
+    else:
+        if num_args > 3:
+            error_message = "Too many arguments: "
+        else:
+            error_message = "Too few arguments: "
+        print(error_message + "Takes 2 arguments, but {} was given.".format(num_args))
         print("Usage: \"python make_level.py <skill_name> <level_name>\"")
         print()
         return
@@ -192,7 +190,7 @@ def main():
     write_init(skill_name, skill_path, level_name)
 
     print()
-    print("Creating Test Cases:")
+    print("Creating Test Case:")
     write_test(skill_path, level_name, level_path)
 
     print()
