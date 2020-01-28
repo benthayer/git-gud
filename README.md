@@ -53,7 +53,7 @@ Once it's installed, you can access all the features that Git Gud has to offer.
 If you just want to get started, type in `git gud instructions`.
 The first skill is already loaded for you, and all you just have to do is follow the instructions and it'll guide you through the levels.
 Once you think you're done with a skill, run `git gud test` to see of you've completed the level.
-If you've solved it, run `git gud progress` to move on to the next level! Look at the full command list below for a complete command list.
+If you've solved it, run `git gud load next` to move on to the next level! Look at the full command list below for a complete command list.
 
 There will be several levels within each skill. Complete all of them to complete the skill, or feel free to skip ahead!
 
@@ -71,7 +71,7 @@ Some commands you'll want to learn and what they do:
   * Will reset the current level in case you mess up
 * git gud test
   * Tests to see if the current level is complete. If it congratulates you, you've successfully completed the level and you can move on! (You can also move on anyways)
-* git gud progress
+* git gud load next
   * Takes you to the next level
 * git gud skills
   * Displays all skills

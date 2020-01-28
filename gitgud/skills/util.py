@@ -245,7 +245,9 @@ class AllSkills(NamedList):
             for level in skill:
                 if last_level is not None:
                     last_level.next_level = level
+                level.prev_level = last_level
                 last_level = level
+
 
 
 class Skill(NamedList):
@@ -262,6 +264,7 @@ class Level:
         self.name = name
         self.skill = None
         self.next_level = None
+        self.prev_level = None
 
     def __repr__(self):
         return "<{class_name}: '{full_name}'>".format(
@@ -365,10 +368,10 @@ class BasicLevel(Level):
             try:
                 if self.next_level.skill != self.skill:
                     print("Level complete, you've completed all levels in this skill!")
-                    print('"git gud progress" to advance to the next skill')
+                    print('"git gud load next" to advance to the next skill')
                     print("Next skill is: {}".format(self.next_level.skill.name))
                 else:
-                    print('Level complete! "git gud progress" to advance to the next level')
+                    print('Level complete! "git gud load next" to advance to the next level')
                     print('Next level is: {}'.format(self.next_level.full_name()))
             except AttributeError:
                 print_all_complete()

@@ -76,7 +76,6 @@ class GitGud:
         reset_parser = self.subparsers.add_parser('reset', help='Reset the current level', description='Reset the current level')
         reload_parser = self.subparsers.add_parser('reload', help='Alias for reset', description='Reset the current level. Reload command is an alias for reset command.')
         test_parser = self.subparsers.add_parser('test', help="Test to see if you've successfully completed the current level", description="Test to see if you've successfully completed the current level")
-        progress_parser = self.subparsers.add_parser('progress', help='Continue to the next level', description='Continue to the next level')
         skills_parser = self.subparsers.add_parser('skills', help='List skills', description='List skills')
         levels_parser = self.subparsers.add_parser('levels', help='List levels in a skill', description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided.')
         load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description=load_description, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -106,7 +105,6 @@ class GitGud:
             'reset': self.handle_reset,
             'reload': self.handle_reset,
             'test': self.handle_test,
-            'progress': self.handle_progress,
             'skills': self.handle_skills,
             'levels': self.handle_levels,
             'load': self.handle_load,
@@ -244,20 +242,6 @@ class GitGud:
         level = self.file_operator.get_level()
         level.test(self.file_operator)
 
-    def handle_progress(self, args):
-        self.assert_initialized()
-
-        print("Progressing to next skill...")
-        print()
-
-        level = self.file_operator.get_level()
-
-        next_level = level.next_level
-        if next_level is not None:
-            self.load_level(next_level)
-        else:
-            print_all_complete()
-
     def handle_skills(self, args):
         if self.is_initialized():
             try:
@@ -309,6 +293,8 @@ class GitGud:
         for index, level in enumerate(skill):
             print(str(index + 1) + ": " + level.name)
 
+        print('\nTo see levels in all skills, run "git gud skills".')
+
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
 
@@ -320,14 +306,36 @@ class GitGud:
                 # Replace the dash with the current skill's name.
                 args.skill_name = self.file_operator.get_level().skill.name
         else:
-            if len(argskillset) == 2:
+            if len(argskillset) == 2:   
                 args.skill_name, args.level_name = tuple(argskillset)
             else:
                 args.skill_name, args.level_name = argskillset[0], None
 
         skill_to_load = self.file_operator.get_level().skill.name
         if args.skill_name:
-            skill_to_load = args.skill_name
+            if args.skill_name.lower() in {"next", "prev", "previous"}:
+                query = args.skill_name.lower()
+                level = self.file_operator.get_level()
+                                
+                if query == "next":
+                    level_to_load = level.next_level
+                else:
+                    query = "previous"
+                    level_to_load = level.prev_level
+                
+                print("Loading the {} level...\n".format(query))
+
+                if level_to_load is not None:
+                    self.load_level(level_to_load)
+                else:
+                    print('To view levels/skills, use "git gud levels" or "git gud skills"\n')
+                    if query == "next":
+                        print_all_complete()
+                    else:
+                        print('Already on the first level. To reload the level, use "git gud reload".')
+                return
+            else:
+                skill_to_load = args.skill_name
         
         level_to_load = '1'
         if args.level_name:
@@ -340,10 +348,10 @@ class GitGud:
                     self.load_level(level)
             else:
                 print('Level "{}" does not exist'.format(args.level_name))
-                print("To view levels/skills, use git gud levels or git gud skills")
+                print('To view levels/skills, use "git gud levels" or "git gud skills"\n')
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
-            print("To view levels/skills, use git gud levels or git gud skills")
+            print('To view levels/skills, use "git gud levels" or "git gud skills"\n')
 
 
     def handle_commit(self, args):
