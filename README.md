@@ -1,6 +1,6 @@
 # Git Gud
 
-![Demonstration](./git-gud-preview-v1.gif)
+![Demonstration](./preview.gif)
 
 ## What is it?
 Git Gud is a command line game to help you learn how to use git in a fun way.
