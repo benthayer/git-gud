@@ -101,7 +101,6 @@ class Operator:
                     self.repo.index.merge_tree(parent, base=merge_base)
                 commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
                 track_commit(self, name, commit_obj.hexsha[:7])
-                
 
             commit_objects[name] = commit_obj
 
