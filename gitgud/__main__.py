@@ -10,6 +10,7 @@ from git.exc import InvalidGitRepositoryError
 
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
+from gitgud.operations import clear_tracked_commits
 from gitgud.skills import all_skills
 from gitgud.skills.util import print_all_complete
 from gitgud.hooks import all_hooks
@@ -129,6 +130,7 @@ class GitGud:
                 raise InitializationError('Currently loaded level does not exist: "{}"'.format(level_name))
 
     def load_level(self, level):
+        clear_tracked_commits(self.file_operator)
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
         show_tree()
@@ -183,9 +185,9 @@ class GitGud:
 
         for git_hook_name, module_hook_name in all_hooks:
             path = os.path.join(self.file_operator.hooks_path, git_hook_name)
-            if (git_hook_name == 'commit-msg'):
+            if git_hook_name == 'commit-msg':
                 pipeline = 'cat - |'
-                passargs =' "$@"'
+                passargs = ' "$@"'
             else:
                 pipeline = ''
                 passargs = ''
@@ -194,9 +196,9 @@ class GitGud:
                 hook_file.write('#!/bin/sh' + os.linesep)
                 hook_file.write(pipeline + python_exec + ' -m gitgud.hooks.' + module_hook_name + passargs + os.linesep)
                 hook_file.write(
-                    "if [[ $? -ne 0 ]]" + os.linesep + "" \
-                    "then" + os.linesep + "" \
-                    "\t exit 1" + os.linesep+ "" \
+                    "if [[ $? -ne 0 ]]" + os.linesep + ""
+                    "then" + os.linesep + ""
+                    "\t exit 1" + os.linesep + ""
                     "fi" + os.linesep)
 
             # Make the files executable
@@ -352,7 +354,6 @@ class GitGud:
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
             print('To view levels/skills, use "git gud levels" or "git gud skills"\n')
-
 
     def handle_commit(self, args):
         self.assert_initialized()

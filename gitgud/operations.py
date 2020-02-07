@@ -22,6 +22,7 @@ class Operator:
             self.repo = None
 
         self.git_path = os.path.join(self.path, '.git')
+        self.commits_json_path = os.path.join(self.path, '.git', 'gud', 'commits.json')
         self.hooks_path = os.path.join(self.path, '.git', 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
@@ -35,6 +36,7 @@ class Operator:
         # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
         self.add_file_to_index(name)
         commit = self.repo.index.commit(name, author=actor, committer=actor, skip_hooks=True)
+        track_commit(self, name, commit.hexsha[:7])
 
         return commit
     
@@ -97,9 +99,9 @@ class Operator:
                     merge_base = self.repo.merge_base(parents[0], parent)
                     self.repo.index.merge_tree(parent, base=merge_base)
                 commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
-                
 
             commit_objects[name] = commit_obj
+            track_commit(self, name, commit_obj.hexsha[:7])
 
             for branch in branches:
                 self.repo.create_head(branch, self.repo.head.commit)
@@ -217,3 +219,20 @@ def get_operator():
         if os.path.isdir(gg_path):
             return Operator(path)
     return None
+
+
+def clear_tracked_commits(file_operator):
+    with open(file_operator.commits_json_path, 'w') as fp:
+        json.dump({}, fp)
+
+
+def track_commit(file_operator, commit_num, commit_hash):
+    # Assumes that .git/gud/commits.json has been initialized by 'git gud load'
+    if os.path.exists(os.path.join(file_operator.git_path, "gud", "commits.json")):
+        with open(os.path.join(file_operator.git_path, "gud", "commits.json")) as fp:
+            commit_dict = json.load(fp)
+        commit_dict["C" + commit_num] = commit_hash
+        with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
+            json.dump(commit_dict, fp)
+    else:
+        print("ERROR: Commit tracker does not exist!")
