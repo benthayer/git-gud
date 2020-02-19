@@ -8,5 +8,52 @@ git-gud \- get good at git with git-gud
 .B git-gud
 teaches you how to use Git with fun interactive tutorials.
 .TP
-Use the following command to creates a Git repository and start the first level:
+Use the following command to create a Git repository and start the first level:
 .B python\ \-m\ gitgud\ start
+.SH OPTIONS
+.TP
+.BR status
+Displays current level.
+.TP
+.BR instructions
+Displays the instructions for the current level.
+.TP
+.BR reset
+Reset the current level in case you mess up.
+.TP
+.BR test
+Tests to see if the current level is complete.
+.TP
+.BR load\ next
+Takes you to the next level.
+.TP
+.BR skills
+Displays all skills.
+.TP
+.BR levels
+Displays all levels in the current skill.
+.TP
+.BR levels\ <skill_name>
+Displays all levels in the specified skill.
+.TP
+.BR load\ <skill_name>
+Begin the first level of the specified skill.
+.TP
+.BR load\ -<level_name>
+Begin the specified level of the current skill.
+.TP
+.BR load\ <skill_name>\ <level_name>
+Begin the specified level of a skill.
+A hyphen can be used instead of a space between <skill_name> and <level_name>.
+.TP
+.BR commit
+Commit an empty file with a unique name.
+.TP
+.BR commit\ <commit_name>
+Commit an empty file with the specified name.
+.TP
+.BR goal
+Concisely prints out what is needed to complete the level.
+.TP
+.BR show\-tree
+Visualizes the current git tree.
