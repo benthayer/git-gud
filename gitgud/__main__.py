@@ -82,9 +82,13 @@ class GitGud:
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
         show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
+        _show_parser_visible = self.subparsers.add_parser('show tree', help='Alternate command for show-tree', description='Alternate command for show-tree')
+        show_parser = self.subparsers.add_parser('show', description='Show the current state of the branching tree. Use "tree" as the argument.')
         contrib_parser = self.subparsers.add_parser('contributors', help='Show project contributors webpage', description='Show all the contributors of the project')
         issues_parser = self.subparsers.add_parser('issues', help='Show project issues webpage', description="Show all the issues for the project")
         
+        show_parser.add_argument('param', metavar='tree', help='Required for command.')
+
         help_parser.add_argument('command_name', metavar='<command>', nargs='?')
 
         init_parser.add_argument('--force', action='store_true')
@@ -110,6 +114,7 @@ class GitGud:
             'load': self.handle_load,
             'commit': self.handle_commit,
             'show-tree': self.handle_show_tree,
+            'show': self.handle_show,
             'contributors': self.handle_contrib,
             'issues': self.handle_issues    
         }
@@ -370,6 +375,11 @@ class GitGud:
 
         if int(commit_name) > int(last_commit):
             self.file_operator.write_last_commit(commit_name)
+    def handle_show(self, args):
+        if args.param == "tree":
+            show_tree()
+        else:
+            print('Error: `git gud show` only takes "tree" as an argument.')
 
     def handle_show_tree(self, args):
         show_tree()
