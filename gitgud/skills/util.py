@@ -1,3 +1,5 @@
+import pkg_resources
+
 import os
 
 from copy import deepcopy
@@ -299,9 +301,9 @@ def print_all_complete():
 
 
 class BasicLevel(Level):
-    def __init__(self, name, path):
+    def __init__(self, name, skill_module):
         super().__init__(name)
-        self.path = path
+        self.path = pkg_resources.resource_filename(skill_module, '_{}/'.format(name))
         self.setup_spec_path = os.path.join(self.path, 'setup.spec')
         self.instructions_path = os.path.join(self.path, 'instructions.txt')
         self.goal_path = os.path.join(self.path, 'goal.txt')
