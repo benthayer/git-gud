@@ -30,6 +30,7 @@ setup(
     python_requires='>=3.5',
     install_requires=[
         'gitpython',
+        'importlib_resources'
     ],
     entry_points={
         "console_scripts": [
