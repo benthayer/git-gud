@@ -1,4 +1,4 @@
-import pkg_resources
+from importlib_resources import files
 
 import os
 
@@ -11,10 +11,9 @@ def get_topology(tree):
     raise NotImplementedError
 
 
-def parse_spec(file_name):
+def parse_spec(spec_path):
     # The purpose of this method is to get a more computer-readable commit tree
-    with open(file_name) as spec_file:
-        spec = spec_file.read()
+    spec = spec_path.read_text()
 
     commits = []  # List of (commit_name, [parents], [branches], [tags])
     all_branches = set()
@@ -301,13 +300,15 @@ def print_all_complete():
 
 
 class BasicLevel(Level):
-    def __init__(self, name, skill_module):
+    def __init__(self, name, skill_package):
         super().__init__(name)
-        self.path = pkg_resources.resource_filename(skill_module, '_{}/'.format(name))
-        self.setup_spec_path = os.path.join(self.path, 'setup.spec')
-        self.instructions_path = os.path.join(self.path, 'instructions.txt')
-        self.goal_path = os.path.join(self.path, 'goal.txt')
-        self.test_spec_path = os.path.join(self.path, 'test.spec')
+
+        self.level_dir = files(skill_package).joinpath('_{}/'.format(name))
+
+        self.setup_spec_path = self.level_dir.joinpath('setup.spec')
+        self.instructions_path = self.level_dir.joinpath('instructions.txt')
+        self.goal_path = self.level_dir.joinpath('goal.txt')
+        self.test_spec_path = self.level_dir.joinpath('test.spec')
 
     def _setup(self, file_operator):
         commits, head = parse_spec(self.setup_spec_path)
