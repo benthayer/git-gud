@@ -20,4 +20,4 @@ jobs:
           name: Running tests
           command: |
             export PATH=$PATH:$HOME/.local/bin
-            python3 -m pytest --ignore=level_file_templates .
+            python3 -m pytest gitgud
