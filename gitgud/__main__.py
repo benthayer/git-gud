@@ -331,11 +331,11 @@ class GitGud:
                 if level_to_load is not None:
                     self.load_level(level_to_load)
                 else:
-                    print('To view levels/skills, use "git gud levels" or "git gud skills"\n')
                     if query == "next":
                         print_all_complete()
                     else:
                         print('Already on the first level. To reload the level, use "git gud reload".')
+                    print('\nTo view levels/skills, use "git gud levels" or "git gud skills"')
                 return
             else:
                 skill_to_load = args.skill_name
