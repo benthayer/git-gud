@@ -3,7 +3,7 @@
 ![Demonstration](./preview.gif)
 
 ## What is it?
-Git Gud is a command line game to help you learn how to use git in a fun way.
+Welcome to Git Gud, a command line game designed to help you learn how to use the popular version control system known as Git!
 As levels progress, you will know more and more about git, and eventually become a git grandmaster!
 
 If something's missing feel free to add an issue, or if you're interested, view the [contributors file](https://github.com/benthayer/git-gud/blob/master/CONTRIBUTING.md) and add something yourself! The project is intentially structured to make it very easy to add new levels!
