@@ -19,4 +19,5 @@ jobs:
       - run:
           name: Running tests
           command: |
-            python3 -m pytest .
+            export PATH=$PATH:$HOME/.local/bin
+            python3 -m pytest gitgud

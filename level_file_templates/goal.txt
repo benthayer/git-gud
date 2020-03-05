@@ -1,0 +1,1 @@
+In this file, write a short explanation of the level's goal (e.g. "Merge commits 1 and 2").

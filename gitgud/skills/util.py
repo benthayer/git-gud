@@ -1,3 +1,5 @@
+from importlib_resources import files
+
 import os
 
 from copy import deepcopy
@@ -9,10 +11,9 @@ def get_topology(tree):
     raise NotImplementedError
 
 
-def parse_spec(file_name):
+def parse_spec(spec_path):
     # The purpose of this method is to get a more computer-readable commit tree
-    with open(file_name) as spec_file:
-        spec = spec_file.read()
+    spec = spec_path.read_text()
 
     commits = []  # List of (commit_name, [parents], [branches], [tags])
     all_branches = set()
@@ -197,16 +198,19 @@ class NamedList:
     # names is a list populated with type str, items is a list populated with any type 
     def __init__(self, names, items):
         assert len(names) == len(items)
-        self._name_dict = {name:index for index, name in enumerate(names)}
+        self._name_dict = {name: index for index, name in enumerate(names)}
         self._items = items
     
     def __getitem__(self, query):
-        if isinstance(query, int):
-            return self._items[query]
-        elif isinstance(query, str):
+        if isinstance(query, str):
+            if query.isnumeric():
+                if 0 < int(query) <= len(self):
+                    return self._items[int(query) - 1]
+                else:
+                    raise KeyError
             return self._items[self._name_dict[query]]
         else:
-            raise ValueError('Bad key type.')
+            raise KeyError
 
     def __iter__(self):
         return self._items.__iter__()
@@ -221,36 +225,36 @@ class NamedList:
         else:
             raise TypeError
 
-    def __contains__(self, key):
-        if isinstance(key, str):
-            return key in self._name_dict.keys()
-        else:
-            return key in self._items()
+    def __contains__(self, item):
+        return item in self._items
 
     def values(self):
         return self._items
     
     def keys(self):
-        return self._name_dict.keys()
+        set_indices = { str(i) for i in range(1, len(self) + 1) }
+        set_names = set(self._name_dict.keys())
+        return set_indices | set_names
+        
 
 
 class AllSkills(NamedList):
     def __init__(self, skills):
-        self._name_dict = {skill.name: index for index, skill in enumerate(skills)}
-        self._items = skills
+        super().__init__([skill.name for skill in skills], skills)
         last_level = None
         for skill in self:
             for level in skill:
                 if last_level is not None:
                     last_level.next_level = level
+                level.prev_level = last_level
                 last_level = level
+
 
 
 class Skill(NamedList):
     def __init__(self, name, levels):
+        super().__init__([level.name for level in levels], levels)
         self.name = name
-        self._name_dict = {level.name:index for index, level in enumerate(levels)}
-        self._items = levels
 
         for level in levels:
             level.skill = self
@@ -261,6 +265,7 @@ class Level:
         self.name = name
         self.skill = None
         self.next_level = None
+        self.prev_level = None
 
     def __repr__(self):
         return "<{class_name}: '{full_name}'>".format(
@@ -288,20 +293,22 @@ def print_all_complete():
     print("Wow! You've complete every level, congratulations!")
 
     print("If you want to keep learning git, why not try contributing"
-          " to git-gud by forking the project at https://github.com/bthayer2365/git-gud/")
+          " to git-gud by forking the project at https://github.com/benthayer/git-gud/")
 
     print("We're always looking for contributions and are more than"
           " happy to accept both pull requests and suggestions!")
 
 
 class BasicLevel(Level):
-    def __init__(self, name, path):
+    def __init__(self, name, skill_package):
         super().__init__(name)
-        self.path = path
-        self.setup_spec_path = os.path.join(self.path, 'setup.spec')
-        self.instructions_path = os.path.join(self.path, 'instructions.txt')
-        self.goal_path = os.path.join(self.path, 'goal.txt')
-        self.test_spec_path = os.path.join(self.path, 'test.spec')
+
+        self.level_dir = files(skill_package).joinpath('_{}/'.format(name))
+
+        self.setup_spec_path = self.level_dir.joinpath('setup.spec')
+        self.instructions_path = self.level_dir.joinpath('instructions.txt')
+        self.goal_path = self.level_dir.joinpath('goal.txt')
+        self.test_spec_path = self.level_dir.joinpath('test.spec')
 
     def _setup(self, file_operator):
         commits, head = parse_spec(self.setup_spec_path)
@@ -322,12 +329,13 @@ class BasicLevel(Level):
 
         self._setup(file_operator)
 
-        print("Setup complete")
+        print('Setup complete')
         print()
-        print("Goal:")
+        print("Simulating: git gud goal")
         self.goal()
         print()
         print("Type \"git gud instructions\" to view full instructions")
+        print("Type \"git gud test\" to test for level completion")
         print("Type \"git gud help\" for more help")
         print()
 
@@ -338,7 +346,7 @@ class BasicLevel(Level):
         with open(self.instructions_path) as instructions_file:
             for line in instructions_file:
                 if line[:3] == '>>>':
-                    input(">>>")
+                    input('>>>')
                 else:
                     print(line.strip())
 
@@ -362,12 +370,13 @@ class BasicLevel(Level):
         if self._test(file_operator):
             try:
                 if self.next_level.skill != self.skill:
-                    print("Level complete, you've completed all levels in this skill! `git gud progress` to advance to the next skill")
+                    print("Level complete, you've completed all levels in this skill!")
+                    print('"git gud load next" to advance to the next skill')
                     print("Next skill is: {}".format(self.next_level.skill.name))
                 else:
-                    print("Level complete! `git gud progress` to advance to the next level")
-                    print("Next level is: {}".format(self.next_level.full_name()))
+                    print('Level complete! "git gud load next" to advance to the next level')
+                    print('Next level is: {}'.format(self.next_level.full_name()))
             except AttributeError:
                 print_all_complete()
         else:
-            print("Level not complete, keep trying. `git gud reset` to start from scratch.")
+            print('Level not complete, keep trying. "git gud reset" to start from scratch.')
