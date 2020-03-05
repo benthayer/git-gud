@@ -1,3 +1,5 @@
+from importlib_resources import files
+
 import os
 import sys
 import subprocess
@@ -206,9 +208,8 @@ class GitGud:
             mode |= (mode & 0o444) >> 2
             os.chmod(path, mode)
 
-        print('Git Gud successfully setup in {}'.format(os.getcwd()))
-        print(open('welcome.txt').read())
-        print()
+        print('Git Gud successfully setup in {}\n'.format(os.getcwd()))
+        print(files('gitgud').joinpath('welcome.txt').read_text())
 
         self.load_level(all_skills["1"]["1"])
 

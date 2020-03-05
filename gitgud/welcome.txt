@@ -1,6 +1,6 @@
-Welcome to Git Gud, a command line tool designed to help you learn how to use the popular version control system known as Git!
+Welcome to Git Gud, a command line game designed to help you learn how to use the popular version control system known as Git!
 
-To use the tool, remember these important commands:
+To play the game, remember these important commands:
 
 #1) git gud instructions: Displays instructions for the current level - if you're unsure what to do next, use this!
 #2) git gud goal: Shows the precise goal to complete for the current level.
@@ -8,4 +8,4 @@ To use the tool, remember these important commands:
 #4) git gud test: Once you've completed the current level's goals, use this to check completion.
 #5) git gud progress: Whether you've completed the current level or just want to skip it, use this to proceed to the next level!
 
-For more information on Git Gud, including a full list of commands, checkout https://github.com/bthayer2365/git-gud
+For more information on Git Gud, including a full list of commands, check out (or checkout) https://github.com/benthayer/git-gud
