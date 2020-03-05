@@ -187,7 +187,7 @@ class GitGud:
 
         for git_hook_name, module_hook_name in all_hooks:
             path = os.path.join(self.file_operator.hooks_path, git_hook_name)
-            if git_hook_name == 'commit-msg':
+            if git_hook_name in ('commit-msg', 'post-rebase'):
                 pipeline = 'cat - |'
                 passargs = ' "$@"'
             else:
