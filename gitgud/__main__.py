@@ -195,7 +195,7 @@ class GitGud:
                 passargs = ''
                 
             with open(path, 'w+') as hook_file:
-                hook_file.write('#!/bin/sh' + os.linesep)
+                hook_file.write('#!/bin/bash' + os.linesep)
                 hook_file.write(pipeline + python_exec + ' -m gitgud.hooks.' + module_hook_name + passargs + os.linesep)
                 hook_file.write(
                     "if [[ $? -ne 0 ]]" + os.linesep + ""
