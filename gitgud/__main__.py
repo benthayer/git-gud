@@ -10,6 +10,7 @@ import argparse
 from git import Repo
 from git.exc import InvalidGitRepositoryError
 
+import gitgud
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
 from gitgud.operations import clear_tracked_commits
@@ -32,6 +33,7 @@ class GitGud:
         self.file_operator = get_operator()  # Only gets operator if Git Gud has been initialized
 
         self.parser = argparse.ArgumentParser(prog='git gud')
+        self.parser.add_argument('--version', action='version', version='%(prog)s ' + gitgud.__version__)
 
         load_description = '\n'.join([
             "Load a specific skill or level. This command can be used in several ways.",
