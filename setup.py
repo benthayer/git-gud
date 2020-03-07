@@ -1,14 +1,12 @@
 from setuptools import setup
 
-import gitgud
-
 
 with open('README.md') as readme:
     long_description = readme.read()
 
 setup(
     name='git-gud',
-    version=gitgud.__version__,
+    version=open('gitgud/version.txt').read().strip(),
     url='https://github.com/benthayer/git-gud/',
     description='A tool to learn git',
     author='Ben Thayer',
@@ -25,7 +23,7 @@ setup(
         'gitgud.skills.rampup',
     ],
     package_data={
-        'gitgud': ['welcome.txt'],
+        'gitgud': ['version.txt', 'welcome.txt'],
         'gitgud.skills.basics': ['_*/*'],
         'gitgud.skills.extras': ['_*/*'],
         'gitgud.skills.rampup': ['_*/*'],

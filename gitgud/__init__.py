@@ -1,3 +1,5 @@
+from importlib_resources import files
+
 import sys
 import os
 import subprocess
@@ -13,4 +15,5 @@ def create_alias():
 
     subprocess.call(['git', 'config', '--global', 'alias.gud', '! "{}" -m gitgud'.format(python)])
 
-__version__ = '0.2.8'
+__version__ = \
+    files('gitgud').joinpath('version.txt').read_text().strip()
