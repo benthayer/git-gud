@@ -1,12 +1,14 @@
 from setuptools import setup
 
+import gitgud
+
 
 with open('README.md') as readme:
     long_description = readme.read()
 
 setup(
     name='git-gud',
-    version='0.2.5',
+    version=gitgud.__version__,
     url='https://github.com/benthayer/git-gud/',
     description='A tool to learn git',
     author='Ben Thayer',
