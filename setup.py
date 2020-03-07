@@ -25,6 +25,7 @@ setup(
         'gitgud.skills.rampup',
     ],
     package_data={
+        'gitgud': ['welcome.txt'],
         'gitgud.skills.basics': ['_*/*'],
         'gitgud.skills.extras': ['_*/*'],
         'gitgud.skills.rampup': ['_*/*'],
