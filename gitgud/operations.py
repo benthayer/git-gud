@@ -22,11 +22,11 @@ class Operator:
             self.repo = None
 
         self.git_path = os.path.join(self.path, '.git')
-        self.commits_json_path = os.path.join(self.path, '.git', 'gud', 'commits.json')
-        self.hooks_path = os.path.join(self.path, '.git', 'hooks')
+        self.hooks_path = os.path.join(self.git_path, 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
-        self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
-        self.level_path = os.path.join(self.gg_path, 'level')
+        self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
+        self.commits_json_path = os.path.join(self.gg_path, 'commits.csv')
+        self.level_path = os.path.join(self.gg_path, 'current_level.txt')
 
     def add_file_to_index(self, filename):
         open('{}/{}'.format(self.path, filename), 'w+').close()
@@ -36,7 +36,6 @@ class Operator:
         # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
         self.add_file_to_index(name)
         commit = self.repo.index.commit(name, author=actor, committer=actor, skip_hooks=True)
-        track_commit(self, name, commit.hexsha[:7])
 
         return commit
     
@@ -101,7 +100,6 @@ class Operator:
                 commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
 
             commit_objects[name] = commit_obj
-            track_commit(self, name, commit_obj.hexsha[:7])
 
             for branch in branches:
                 self.repo.create_head(branch, self.repo.head.commit)
@@ -209,6 +207,16 @@ class Operator:
         with open(self.last_commit_path, 'w+') as last_commit_file:
             last_commit_file.write(name)
 
+    def clear_tracked_commits(self):
+        with open(self.commits_json_path, 'w'):
+            pass
+
+    def track_commit(self, first_hash, second_hash, action):
+        # Used to track rebases, amends and reverts
+        with open(self.commits_json_path, 'a') as commit_tracker_file:
+            commit_tracker_file.write(','.join([first_hash, second_hash, action]))
+            commit_tracker_file.write('\n')
+
 
 def get_operator():
     cwd = os.getcwd().split(os.path.sep)
@@ -219,20 +227,3 @@ def get_operator():
         if os.path.isdir(gg_path):
             return Operator(path)
     return None
-
-
-def clear_tracked_commits(file_operator):
-    with open(file_operator.commits_json_path, 'w') as fp:
-        json.dump({}, fp)
-
-
-def track_commit(file_operator, commit_num, commit_hash):
-    # Assumes that .git/gud/commits.json has been initialized by 'git gud load'
-    if os.path.exists(os.path.join(file_operator.git_path, "gud", "commits.json")):
-        with open(os.path.join(file_operator.git_path, "gud", "commits.json")) as fp:
-            commit_dict = json.load(fp)
-        commit_dict["C" + commit_num] = commit_hash
-        with open(os.path.join(file_operator.git_path, "gud", "commits.json"), 'w') as fp:
-            json.dump(commit_dict, fp)
-    else:
-        print("ERROR: Commit tracker does not exist!")

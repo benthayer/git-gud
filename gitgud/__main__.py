@@ -13,7 +13,6 @@ from git.exc import InvalidGitRepositoryError
 import gitgud
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
-from gitgud.operations import clear_tracked_commits
 from gitgud.skills import all_skills
 from gitgud.skills.util import print_all_complete
 from gitgud.hooks import all_hooks
@@ -134,7 +133,7 @@ class GitGud:
                 raise InitializationError('Currently loaded level does not exist: "{}"'.format(level_name))
 
     def load_level(self, level):
-        clear_tracked_commits(self.file_operator)
+        self.file_operator.clear_tracked_commits()
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
         show_tree()
@@ -187,9 +186,9 @@ class GitGud:
 
         python_exec = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
 
-        for git_hook_name, module_hook_name in all_hooks:
+        for git_hook_name, module_hook_name, accepts_args in all_hooks:
             path = os.path.join(self.file_operator.hooks_path, git_hook_name)
-            if git_hook_name in ('commit-msg', 'post-rebase'):
+            if accepts_args:
                 pipeline = 'cat - |'
                 passargs = ' "$@"'
             else:
