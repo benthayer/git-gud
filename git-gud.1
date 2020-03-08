@@ -1,0 +1,73 @@
+.TH GIT-GUD 1 "19 Feb 2020" "version 0.0"
+.SH NAME
+git-gud \- get good at git with git-gud
+.SH SYNOPSIS
+.B git gud
+[\-\-version] [\-\-help]  
+<command> [<args>]
+.SH DESCRIPTION
+.B Git Gud
+teaches you how to use Git with fun interactive tutorials.  
+Use the following command to create a Git repository and start the first level:  
+.B git\ gud\ init
+.SH OPTIONS
+.TP
+\fBstatus\fP
+Displays current level.
+.TP
+\fBinstructions\fP
+Displays instructions for current level.
+.TP
+\fBreset\fP
+Resets the current level.
+.TP
+\fBtest\fP
+Tests if current level is complete.
+.TP
+\fBskills\fP
+Displays all skills.
+.TP
+\fBlevels\fP
+Displays all levels in the current skill.
+.TP
+\fBlevels\ <skill_name>\fP
+Displays all levels in the specified skill.
+.TP
+\fBload\ next\fP
+Takes you to the next level.
+.TP
+\fBload\ prev\fP, \fBload\ previous\fP
+Takes you to the previous level.
+.TP
+\fBload\ <skill_name>\fP
+Begin the first level of the specified skill.
+.TP
+\fBload\ \-<level_name>\fP
+Begin the specified level of the current skill.
+.TP
+\fBload\ <skill_name>\ <level_name>\fR, \fBload\ <skill_name>\-<level_name>\fP
+Begin the specified level of a skill.
+.TP
+\fBcommit\fP
+Commit an empty file with a unique name.
+.TP
+\fBcommit\ <commit_name>\fP
+Commit an empty file with the specified name.
+.TP
+\fBgoal\fP
+Concisely prints out what is needed to complete the level.
+.TP
+\fBshow\-tree\fP
+Visualizes the current git tree.
+.SH BUGS
+If you believe you have found a bug in \fBgit-gud\fR, please file an issue at this address https://github.com/benthayer/git-gud/issues/
+.SH AUTHOR
+Please see https://github.com/benthayer/git-gud/graphs/contributors for a full list of contributors.  
+This page was written by Evan LeClercq (eleclercq@tuta.io).  
+.SH SEE ALSO
+.TP
+git(1)
+.SH DISCLAIMER
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+See the LICENSE file distributed with git-gud or https://github.com/benthayer/git-gud/blob/master/LICENSE.md for complete details.
