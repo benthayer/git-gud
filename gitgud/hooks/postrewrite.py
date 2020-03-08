@@ -1,11 +1,9 @@
 import sys
 
-# TODO Git hooks should not actually do any logging
-# TODO Keep track of rebased commits
-print(sys.argv[1])
+from gitgud.operations import get_operator
+
+operator = get_operator()
 
 for i, line in enumerate(sys.stdin):
     old_hash, new_hash = line.split()
-    print('Change {}'.format(i + 1))
-    print('Old hash: ', old_hash)
-    print('New hash: ', new_hash)
+    operator.track_commit(old_hash, new_hash, sys.argv[1])
