@@ -1,7 +1,8 @@
 import os
 
 from gitgud.skills import all_skills
-from gitgud.skills.util import Skill, Level, NamedList
+from gitgud.skills.util import NamedList, Skill
+from gitgud.skills.level_builder import Level
 
 
 def test_skill_access():
