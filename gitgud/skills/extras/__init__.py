@@ -1,5 +1,5 @@
-from gitgud.skills.util import BasicLevel
 from gitgud.skills.util import Skill
+from gitgud.skills.level_builder import BasicLevel
 
 skill = Skill(
     'extras',

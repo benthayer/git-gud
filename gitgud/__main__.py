@@ -14,13 +14,9 @@ import gitgud
 from gitgud.operations import get_operator
 from gitgud.operations import Operator
 from gitgud.skills import all_skills
-from gitgud.skills.util import print_all_complete
+from gitgud.skills.user_messages import all_levels_complete
+from gitgud.skills.user_messages import show_tree
 from gitgud.hooks import all_hooks
-
-
-def show_tree():
-    print("Simulating: git log --graph --oneline --all ")
-    subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
 
 
 class InitializationError(Exception):
@@ -136,7 +132,6 @@ class GitGud:
         self.file_operator.clear_tracked_commits()
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
-        show_tree()
 
     def handle_help(self, args):
         if args.command_name is None:
@@ -209,9 +204,6 @@ class GitGud:
             mode |= (mode & 0o444) >> 2
             os.chmod(path, mode)
 
-        print('Git Gud successfully setup in {}\n'.format(os.getcwd()))
-        print(files('gitgud').joinpath('welcome.txt').read_text())
-
         self.load_level(all_skills["1"]["1"])
 
     def handle_status(self, args):
@@ -238,7 +230,6 @@ class GitGud:
         self.assert_initialized()
 
         level = self.file_operator.get_level()
-        print("Resetting...")
         self.load_level(level)
 
     def handle_test(self, args):
@@ -326,14 +317,12 @@ class GitGud:
                 else:
                     query = "previous"
                     level_to_load = level.prev_level
-                
-                print("Loading the {} level...\n".format(query))
 
                 if level_to_load is not None:
                     self.load_level(level_to_load)
                 else:
                     if query == "next":
-                        print_all_complete()
+                        all_levels_complete()
                     else:
                         print('Already on the first level. To reload the level, use "git gud reload".')
                     print('\nTo view levels/skills, use "git gud levels" or "git gud skills"')
