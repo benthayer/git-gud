@@ -204,7 +204,7 @@ class GitGud:
             mode |= (mode & 0o444) >> 2
             os.chmod(path, mode)
 
-        self.load_level(all_skills["1"]["1"])
+        self.load_level(all_skills["0"]["1"])
 
     def handle_status(self, args):
         if self.is_initialized():
@@ -252,7 +252,7 @@ class GitGud:
         
         for i, skill in enumerate(all_skills):
             # TODO Add description
-            print(skill_format_template.format(i + 1, skill.name, len(skill), ("", "s")[len(skill) > 1]))
+            print(skill_format_template.format(i , skill.name, len(skill), "s" if len(skill) > 1 else ""))
 
             for index, level in enumerate(skill):
                 print(level_format_template.format(index + 1, level.name))
