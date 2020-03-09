@@ -44,6 +44,9 @@ class Level:
 
     def goal(self):
         pass
+
+    def status(self):
+        print('Currently on level: "{}"'.format(self.full_name()))
     
     def _test(self, file_operator):
         pass

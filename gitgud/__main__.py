@@ -210,7 +210,7 @@ class GitGud:
         if self.is_initialized():
             try:
                 level = self.file_operator.get_level()
-                print('Currently on level: "{}"'.format(level.full_name()))
+                level.status()
             except KeyError:
                 level_name = self.file_operator.read_level_file()
                 print('Currently on unregistered level: "{}"'.format(level_name))
