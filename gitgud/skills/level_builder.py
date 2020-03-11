@@ -105,16 +105,14 @@ class BasicLevel(Level):
         show_tree()
 
     def instructions(self):
-        with open(self.instructions_path) as instructions_file:
-            for line in instructions_file:
-                if line[:3] == '>>>':
-                    input('>>>')
-                else:
-                    print(line.strip())
+        for line in self.instructions_path.read_text().strip().split('\n'):
+            if line[:3] == '>>>':
+                input('>>>')
+            else:
+                print(line.strip())
 
     def goal_str(self):
-        with open(self.goal_path) as goal_file:
-            return goal_file.read().strip()
+        return self.goal_path.read_text().strip()
 
     def goal(self):
         print(self.goal_str())
