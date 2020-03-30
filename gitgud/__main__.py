@@ -66,6 +66,17 @@ class GitGud:
             "   git gud load -<level>",
             "\n",
         ])
+        
+        show_description = "".join([
+            "Helper command to show certain information.",
+            "\n\n",
+            "Subcommands:",
+            "\n",
+            "  <command>",
+            "\n",
+            "    tree", "\t", "Show the current state of the branching tree"
+        ])
+
         self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
         help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands')
@@ -81,15 +92,13 @@ class GitGud:
         load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description=load_description, formatter_class=argparse.RawDescriptionHelpFormatter)
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
-        show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
-        _show_parser_visible = self.subparsers.add_parser('show tree', help='Alternate command for show-tree', description='Alternate command for show-tree')
-        show_parser = self.subparsers.add_parser('show', description='Show the current state of the branching tree. Use "tree" as the argument.')
+        show_parser = self.subparsers.add_parser('show', description=show_description, formatter_class=argparse.RawDescriptionHelpFormatter)
         contrib_parser = self.subparsers.add_parser('contributors', help='Show project contributors webpage', description='Show all the contributors of the project')
         issues_parser = self.subparsers.add_parser('issues', help='Show project issues webpage', description="Show all the issues for the project")
         
-        show_parser.add_argument('param', metavar='tree', help='Required for command.')
+        show_parser.add_argument('cmd', metavar='cmd', help='Command to show information', nargs='?')
 
-        help_parser.add_argument('command_name', metavar='<command>', nargs='?')
+        help_parser.add_argument('command_name', metavar='cmd', help="Command to get help on", nargs='?')
 
         init_parser.add_argument('--force', action='store_true')
 
@@ -375,11 +384,12 @@ class GitGud:
 
         if int(commit_name) > int(last_commit):
             self.file_operator.write_last_commit(commit_name)
+    
     def handle_show(self, args):
-        if args.param == "tree":
+        if args.cmd == "tree":
             show_tree()
         else:
-            print('Error: `git gud show` only takes "tree" as an argument.')
+            print('Error: `git gud show` takes specific arguments. Type `git gud help show` for more information.')
 
     def handle_show_tree(self, args):
         show_tree()
