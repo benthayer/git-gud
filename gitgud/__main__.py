@@ -280,14 +280,18 @@ class GitGud:
                 skill = self.file_operator.get_level().skill
                 key_error_flag = True
         
+        skill_chars = len(skill.name)
+        skill_format_template = 'Levels {{}} skill "{{:<{}}}":\n'.format(skill_chars)
+        level_format_template = "    Level {:>2} : {:<3}"
+
         if key_error_flag or args.skill_name is None:
-            print('Levels in the current skill "{}" : \n'.format(skill.name))
+            grammar_string = "in the current"    
         else:
-            print('Levels for skill "{}" : \n'.format(skill.name))
-
+            grammar_string = "for"
+        print(skill_format_template.format(grammar_string, skill.name))
         for index, level in enumerate(skill):
-            print(str(index + 1) + ": " + level.name)
-
+            print(level_format_template.format(index + 1, level.name))
+        print("\nLoad a level with `git gud load`")
         print('\nTo see levels in all skills, run "git gud skills".')
 
     def handle_load(self, args):
