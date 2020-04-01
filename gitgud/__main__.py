@@ -385,7 +385,6 @@ class GitGud:
     def parse(self):
         args, _ = self.parser.parse_known_args()
         if args.command is None:
-            self.parser.print_help()
             if not self.is_initialized():
                 print('\nNOTICE: Currently in an uninitialized directory.\nGet started by running "git gud init" in a new directory!\n')
         else:
