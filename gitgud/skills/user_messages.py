@@ -1,5 +1,17 @@
 import subprocess
 
+def print_user_message(message):
+    print(message)
+
+
+def show_level_name(level):
+    print('Level: "{}"'.format(level.full_name()))
+
+
+def print_goal(level):
+    print(level.goal_str)
+
+
 def simulate_goal(level):
     print("Simulating: git gud goal")
     level.goal()
@@ -16,6 +28,17 @@ def help():
     print("Type \"git gud help\" for more help")
 
 
+def level_complete(level):
+    print('Level complete! "git gud load next" to advance to the next level')
+    print('Next level is: {}'.format(level.next_level.full_name()))
+
+
+def skill_complete(level):
+    print("Level complete, you've completed all levels in this skill!")
+    print('"git gud load next" to advance to the next skill')
+    print("Next skill is: {}".format(level.next_level.skill.name))
+
+
 def all_levels_complete():
     print("Wow! You've complete every level, congratulations!")
 
@@ -27,3 +50,4 @@ def all_levels_complete():
 
 def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')
+
