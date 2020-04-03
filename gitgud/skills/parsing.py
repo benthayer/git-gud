@@ -165,11 +165,11 @@ def test_skill(skill, test):
     # Check branches
     if len(test['branches']) != len(skill['branches']):
         return False
-    for branch_name in test['branches']:
-        if branch_name not in skill['branches']:
+    for test_branch_name, skill_branch_name in zip(test['branches'], skill['branches']):
+        if test_branch_name.lower() not in set(s.lower() for s in skill['branches']):
             return False
-        if skill['branches'][branch_name]['target'] != test['branches'][branch_name]['target']:
-            if merge_name_map[test['branches'][branch_name]['target']] != skill['branches'][branch_name]['target']:
+        if skill['branches'][skill_branch_name]['target'] != test['branches'][test_branch_name]['target']:
+            if merge_name_map[test['branches'][test_branch_name]['target']] != skill['branches'][skill_branch_name]['target']:
                 return False  # It's also not a known merge
 
     # Check tags
