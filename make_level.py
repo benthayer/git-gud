@@ -46,7 +46,7 @@ def write_init(skill_name, skill_path, level_name):
         with open(filepath, 'r') as fp:
             filedata = fp.read()
 
-        replace = ",\n        BasicLevel('{level_name}', pkg_resources.resource_filename(__name__, '_{level_name}/'))\n    ]".format(level_name=level_name)
+        replace = ",\n        BasicLevel('{level_name}', __name__)\n    ]".format(level_name=level_name)
         filedata = filedata.replace("\n    ]", replace)
         filedata = filedata.replace("[,", "[")
 
@@ -207,3 +207,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -9,6 +9,6 @@ all_skills = AllSkills([
     intro_skill,
     basics_skill,
     rampup_skill,
-    extras_skill,
+    extras_skill
 ])
 
