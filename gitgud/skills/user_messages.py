@@ -1,5 +1,16 @@
 import subprocess
 
+user_has_seen_messages = False
+
+def separated(func):
+    def new_func(*args, **kwargs):
+        if user_has_seen_message:
+            print()
+            user_has_seen_message = True
+
+        func(*args, **kwargs)
+    return new_func
+
 def print_user_message(message):
     print(message)
 
@@ -9,7 +20,7 @@ def show_level_name(level):
 
 
 def print_goal(level):
-    print(level.goal_str)
+    print(level.goal_str())
 
 
 def simulate_goal(level):

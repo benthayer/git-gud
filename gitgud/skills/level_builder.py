@@ -6,6 +6,7 @@ from .parsing import test_skill
 from .parsing import level_json
 from .parsing import parse_spec
 
+from .user_messages import print_user_message
 from .user_messages import show_level_name
 from .user_messages import print_goal
 from .user_messages import simulate_goal
@@ -126,7 +127,7 @@ class BasicLevel(Level):
 
     def test_passed(self):
         if self.passed_path.exists():
-            print_user_message(passed_path.read_text())
+            print_user_message(self.passed_path.read_text())
         else:
             super().test_passed(self)
             
