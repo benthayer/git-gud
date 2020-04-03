@@ -11,7 +11,7 @@ If something's missing feel free to add an issue, or if you're interested, view 
 If you're more of a visual learner, you should start with ["Learn Git Branching"](https://learngitbranching.js.org), and and then give Git Gud a try. Learn Git Branching is more visual, but with Git Gud, you're actually using git to complete the levels.
 
 ## How do I use it?
-First, no matter what, you'll need Python 3.
+First, you'll need to be using a version of Python>=3.6.
 We'll use python to install Git Gud.
 Depending on which way you want to install, we'll either do a "User install" by downloading the `git-gud` package from PyPi, which is handled by pip, or we'll do an edit-mode (development) install, which also uses pip, but in a different way.
 Once it's installed, we make an empty directory and switch into it. We need to do this because Git Gud acts as if we're in a git repository and modifies the files to set up different "levels".
@@ -19,7 +19,7 @@ If we were in another directory, it would delete all our files! But don't worry,
 
 Recap:
 
-1. Install Git Gud using Python 3
+1. Install Git Gud using Python>=3.6
 2. Create and change into an empty directory for Git Gud to load the skills into
 3. Run `git gud init`
 4. Follow the instructions to git gud!
