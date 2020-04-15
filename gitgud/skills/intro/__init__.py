@@ -10,9 +10,6 @@ class Intro(BasicLevel):
     def setup(self, file_operator):
         self._setup(file_operator)
         self.goal()
-    
-    def test_passed(self):
-        print(self.level_dir.joinpath('passed.txt').read_text())
 
 skill = Skill(
     'intro',
