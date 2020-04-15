@@ -14,6 +14,7 @@ jobs:
           command: |
             pip3 install --user .
             pip3 install --user pytest
+            pip3 install --user flake8
             git config --global user.name "CircleCI"
             git config --global user.email "circleci@example.com"
       - run:
@@ -21,3 +22,7 @@ jobs:
           command: |
             export PATH=$PATH:$HOME/.local/bin
             python3 -m pytest gitgud
+      - run:
+          name: flake8 checks
+          command: |
+            python3 -m flake8 .
