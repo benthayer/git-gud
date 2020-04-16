@@ -6,6 +6,6 @@ from gitgud.skills.util import Skill
 skill = Skill(
     'rework',
     [
-        BasicLevel('cherrypick', pkg_resources.resource_filename(__name__, '_cherrypick/'))
+        BasicLevel('cherrypicking', pkg_resources.resource_filename(__name__, '_cherrypicking/'))
     ]
 )
