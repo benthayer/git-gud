@@ -6,7 +6,7 @@ with open('README.md') as readme:
 
 setup(
     name='git-gud',
-    version='0.2.4',
+    version=open('gitgud/version.txt').read().strip(),
     url='https://github.com/benthayer/git-gud/',
     description='A tool to learn git',
     author='Ben Thayer',
@@ -21,19 +21,24 @@ setup(
         'gitgud.skills.basics',
         'gitgud.skills.extras',
         'gitgud.skills.rampup',
+        'gitgud.skills.intro',
     ],
     package_data={
+        'gitgud': ['version.txt', 'welcome.txt'],
+        'gitgud.skills.intro': ['_*/*'],
         'gitgud.skills.basics': ['_*/*'],
         'gitgud.skills.extras': ['_*/*'],
         'gitgud.skills.rampup': ['_*/*'],
     },
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     install_requires=[
         'gitpython',
+        'importlib_resources'
     ],
     entry_points={
         "console_scripts": [
             "git-gud=gitgud.__main__:main"
         ]
-    }
+    },
+    data_files = [('man/man1', ['git-gud.1'])]
 )

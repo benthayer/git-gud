@@ -1,14 +1,12 @@
-import pkg_resources
-
-from gitgud.skills.util import BasicLevel
 from gitgud.skills.util import Skill
+from gitgud.skills.level_builder import BasicLevel
 
 skill = Skill(
     'rampup',
     [
-        BasicLevel('detaching', pkg_resources.resource_filename(__name__, '_detaching/')),
-        BasicLevel('relrefs1', pkg_resources.resource_filename(__name__, '_relrefs1/')),
-        BasicLevel('relrefs2', pkg_resources.resource_filename(__name__, '_relrefs2/')),
-        BasicLevel('reversing', pkg_resources.resource_filename(__name__, '_reversing/'))
+        BasicLevel('detaching', __name__),
+        BasicLevel('relrefs1', __name__),
+        BasicLevel('relrefs2', __name__),
+        BasicLevel('reversing', __name__)
     ]
 )

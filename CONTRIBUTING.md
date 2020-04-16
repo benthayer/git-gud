@@ -1,25 +1,8 @@
 ## So, you want to be a contributor?
 You're in luck! 
-Git Gud was intentionally designed to make it easy for you to contribute! 
-If the only thing you want to do is to make a level that tests to see if you can modify the tree in a simple way, then there's already the `BasicLevel` class to deal with that.
-If you want to do something more complicated, just throw out the idea.
-The easiest way to contribute is to open up an issue.
-Even though you're not writing code, GitHub still counts issues as contributions!
+Git Gud was intentionally designed to make it easy for you to contribute! If you have an idea or an issue, add an issue and we can get to work.
 
-Once you write your first issue, I'll respond and we can figure out how to design a skill, add your feature, or fix your problem.
-If you want to end it there, you can, but I encourage you to continue. 
-A Pull Request might just be a couple lines of code away, and I'll be happy to help you through any issues you encounter!  
-
-If you feel like your issue is too complicated for you to solve, but you'd still like to write code, just say so. 
-I can point you towards the files you need or other code that does something similar. 
-If you're still not sure, then I'm happy to write some code to get you started.
-
-Remember: Everyone, including me, was a noob at some point. 
-Don't be worried about wasting my time because you're not. 
-Contributing is called contributing because it is exactly that. 
-Any code you write makes the project more complete and any issues you submit opens up the opportunity for others to contribute and to make the project better. 
-I started this project because I wanted to help people learn git and programming. 
-I am committed to that goal and more than happy to help to you learn to code and to submit a pull request.
+If you want to get to work on a level, take a look at the existing levels and you should get a feel for how we create levels.
 
 ## Download and Setup
 ```
@@ -107,6 +90,21 @@ The class you create should then be imported into `__init__.py` and instantiated
 Currently, the majority of levels are constructed using `gitgud.skills.util.BasicLevel`.
 This is because  many of the levels are simple enough that they fall into the common structure of starting with a bunch of commits in a certain order and then in some way modifying the branches and ordering of those commits, or creating new ones.
 If you're making your own level, you may want to consider using this class.
+
+### Creating a skill/level
+Creating a skill or level is as easy as running the 'make_level.py' script and filling in the generated template documents. To use the skill/level creator, use the 'make_level.py' script located in the directory containing 'gitgud'. This script can create a skill or level. If you pass the name of a skill that already exists, the level will be created within that existing directory (no duplicate skill directories will be created).
+
+The usage of the script is as follows: "python3 make_level.py <skill_name> <level_name>". 
+
+The script will register the new skill/level to the relevant files (you do not have to worry about this). Additionally, it will create the skill/level directory and template files. 
+
+The template files are:
+    *skills/test_levels.py
+    *skills/<skill_name>/<level_name>/goal.txt
+    *skills/<skill_name>/<level_name>/instructions.txt
+    *skills/<skill_name>/<level_name>/setup.spec
+    *skills/<skill_name>/<level_name>/test.spec
+Fill these files out as specified in the documents.
 
 #### `.spec` files
 `.spec` files are something I created in order to more easily specify a git tree. 

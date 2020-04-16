@@ -2,6 +2,7 @@ import os
 import shutil
 import datetime as dt
 import email.utils
+import json
 
 from glob import glob
 
@@ -21,10 +22,11 @@ class Operator:
             self.repo = None
 
         self.git_path = os.path.join(self.path, '.git')
-        self.hooks_path = os.path.join(self.path, '.git', 'hooks')
+        self.hooks_path = os.path.join(self.git_path, 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
-        self.last_commit_path = os.path.join(self.gg_path, 'last_commit')
-        self.level_path = os.path.join(self.gg_path, 'level')
+        self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
+        self.commits_json_path = os.path.join(self.gg_path, 'commits.csv')
+        self.level_path = os.path.join(self.gg_path, 'current_level.txt')
 
     def add_file_to_index(self, filename):
         open('{}/{}'.format(self.path, filename), 'w+').close()
@@ -33,7 +35,7 @@ class Operator:
     def add_and_commit(self, name):
         # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
         self.add_file_to_index(name)
-        commit = self.repo.index.commit(name, author=actor, committer=actor)
+        commit = self.repo.index.commit(name, author=actor, committer=actor, skip_hooks=True)
 
         return commit
     
@@ -51,7 +53,7 @@ class Operator:
         # TODO GitPython set index to working tree
         self.repo.git.add(update=True)
         # TODO GitPython clear index (for initial commits)
-        self.repo.index.commit("Clearing index")  # Easiest way to clear the index is to commit an empty directory
+        self.repo.index.commit("Clearing index", skip_hooks=True)  # Easiest way to clear the index is to commit an empty directory
 
         dirs.remove(self.path + os.path.sep)  # Don't remove current directory
 
@@ -86,7 +88,7 @@ class Operator:
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
+                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
             else:
                 assert name[0] == 'M'
                 int(name[1:])  # Fails if not a number
@@ -95,9 +97,9 @@ class Operator:
                 for parent in parents[1:]:
                     merge_base = self.repo.merge_base(parents[0], parent)
                     self.repo.index.merge_tree(parent, base=merge_base)
-                self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents)
+                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
 
-            commit_objects[name] = self.repo.head.commit
+            commit_objects[name] = commit_obj
 
             for branch in branches:
                 self.repo.create_head(branch, self.repo.head.commit)
@@ -204,6 +206,16 @@ class Operator:
     def write_last_commit(self, name):
         with open(self.last_commit_path, 'w+') as last_commit_file:
             last_commit_file.write(name)
+
+    def clear_tracked_commits(self):
+        with open(self.commits_json_path, 'w'):
+            pass
+
+    def track_commit(self, first_hash, second_hash, action):
+        # Used to track rebases, amends and reverts
+        with open(self.commits_json_path, 'a') as commit_tracker_file:
+            commit_tracker_file.write(','.join([first_hash, second_hash, action]))
+            commit_tracker_file.write('\n')
 
 
 def get_operator():
