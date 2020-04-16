@@ -260,13 +260,20 @@ class GitGud:
             except KeyError:
                 pass
         
-        skill_chars = max(len(skill.name) for skill in all_skills)
-        skill_format_template = 'Skill {{}} - "{{:<{}}}" :{{:>2}} level{{}}'.format(skill_chars)
+        # Add two for quotes
+        skill_formatted_len = max(len(skill.name) for skill in all_skills) + 2
+
+        skill_format_template = 'Skill {skill_number} - {formatted_skill_name} : {num_levels:>2} level{plural}'
         level_format_template = "    Level {:>2} : {:<3}"
         
-        for i, skill in enumerate(all_skills):
+        for skill_number, skill in enumerate(all_skills):
             # TODO Add description
-            print(skill_format_template.format(i , skill.name, len(skill), "s" if len(skill) > 1 else ""))
+            print(skill_format_template.format(
+                skill_number=skill_number,
+                formatted_skill_name='"{}"'.format(skill.name).ljust(skill_formatted_len),
+                num_levels=len(skill),
+                plural="s" if len(skill) > 1 else ""
+            ))
 
             for index, level in enumerate(skill):
                 print(level_format_template.format(index + 1, level.name))
