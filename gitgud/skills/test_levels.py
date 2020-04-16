@@ -1,8 +1,12 @@
 import pytest
 
+import os
+
 from . import skill
 
-from gitgud.skills import all_levels
+from gitgud.skills import all_skills, all_levels
+from gitgud.skills.level_builder import Level
+from gitgud.skills.util import Skill
 from gitgud.skills.parsing import parse_spec
 
 def test_skill_access():
