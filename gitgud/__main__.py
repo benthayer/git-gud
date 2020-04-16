@@ -247,13 +247,17 @@ class GitGud:
                 pass
         
         skill_chars = max(len(skill.name) for skill in all_skills)
-        skill_format_template = 'Skill {{}} - "{{:<{}}}" :{{:>2}} level{{}}'.format(skill_chars)
-        level_format_template = "    Level {:>2} : {:<3}"
-        
+
+        level_format_template = "    Level {:>2} : {}"
+
         for i, skill in enumerate(all_skills):
             # TODO Add description
-            print(skill_format_template.format(i , skill.name, len(skill), "s" if len(skill) > 1 else ""))
-
+            print("".join([
+                'Skill {} - '.format(i),
+                ('"{' + ':<{}'.format(skill_chars) + '}": ').format(skill.name),
+                '{:>2} level{}'.format(len(skill), "s" if len(skill) > 1 else "")
+            ]))
+            
             for index, level in enumerate(skill):
                 print(level_format_template.format(index + 1, level.name))
         
@@ -282,7 +286,7 @@ class GitGud:
         
         skill_chars = len(skill.name)
         skill_format_template = 'Levels {{}} skill "{{:<{}}}":\n'.format(skill_chars)
-        level_format_template = "    Level {:>2} : {:<3}"
+        level_format_template = '    Level {:>2} : {:<3}'
 
         if key_error_flag or args.skill_name is None:
             grammar_string = "in the current"    
