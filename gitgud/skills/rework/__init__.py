@@ -1,11 +1,9 @@
-import pkg_resources
-
-from gitgud.skills.util import BasicLevel
+from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
 
 skill = Skill(
     'rework',
     [
-        BasicLevel('cherrypicking', pkg_resources.resource_filename(__name__, '_cherrypicking/'))
+        BasicLevel('cherrypicking', __name__)
     ]
 )

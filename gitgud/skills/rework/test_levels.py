@@ -9,7 +9,7 @@ level_tests = [
     (
         skill['cherrypicking'], [
             'git cherry-pick bugFix',
-            'git cherry-pick side',
+            'git cherry-pick side~',
             'git cherry-pick another'
         ]
     )
