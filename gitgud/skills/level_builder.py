@@ -2,7 +2,7 @@ from importlib_resources import files
 
 import os
 
-from .parsing import test_skill
+from .parsing import test_ancestry
 from .parsing import level_json
 from .parsing import parse_spec
 
@@ -123,7 +123,7 @@ class BasicLevel(Level):
         commits, head = parse_spec(self.test_spec_path)
         test_tree = level_json(commits, head)
         level_tree = file_operator.get_current_tree()
-        return test_skill(level_tree, test_tree)
+        return test_ancestry(level_tree, test_tree)
 
     def test_passed(self):
         if self.passed_path.exists():

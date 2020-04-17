@@ -75,7 +75,7 @@ def parse_spec(spec_path):
 
 
 def level_json(commits, head):
-    # We've formally replicated the input string in memory
+    # Used with test spec files, return a json object to be compared with the tree of the level
 
     level = {
         'topology': [],
@@ -84,18 +84,13 @@ def level_json(commits, head):
         'commits': {},
         'HEAD': {},
     }
-
-    all_branches = []
-    all_tags = []
+    
     for commit_name, parents, branches_here, tags_here in commits:
         level['topology'].append(commit_name)
         level['commits'][commit_name] = {
             'parents': parents,
             'id': commit_name
         }
-
-        all_branches.extend(branches_here)
-        all_tags.extend(tags_here)
 
         for branch in branches_here:
             level['branches'][branch] = {
@@ -113,15 +108,11 @@ def level_json(commits, head):
         'target': head,
         'id': 'HEAD'
     }
-
+    
     return level
 
 
-def test_skill(skill, test):
-    # We don't know the names of merges, so we match them with their test names
-    # TODO Only works when merges don't have other merges as parents
-    # TODO Topological sort merge commits
-    skill = deepcopy(skill)
+def name_merges(skill, test):
     merge_name_map = {}
     for commit_name in skill['commits']:
         skill_commit = skill['commits'][commit_name]
@@ -138,22 +129,57 @@ def test_skill(skill, test):
                         break
                 if len(skill_parents) == len(test_parents) and parents_equal:
                     merge_name_map[test_commit_name] = commit_name
+    return merge_name_map
 
-    # TODO Update parents to reference merge commits by new name
 
-    # Check commits
-    if len(test['commits']) != len(skill['commits']):
+def has_all_branches(skill, test):
+    # Has HEAD
+    if test['HEAD']['target'] in skill['branches']:
         return False
+
+    # Has all the other specified branches
+    for branch_name in test['branches']:
+        if branch_name not in skill['branches']:
+            return False
+
+    return True
+
+
+def all_branches_correct(skill, test):
+    for branch_name in test['branches']:
+        if skill['branches'][branch_name]['target'] != test['branches'][branch_name]['target']:
+            return False
+    return True
+
+
+def head_correct(skill, test):
+    if skill['HEAD']['target'] != test['HEAD']['target']:
+        return False
+    return True
+
+def has_all_tags(skill, test):
+    # Has all tags specified
+    for tag_name in test['tags']:
+        if tag_name not in skill['tags']:
+            return False
+    return True
+
+
+def all_tags_correct(skill, test):
+    for tag_name in test['tags']:
+        if skill['tags'][tag_name]['target'] != test['tags'][tag_name]['target']:
+            return False
+    return True
+
+
+def check_commits(skill, test):
     for commit_name in test['commits']:
-        test_commit = test['commits'][commit_name]
+        
         if commit_name not in skill['commits']:
-            if merge_name_map[commit_name] in skill['commits']:
-                # It's a known merge
-                skill_commit = skill['commits'][merge_name_map[commit_name]]
-            else:
-                return False
-        else:
-            skill_commit = skill['commits'][commit_name]
+            return False
+        
+        skill_commit = skill['commits'][commit_name]
+        test_commit = test['commits'][commit_name]
 
         # Commits must have the same number of parents and be in the same order
         if len(skill_commit['parents']) != len(test_commit['parents']):
@@ -161,28 +187,27 @@ def test_skill(skill, test):
         for skill_parent, test_parent in zip(skill_commit['parents'], test_commit['parents']):
             if skill_parent != test_parent:
                 return False
+    return True
 
-    # Check branches
-    if len(test['branches']) != len(skill['branches']):
+
+def test_ancestry(skill, test):
+    # Tests that the graph of the git history matches 
+
+    # skill = name_merges(skill, test)
+    
+    if not check_commits(skill, test):
         return False
-    for branch_name in test['branches']:
-        if branch_name not in skill['branches']:
-            return False
-        if skill['branches'][branch_name]['target'] != test['branches'][branch_name]['target']:
-            if merge_name_map[test['branches'][branch_name]['target']] != skill['branches'][branch_name]['target']:
-                return False  # It's also not a known merge
 
-    # Check tags
-    if len(test['tags']) != len(skill['tags']):
+    if not has_all_branches(skill, test):
         return False
-    for tag_name in test['tags']:
-        if tag_name not in skill['tags']:
-            return False
-        if skill['tags'][tag_name]['target'] != test['tags'][tag_name]['target']:
-            return False
-
-    # Check HEAD
-    if skill['HEAD']['target'] != test['HEAD']['target']:
+    if not all_branches_correct(skill, test):
+        return False
+    if not has_all_tags(skill, test):
+        return False
+    if not all_tags_correct(skill, test):
+        return False
+    if not head_correct(skill, test):
         return False
 
     return True
+

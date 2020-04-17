@@ -2,7 +2,6 @@ import os
 import shutil
 import datetime as dt
 import email.utils
-import json
 
 from glob import glob
 
@@ -25,7 +24,7 @@ class Operator:
         self.hooks_path = os.path.join(self.git_path, 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
-        self.commits_json_path = os.path.join(self.gg_path, 'commits.csv')
+        self.commits_path = os.path.join(self.gg_path, 'commits.csv')
         self.level_path = os.path.join(self.gg_path, 'current_level.txt')
 
     def add_file_to_index(self, filename):
@@ -64,10 +63,10 @@ class Operator:
     def create_tree(self, commits, head):
         branches = self.repo.branches
         try:
-            # TODO GitPython detach head
-            self.repo.git.checkout(self.repo.head.commit)  # Detached head, we can now delete everything
+            self.repo.git.checkout(self.repo.head.commit)
         except ValueError:
             pass
+
         self.clear_tree_and_index()
 
         for branch in branches:
@@ -100,6 +99,7 @@ class Operator:
                 commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
 
             commit_objects[name] = commit_obj
+            self.track_commit(commit_obj, name)
 
             for branch in branches:
                 self.repo.create_head(branch, self.repo.head.commit)
@@ -208,14 +208,19 @@ class Operator:
             last_commit_file.write(name)
 
     def clear_tracked_commits(self):
-        with open(self.commits_json_path, 'w'):
+        with open(self.commits_path, 'w'):
             pass
 
-    def track_commit(self, first_hash, second_hash, action):
-        # Used to track rebases, amends and reverts
-        with open(self.commits_json_path, 'a') as commit_tracker_file:
-            commit_tracker_file.write(','.join([first_hash, second_hash, action]))
-            commit_tracker_file.write('\n')
+    def track_commit(self, hash, name):
+        with open(self.commits_path, 'a') as commit_file:
+            commit_file.write('{},{}\n'.format(hash, name))
+
+    def track_rewrite(self, new_hash, old_hash, action):
+        # Used to track commits, rebases, amends
+        if action == 'amend':
+            raise NotImplementedError
+
+        track_commit(new_hash, "{}'".format(old_hash))
 
 
 def get_operator():
