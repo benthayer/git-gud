@@ -14,6 +14,10 @@ def separated(func):
     return new_func
 
 @separated
+def print_user_file(path):
+    print(path.read_text().strip())
+
+@separated
 def print_user_message(message):
     print(message)
 
@@ -28,16 +32,26 @@ def print_goal(level):
     print(level.goal_str())
 
 
+def print_git_gud_bar():
+    num_chars = 25
+    print()
+    print('-' * num_chars + 'Git Gud' + '-' * num_chars)
+    print()
+
 @separated
+def simulate_command(command):
+    print("Simulating: {}".format(command))
+    print_git_gud_bar()
+    subprocess.call(command, shell=True)
+    print_git_gud_bar()
+
+
 def simulate_goal(level):
-    print("Simulating: git gud goal")
-    print(level.goal_str())
+    simulate_command("git gud goal")
 
 
-@separated
 def show_tree():
-    print("Simulating: git log --graph --oneline --all ")
-    subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
+    simulate_command("git log --graph --oneline --all")
 
 
 @separated
@@ -70,7 +84,13 @@ def all_levels_complete():
     print("We're always looking for contributions and are more than"
           " happy to accept both pull requests and suggestions!")
 
+
 @separated
 def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')
+
+
+@separated
+def default_fail_no_reset():
+    print('Level not complete, keep trying.')
 

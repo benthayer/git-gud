@@ -6,6 +6,7 @@ from .parsing import test_skill
 from .parsing import level_json
 from .parsing import parse_spec
 
+from .user_messages import print_user_file
 from .user_messages import print_user_message
 from .user_messages import show_level_name
 from .user_messages import print_goal
@@ -36,12 +37,11 @@ class Level:
         pass
 
     def setup(self, file_operator):
-        show_level_name(self)
         self._setup(file_operator)
         self.post_setup()
     
     def post_setup(self):
-        pass
+        show_level_name(self)
 
     def instructions(self):
         pass
@@ -51,7 +51,7 @@ class Level:
 
     def status(self):
         show_level_name(self)
-    
+
     def _test(self, file_operator):
         pass
 
@@ -81,12 +81,17 @@ class BasicLevel(Level):
 
         self.setup_spec_path = self.level_dir.joinpath('setup.spec')
         self.test_spec_path = self.level_dir.joinpath('test.spec')
-        self.passed_path = self.level_dir.joinpath('passed.txt')
 
-        self.goal_path = self.level_dir.joinpath('goal.txt')
         self.instructions_path = self.level_dir.joinpath('instructions.txt')
+        
+        self.goal_path = self.level_dir.joinpath('goal.txt')
+
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
+
+    def display_message(self, message_path):
+        path = self.level_dir.joinpath(message_path)
+        print_user_file(path)
 
     def _setup(self, file_operator):
         commits, head = parse_spec(self.setup_spec_path)
@@ -124,11 +129,4 @@ class BasicLevel(Level):
         test_tree = level_json(commits, head)
         level_tree = file_operator.get_current_tree()
         return test_skill(level_tree, test_tree)
-
-    def test_passed(self):
-        if self.passed_path.exists():
-            print_user_message(self.passed_path.read_text())
-        else:
-            super().test_passed(self)
-            
 

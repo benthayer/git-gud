@@ -189,6 +189,9 @@ class GitGud:
             self.file_operator.repo = Repo(self.file_operator.path)
         except InvalidGitRepositoryError:
             self.file_operator.repo = Repo.init(self.file_operator.path)
+        
+        # Disable pager so "git gud status" can use the output easily
+        subprocess.call("git config core.pager ''", shell=True)
 
         if not os.path.exists(self.file_operator.gg_path):
             os.mkdir(self.file_operator.gg_path)
@@ -411,10 +414,11 @@ class GitGud:
     
     def parse(self):
         args, _ = self.parser.parse_known_args()
+        print()
         if args.command is None:
             if not self.is_initialized():
                 print('Currently in an uninitialized directory.')
-                print('Get started by running "git gud init" in a new directory!')
+                print('Get started by running "git gud init" in an empty directory!')
             else:
                 self.parser.print_help()
         else:
@@ -422,6 +426,7 @@ class GitGud:
                 self.command_dict[args.command](args)
             except InitializationError as error:
                 print(error)
+        print()
 
 
 def main():

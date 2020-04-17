@@ -1,0 +1,2 @@
+We are currently in a git repo. Here we have our initial commit:
+
