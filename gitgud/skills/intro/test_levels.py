@@ -9,6 +9,9 @@ level_tests = [
     (
         skill['intro'], [
         ]
+    ), (
+        skill['level2'], [
+        ]
     )
 ]
 

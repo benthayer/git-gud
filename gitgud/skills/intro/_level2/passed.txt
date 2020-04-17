@@ -1,0 +1,3 @@
+Level complete!
+Now type
+    $ git gud load next
