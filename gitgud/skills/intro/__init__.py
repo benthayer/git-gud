@@ -4,7 +4,6 @@ from gitgud.skills.util import Skill
 from gitgud.skills.level_builder import BasicLevel
 
 from gitgud.skills.user_messages import simulate_command
-from gitgud.skills.user_messages import simulate_goal
 from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import default_fail_no_reset
 

@@ -9,8 +9,6 @@ from .parsing import parse_spec
 from .user_messages import print_user_file
 from .user_messages import print_user_message
 from .user_messages import show_level_name
-from .user_messages import print_goal
-from .user_messages import simulate_goal
 from .user_messages import show_tree
 from .user_messages import default_fail
 from .user_messages import skill_complete
@@ -108,7 +106,7 @@ class BasicLevel(Level):
         file_operator.write_last_commit(latest_commit)
 
     def post_setup(self):
-        simulate_goal(self)
+        self.display_message('goal.txt')
         show_tree()
 
     def instructions(self):
@@ -118,11 +116,8 @@ class BasicLevel(Level):
             else:
                 print(line.strip())
 
-    def goal_str(self):
-        return self.goal_path.read_text().strip()
-
     def goal(self):
-        print_goal(self)
+        self.display_message("goal.txt")
 
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)

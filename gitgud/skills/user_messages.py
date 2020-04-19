@@ -27,11 +27,6 @@ def show_level_name(level):
     print('Level: "{}"'.format(level.full_name()))
 
 
-@separated
-def print_goal(level):
-    print(level.goal_str())
-
-
 def print_git_gud_bar():
     num_chars = 25
     print()
@@ -44,10 +39,6 @@ def simulate_command(command):
     print_git_gud_bar()
     subprocess.call(command, shell=True)
     print_git_gud_bar()
-
-
-def simulate_goal(level):
-    simulate_command("git gud goal")
 
 
 def show_tree():

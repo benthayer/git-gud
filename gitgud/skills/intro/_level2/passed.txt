@@ -1,6 +1,5 @@
 Great, your name and email are set, you're ready to make your first commit!
 
-Run "git gud load next" to load the next level.
-
-We won't remind you, but if you ever forget what command to use, type "git gud help"
+Run "git gud load next" to load the next level. 
+If you ever forget this command, type "git gud help"
 
