@@ -27,7 +27,7 @@ jobs:
       run: |
         mkdir $HOME/.ssh
         chmod 700 $HOME/.ssh
-        echo $OSAI_ID_RSA > $HOME/.ssh/id_rsa
+        echo "$OSAI_ID_RSA" > $HOME/.ssh/id_rsa
         chmod 600 $HOME/.ssh/id_rsa
         git remote add osai git@github.com:open-source-at-illinois/git-gud.git
         git push -f osai master
