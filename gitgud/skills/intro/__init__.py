@@ -9,7 +9,7 @@ from gitgud.skills.user_messages import default_fail_no_reset
 
 class Level1(BasicLevel):
     def __init__(self):
-        super().__init__('level1' , __name__)
+        super().__init__('welcome' , __name__)
 
     def post_setup(self):
         self.display_message("post-setup.txt")

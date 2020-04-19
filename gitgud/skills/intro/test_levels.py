@@ -7,7 +7,7 @@ from . import skill
 
 level_tests = [
     (
-        skill['intro'], [
+        skill['welcome'], [
         ]
     ), (
         skill['level2'], [
