@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Push to open-source-at-illinois/git-gud
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -25,6 +25,9 @@ jobs:
       env:
         OSAI_ID_RSA: ${{ secrets.OSAI_ID_RSA }}
       run: |
+        mkdir $HOME/.ssh
+        chmod 700 $HOME/.ssh
         echo $OSAI_ID_RSA > $HOME/.ssh/id_rsa
+        chmod 600 $HOME/.ssh/id_rsa
         git remote add osai git@github.com:open-source-at-illinois/git-gud.git
-        git push osai master
+        git push -f osai master
