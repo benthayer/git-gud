@@ -30,7 +30,7 @@ setup(
         'gitgud.skills.extras': ['_*/*'],
         'gitgud.skills.rampup': ['_*/*'],
     },
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     install_requires=[
         'gitpython',
         'importlib_resources'
@@ -39,5 +39,6 @@ setup(
         "console_scripts": [
             "git-gud=gitgud.__main__:main"
         ]
-    }
+    },
+    data_files = [('man/man1', ['git-gud.1'])]
 )

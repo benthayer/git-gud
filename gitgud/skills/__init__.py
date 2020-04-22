@@ -9,6 +9,12 @@ all_skills = AllSkills([
     intro_skill,
     basics_skill,
     rampup_skill,
-    extras_skill,
+    extras_skill
 ])
+
+all_levels = []
+
+for skill in all_skills:
+    for level in skill:
+        all_levels.append(level)
 

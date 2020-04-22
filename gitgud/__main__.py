@@ -66,6 +66,17 @@ class GitGud:
             "   git gud load -<level>",
             "\n",
         ])
+        
+        show_description = "".join([
+            "Helper command to show certain information.",
+            "\n\n",
+            "Subcommands:",
+            "\n",
+            "  <command>",
+            "\n",
+            "    tree", "\t", "Show the current state of the branching tree"
+        ])
+
         self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
 
         help_parser = self.subparsers.add_parser('help', help='Show help for commands', description='Show help for commands')
@@ -81,11 +92,13 @@ class GitGud:
         load_parser = self.subparsers.add_parser('load', help='Load a specific skill or level', description=load_description, formatter_class=argparse.RawDescriptionHelpFormatter)
         commit_parser = self.subparsers.add_parser('commit', help='Quickly create and commit a file', description='Quickly create and commit a file')
         goal_parser = self.subparsers.add_parser('goal', help='Show a description of the current goal', description='Show a description of the current goal')
-        show_tree_parser = self.subparsers.add_parser('show-tree', help='Show the current state of the branching tree', description='Show the current state of the branching tree')
+        show_parser = self.subparsers.add_parser('show', description=show_description, formatter_class=argparse.RawDescriptionHelpFormatter)
         contrib_parser = self.subparsers.add_parser('contributors', help='Show project contributors webpage', description='Show all the contributors of the project')
         issues_parser = self.subparsers.add_parser('issues', help='Show project issues webpage', description="Show all the issues for the project")
         
-        help_parser.add_argument('command_name', metavar='<command>', nargs='?')
+        show_parser.add_argument('cmd', metavar='cmd', help='Command to show information', nargs='?')
+
+        help_parser.add_argument('command_name', metavar='cmd', help="Command to get help on", nargs='?')
 
         init_parser.add_argument('--force', action='store_true')
 
@@ -110,6 +123,7 @@ class GitGud:
             'load': self.handle_load,
             'commit': self.handle_commit,
             'show-tree': self.handle_show_tree,
+            'show': self.handle_show,
             'contributors': self.handle_contrib,
             'issues': self.handle_issues    
         }
@@ -246,6 +260,7 @@ class GitGud:
             except KeyError:
                 pass
         
+<<<<<<< HEAD
         skill_chars = max(len(skill.name) for skill in all_skills)
 
         level_format_template = "    Level {:>2} : {}"
@@ -258,6 +273,23 @@ class GitGud:
                 '{:>2} level{}'.format(len(skill), "s" if len(skill) > 1 else "")
             ]))
             
+=======
+        # Add two for quotes
+        skill_formatted_len = max(len(skill.name) for skill in all_skills) + 2
+
+        skill_format_template = 'Skill {skill_number} - {formatted_skill_name} : {num_levels:>2} level{plural}'
+        level_format_template = "    Level {:>2} : {:<3}"
+        
+        for skill_number, skill in enumerate(all_skills):
+            # TODO Add description
+            print(skill_format_template.format(
+                skill_number=skill_number,
+                formatted_skill_name='"{}"'.format(skill.name).ljust(skill_formatted_len),
+                num_levels=len(skill),
+                plural="s" if len(skill) > 1 else ""
+            ))
+
+>>>>>>> upstream/master
             for index, level in enumerate(skill):
                 print(level_format_template.format(index + 1, level.name))
         
@@ -378,6 +410,12 @@ class GitGud:
 
         if int(commit_name) > int(last_commit):
             self.file_operator.write_last_commit(commit_name)
+    
+    def handle_show(self, args):
+        if args.cmd == "tree":
+            show_tree()
+        else:
+            print('Error: `git gud show` takes specific arguments. Type `git gud help show` for more information.')
 
     def handle_show_tree(self, args):
         show_tree()
@@ -393,7 +431,11 @@ class GitGud:
     def parse(self):
         args, _ = self.parser.parse_known_args()
         if args.command is None:
-            self.parser.print_help()
+            if not self.is_initialized():
+                print('Currently in an uninitialized directory.')
+                print('Get started by running "git gud init" in a new directory!')
+            else:
+                self.parser.print_help()
         else:
             try:
                 self.command_dict[args.command](args)

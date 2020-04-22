@@ -18,3 +18,4 @@ level_tests = [
 @pytest.mark.parametrize('level,commands', level_tests)
 def test_level(gg, level, commands):
     simulate(gg, level, commands)
+

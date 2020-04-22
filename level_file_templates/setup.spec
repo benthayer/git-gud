@@ -7,3 +7,4 @@
 M1 : 3 6 (merge-3-and-6)
 8 (checked-out-branch)
 checked-out-branch
+
