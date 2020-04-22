@@ -40,7 +40,7 @@ class GitGud:
             "   git gud load <skill> <level>",
             "   git gud load <skill>-<level>",
             "\n",
-            "<skill> and <level> could either be the name of the skill/level or the number of the skill/level.",
+            "<skill> and <level> could either be the short name of the skill/level or the number of the skill/level.",
             "Running `git gud skills` will help you find the number and name associated with each skill/level.",
             "\n",
             "Here are example uses which load the same level:",
@@ -262,9 +262,10 @@ class GitGud:
         
         # Add two for quotes
         skill_formatted_len = max(len(skill.name) for skill in all_skills) + 2
-
-        skill_format_template = 'Skill {skill_number} - {formatted_skill_name} : {num_levels:>2} level{plural}'
-        level_format_template = "    Level {:>2} : {:<3}"
+        level_formatted_len = max(max(len(level.name) for level in skill) for skill in all_skills) + 2
+        
+        skill_format_template = 'Skill {skill_number:>2} - {formatted_skill_name} : {num_levels:>2} level{plural}'
+        level_format_template = "    Level {level_number:>2} : {formatted_level_name} {readable_name_str}"
         
         for skill_number, skill in enumerate(all_skills):
             # TODO Add description
@@ -276,7 +277,11 @@ class GitGud:
             ))
 
             for index, level in enumerate(skill):
-                print(level_format_template.format(index + 1, level.name))
+                print(level_format_template.format(
+                    level_number=index + 1, 
+                    formatted_level_name='"{}"'.format(level.name).ljust(level_formatted_len), 
+                    readable_name_str='--- {}'.format(level.readable_name) if level.readable_name else ""
+                ))
         
         print("\nLoad a level with `git gud load`")
         

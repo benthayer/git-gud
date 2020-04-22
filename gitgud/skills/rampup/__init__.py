@@ -5,8 +5,8 @@ skill = Skill(
     'rampup',
     [
         BasicLevel('detaching', __name__),
-        BasicLevel('relrefs1', __name__),
-        BasicLevel('relrefs2', __name__),
+        BasicLevel('relrefs1', __name__, "Relative References I"),
+        BasicLevel('relrefs2', __name__, "Relative References II"),
         BasicLevel('reversing', __name__)
     ]
 )
