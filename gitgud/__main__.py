@@ -98,6 +98,8 @@ class GitGud:
         issues_parser = self.subparsers.add_parser('issues', help='Show project issues webpage', description="Show all the issues for the project")
         solutions_parser = self.subparsers.add_parser('solution', help='Show solution for the given level', description='Show the solution for the given level')
         
+        solutions_parser.add_argument('--confirm', action='store_true')
+
         show_parser.add_argument('cmd', metavar='cmd', help='Command to show information', nargs='?')
 
         help_parser.add_argument('command_name', metavar='cmd', help="Command to get help on", nargs='?')
@@ -258,21 +260,27 @@ class GitGud:
         self.assert_initialized()
         current_level = self.file_operator.get_level()
         skill_name = current_level.skill.name
-        tests_module = import_module('.test_levels', 'gitgud.skills.' + skill_name)
-        level_tests = tests_module.level_tests
-        solution_set = None
+        if not args.confirm:
+            print("Are you sure you want to view the solution for ", end="")
+            print('the current level "{}" in the skill "{}"?'.format(current_level.name, skill_name))
+            print('If so, run `git gud solution` again with --confirm.')
+        else:
+            tests_module = import_module('.test_levels', 'gitgud.skills.' + skill_name)
+            level_tests = tests_module.level_tests
+            solution_set = None
 
-        for level, commands in level_tests:
-            if level is current_level:
-                solution_set = commands
-                break
-        
-        if not solution_set:
-            print("No solutions available for this level.")
-            return
-        
-        for command in solution_set:
-            print(command)
+            for level, commands in level_tests:
+                if level is current_level:
+                    solution_set = commands
+                    break
+                
+            if not solution_set:
+                print("No solutions available for this level.")
+                return
+            
+            print('Solution for the current level "{}" in the skill "{}":'.format(current_level.name, skill_name))
+            for command in solution_set:
+                print('\t' + command)
         
     
     def handle_skills(self, args):
