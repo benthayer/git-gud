@@ -260,20 +260,6 @@ class GitGud:
             except KeyError:
                 pass
         
-<<<<<<< HEAD
-        skill_chars = max(len(skill.name) for skill in all_skills)
-
-        level_format_template = "    Level {:>2} : {}"
-
-        for i, skill in enumerate(all_skills):
-            # TODO Add description
-            print("".join([
-                'Skill {} - '.format(i),
-                ('"{' + ':<{}'.format(skill_chars) + '}": ').format(skill.name),
-                '{:>2} level{}'.format(len(skill), "s" if len(skill) > 1 else "")
-            ]))
-            
-=======
         # Add two for quotes
         skill_formatted_len = max(len(skill.name) for skill in all_skills) + 2
 
@@ -289,7 +275,6 @@ class GitGud:
                 plural="s" if len(skill) > 1 else ""
             ))
 
->>>>>>> upstream/master
             for index, level in enumerate(skill):
                 print(level_format_template.format(index + 1, level.name))
         
@@ -317,16 +302,22 @@ class GitGud:
                 key_error_flag = True
         
         skill_chars = len(skill.name)
-        skill_format_template = 'Levels {{}} skill "{{:<{}}}":\n'.format(skill_chars)
-        level_format_template = '    Level {:>2} : {:<3}'
-
+        skill_format_template = 'Levels {grammar_string} skill {skill_name}:'
+        level_format_template = '    Level {level_number:>2} : {level_name}'
+        
         if key_error_flag or args.skill_name is None:
-            grammar_string = "in the current"    
+            grammar_string = "in the current"
         else:
             grammar_string = "for"
-        print(skill_format_template.format(grammar_string, skill.name))
+        print(skill_format_template.format(
+            grammar_string=grammar_string,
+            skill_name='"{}"'.format(skill.name)
+        ))
         for index, level in enumerate(skill):
-            print(level_format_template.format(index + 1, level.name))
+            print(level_format_template.format(
+                level_number=index+1,
+                level_name='"{}"'.format(level.name)
+            ))
         print("\nLoad a level with `git gud load`")
         print('\nTo see levels in all skills, run "git gud skills".')
 
