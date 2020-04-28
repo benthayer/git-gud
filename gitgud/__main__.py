@@ -106,6 +106,8 @@ class GitGud:
 
         load_parser.add_argument('skill_name', metavar='skill', help='Skill to load')
         load_parser.add_argument('level_name', metavar='level', nargs='?', help='Level to load')
+        load_parser.add_argument('--force', action="store_true")
+
 
         commit_parser.add_argument('file', nargs='?')
 
@@ -328,13 +330,21 @@ class GitGud:
                 args.skill_name, args.level_name = argskillset[0], None
 
         skill_to_load = self.file_operator.get_level().skill.name
+
         if args.skill_name:
             if args.skill_name.lower() in {"next", "prev", "previous"}:
                 query = args.skill_name.lower()
                 level = self.file_operator.get_level()
                                 
                 if query == "next":
-                    level_to_load = level.next_level
+                    current_level_complete = level._test(self.file_operator)
+                    if not args.force and not current_level_complete:
+                        print("It doesn't look like you've completed this level yet!")
+                        print("Are you sure you want to go to the next level?", end=" ")
+                        print("If so, run `git gud load next` again with --force.")
+                        return
+                    else:
+                        level_to_load = level.next_level
                 else:
                     query = "previous"
                     level_to_load = level.prev_level
