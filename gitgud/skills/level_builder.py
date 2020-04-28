@@ -12,6 +12,7 @@ from .user_messages import print_goal
 from .user_messages import simulate_goal
 from .user_messages import show_tree
 from .user_messages import default_fail
+from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
 
@@ -65,9 +66,9 @@ class Level:
         if self.next_level is None:
             all_levels_complete()
         elif self.next_level.skill != self.skill:
-            skill_complete(level)
+            skill_complete(self)
         else:
-            level_complete(level)
+            level_complete(self)
 
     def test_failed(self):
         default_fail()
@@ -129,6 +130,6 @@ class BasicLevel(Level):
         if self.passed_path.exists():
             print_user_message(self.passed_path.read_text())
         else:
-            super().test_passed(self)
+            super().test_passed()
             
 
