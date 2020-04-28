@@ -270,11 +270,10 @@ class GitGud:
             solution_set = None
 
             for level, commands in level_tests:
-                if level is current_level:
+                if level is current_level and commands:
                     solution_set = commands
                     break
-                
-            if not solution_set:
+            else:
                 print("No solutions available for this level.")
                 return
             
