@@ -4,8 +4,9 @@ from gitgud.skills.user_messages import simulate_goal
 from gitgud.skills.user_messages import show_tree
 
 class Intro(BasicLevel):
-    def __init__(self):
+    def __init__(self, readable_name=""):
         super().__init__('intro' , __name__)
+        self.readable_name = readable_name
 
     def setup(self, file_operator):
         self._setup(file_operator)
@@ -14,6 +15,6 @@ class Intro(BasicLevel):
 skill = Skill(
     'intro',
     [
-        Intro()
+        Intro("Welcome to Git Gud!")
     ]
 )
