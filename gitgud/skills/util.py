@@ -29,9 +29,7 @@ class NamedList:
         return self._items
     
     def keys(self):
-        set_indices = { str(i) for i in range(len(self)) }
-        set_names = set(self._name_dict.keys())
-        return set_indices | set_names
+        return self._name_dict.keys()
         
 
 
