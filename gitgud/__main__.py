@@ -69,13 +69,13 @@ class GitGud:
         ])
         
         show_description = "".join([
-            "Helper command to show certain information.",
-            "\n\n",
-            "Subcommands:",
+            "Helper command to show certain information.", "\n",
             "\n",
-            "  <command>",
-            "\n",
-            "    tree", "\t", "Show the current state of the branching tree"
+            "Subcommands:", "\n",
+            "  <command>", "\n",
+            "    tree", "\t", "Show the current state of the branching tree", "\n",
+            "    solution", "\t", "Show the solution for the current level"
+
         ])
 
         self.subparsers = self.parser.add_subparsers(title='Subcommands', metavar='<command>', dest='command')
@@ -96,9 +96,8 @@ class GitGud:
         show_parser = self.subparsers.add_parser('show', description=show_description, formatter_class=argparse.RawDescriptionHelpFormatter)
         contrib_parser = self.subparsers.add_parser('contributors', help='Show project contributors webpage', description='Show all the contributors of the project')
         issues_parser = self.subparsers.add_parser('issues', help='Show project issues webpage', description="Show all the issues for the project")
-        solutions_parser = self.subparsers.add_parser('solution', help='Show solution for the given level', description='Show the solution for the given level')
         
-        solutions_parser.add_argument('--confirm', action='store_true')
+        show_parser.add_argument('--confirm', action='store_true')
 
         show_parser.add_argument('cmd', metavar='cmd', help='Command to show information', nargs='?')
 
@@ -130,7 +129,6 @@ class GitGud:
             'show': self.handle_show,
             'contributors': self.handle_contrib,
             'issues': self.handle_issues,
-            'solution': self.handle_solution    
         }
 
     def is_initialized(self):
@@ -255,32 +253,6 @@ class GitGud:
         self.assert_initialized()
         level = self.file_operator.get_level()
         level.test(self.file_operator)
-    
-    def handle_solution(self, args):
-        self.assert_initialized()
-        current_level = self.file_operator.get_level()
-        skill_name = current_level.skill.name
-        if not args.confirm:
-            print("Are you sure you want to view the solution for ", end="")
-            print('the current level "{}" in the skill "{}"?'.format(current_level.name, skill_name))
-            print('If so, run `git gud solution` again with --confirm.')
-        else:
-            tests_module = import_module('.test_levels', 'gitgud.skills.' + skill_name)
-            level_tests = tests_module.level_tests
-            solution_set = None
-
-            for level, commands in level_tests:
-                if level is current_level and commands:
-                    solution_set = commands
-                    break
-            else:
-                print("No solutions available for this level.")
-                return
-            
-            print('Solution for the current level "{}" in the skill "{}":'.format(current_level.name, skill_name))
-            for command in solution_set:
-                print('\t' + command)
-        
     
     def handle_skills(self, args):
         if self.is_initialized():
@@ -426,6 +398,8 @@ class GitGud:
     def handle_show(self, args):
         if args.cmd == "tree":
             show_tree()
+        elif args.cmd == "solution":
+            self.show_solution(args)
         else:
             print('Error: `git gud show` takes specific arguments. Type `git gud help show` for more information.')
 
@@ -439,6 +413,33 @@ class GitGud:
     def handle_issues(self, args):
         issues_website = "https://github.com/benthayer/git-gud/issues"
         webbrowser.open_new(issues_website)
+
+    def show_solution(self, args):
+        self.assert_initialized()
+        current_level = self.file_operator.get_level()
+        skill_name = current_level.skill.name
+        if not args.confirm:
+            print("Are you sure you want to view the solution for ", end="")
+            print('the current level "{}" in the skill "{}"?'.format(current_level.name, skill_name))
+            print('If so, run `git gud show solution` again with --confirm.')
+        else:
+            tests_module = import_module('.test_levels', 'gitgud.skills.' + skill_name)
+            level_tests = tests_module.level_tests
+            solution_set = None
+
+            for level, commands in level_tests:
+                if level is current_level and commands:
+                    solution_set = commands
+                    break
+            else:
+                print("No solutions available for this level.")
+                return
+            
+            print('Solution for the current level "{}" in the skill "{}":'.format(current_level.name, skill_name))
+            for command in solution_set:
+                print('\t' + command)
+        
+    
     
     def parse(self):
         args, _ = self.parser.parse_known_args()
