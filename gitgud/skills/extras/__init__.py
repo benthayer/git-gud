@@ -4,6 +4,6 @@ from gitgud.skills.level_builder import BasicLevel
 skill = Skill(
     'extras',
     [
-        BasicLevel('octopus', __name__)
+        BasicLevel('octopus', __name__, 'The Octopus Merge')
     ]
 )
