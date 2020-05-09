@@ -144,6 +144,7 @@ class GitGud:
 
     def load_level(self, level):
         # Clear remotes
+        self.assert_initialized()
         level_repo = self.file_operator.repo
         for remote in level_repo.remotes:
             level_repo.delete_remote(remote)
