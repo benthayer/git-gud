@@ -143,6 +143,11 @@ class GitGud:
                 raise InitializationError('Currently loaded level does not exist: "{}"'.format(level_name))
 
     def load_level(self, level):
+        # Clear remotes
+        self.assert_initialized(skip_level_check=True)
+        level_repo = self.file_operator.repo
+        for remote in level_repo.remotes:
+            level_repo.delete_remote(remote)
         self.file_operator.clear_tracked_commits()
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
