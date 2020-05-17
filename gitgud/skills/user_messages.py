@@ -74,3 +74,8 @@ def all_levels_complete():
 def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')
 
+@separated
+def handle_load_confirm():
+    print("It doesn't look like you've completed this level yet!")
+    print("Are you sure you want to go to the next level?", end=" ")
+    print("If so, run `git gud load next` again with --force.")

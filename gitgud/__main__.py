@@ -16,6 +16,7 @@ from gitgud.operations import Operator
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
+from gitgud.skills.user_messages import handle_load_confirm
 from gitgud.hooks import all_hooks
 
 
@@ -339,9 +340,7 @@ class GitGud:
                 if query == "next":
                     current_level_complete = level._test(self.file_operator)
                     if not args.force and not current_level_complete:
-                        print("It doesn't look like you've completed this level yet!")
-                        print("Are you sure you want to go to the next level?", end=" ")
-                        print("If so, run `git gud load next` again with --force.")
+                        handle_load_confirm()
                         return
                     else:
                         level_to_load = level.next_level
