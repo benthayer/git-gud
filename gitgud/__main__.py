@@ -1,5 +1,4 @@
 from importlib_resources import files
-from importlib import import_module
 
 import os
 import sys
@@ -241,7 +240,7 @@ class GitGud:
 
     def handle_goal(self, args):
         self.assert_initialized()
-        self.file_operator.get_level().goal()
+        self.file_operator.get_level().goal()   
 
     def handle_reset(self, args):
         self.assert_initialized()
@@ -423,20 +422,13 @@ class GitGud:
             print('the current level "{}" in the skill "{}"?'.format(current_level.name, skill_name))
             print('If so, run `git gud show solution` again with --confirm.')
         else:
-            tests_module = import_module('.test_levels', 'gitgud.skills.' + skill_name)
-            level_tests = tests_module.level_tests
-            solution_set = None
-
-            for level, commands in level_tests:
-                if level is current_level and commands:
-                    solution_set = commands
-                    break
-            else:
+            solutions = current_level.solutions()
+            if not solutions:
                 print("No solutions available for this level.")
                 return
             
             print('Solution for the current level "{}" in the skill "{}":'.format(current_level.name, skill_name))
-            for command in solution_set:
+            for command in solutions:
                 print('\t' + command)
         
     

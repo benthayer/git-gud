@@ -1,4 +1,5 @@
 from importlib_resources import files
+from importlib import import_module
 
 import os
 
@@ -40,6 +41,7 @@ class Level:
         self._setup(file_operator)
         self.post_setup()
     
+        
     def post_setup(self):
         pass
 
@@ -118,7 +120,17 @@ class BasicLevel(Level):
 
     def goal(self):
         print_goal(self)
-
+    
+    def solutions(self):
+        tests_module = import_module('.test_levels', 'gitgud.skills.' + self.skill.name)
+        level_tests = tests_module.level_tests
+        solution_set = []
+        for level, commands in level_tests:
+            if level is self and commands:
+                solution_set = commands
+                break
+        return solution_set
+    
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
         test_tree = level_json(commits, head)
