@@ -3,7 +3,9 @@ class NamedList:
     def __init__(self, names, items, start_index=1):
         assert len(names) == len(items)
         self._name_dict = {name: index for index, name in enumerate(names)}
-        self._name_dict.update({str(index + start_index): index for index in range(len(names))})
+        index_mappings = [str(index + start_index) for index in range(len(names))]
+        self._name_dict.update({mapped_index: index for index, mapped_index in enumerate(index_mappings)})
+        self._index_dict = {name: mapped_index for name, mapped_index in zip(names, index_mappings)}
         self._items = items
     
     def __getitem__(self, query):
@@ -25,6 +27,9 @@ class NamedList:
     def __contains__(self, item):
         return item in self._items
 
+    def get_index(self, name):
+        return self._index_dict[name]
+    
     def values(self):
         return self._items
     
