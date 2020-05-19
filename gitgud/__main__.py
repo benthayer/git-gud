@@ -384,14 +384,14 @@ class GitGud:
                 commit_name = args.file
             except ValueError:
                 pass
-
+        
         print('Simulating: Create file "{}"'.format(commit_name))
         print('Simulating: git add {}'.format(commit_name))
         print('Simulating: git commit -m "{}"'.format(commit_name))
+        
 
         commit = self.file_operator.add_and_commit(commit_name)
         print("New Commit: {}".format(commit.hexsha[:7]))
-
         # Check if the newest commit is greater than the last_commit, if yes, then write
 
         if int(commit_name) > int(last_commit):

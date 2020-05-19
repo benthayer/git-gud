@@ -36,8 +36,10 @@ def simulate_goal(level):
 
 @separated
 def show_tree():
-    print("Simulating: git log --graph --oneline --all ")
+    simulated_command_header()
+    print("git log --graph --oneline --all ")
     subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
+    simulated_command_footer()
 
 
 @separated
@@ -74,3 +76,8 @@ def all_levels_complete():
 def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')
 
+def simulated_command_header():
+    print('<<<<<<<', end=" ")
+
+def simulated_command_footer():
+    print('=======')
