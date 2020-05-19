@@ -78,8 +78,8 @@ def default_fail():
 def handle_solutions_messages(level, message_id):
     if message_id == 1:
         print("Are you sure you want to view the solution for ", end="")
-        print('the current level "{}" in the skill "{}"?'.format(level.name, level.skill.name))
-        print('If so, run `git gud show solution` again with --confirm.')
+        print('"{}": "{}"?'.format(level.name, level.skill.name))
+        print('If so, run `git gud show solution` with --confirm.')
     elif message_id == 2:
         print("No solutions available for this level.")
     elif message_id == 3:
