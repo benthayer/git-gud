@@ -16,6 +16,7 @@ from gitgud.operations import Operator
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
+from gitgud.skills.user_messages import handle_solutions_messages
 from gitgud.hooks import all_hooks
 
 
@@ -416,18 +417,15 @@ class GitGud:
     def show_solution(self, args):
         self.assert_initialized()
         current_level = self.file_operator.get_level()
-        skill_name = current_level.skill.name
         if not args.confirm:
-            print("Are you sure you want to view the solution for ", end="")
-            print('the current level "{}" in the skill "{}"?'.format(current_level.name, skill_name))
-            print('If so, run `git gud show solution` again with --confirm.')
+            handle_solutions_messages(current_level, message_id=1)
         else:
             solutions = current_level.solutions()
             if not solutions:
-                print("No solutions available for this level.")
+                handle_solutions_messages(current_level, message_id=2)
                 return
             
-            print('Solution for the current level "{}" in the skill "{}":'.format(current_level.name, skill_name))
+            handle_solutions_messages(current_level, message_id=3)
             for command in solutions:
                 print('\t' + command)
         

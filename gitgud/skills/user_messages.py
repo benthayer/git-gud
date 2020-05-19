@@ -74,3 +74,15 @@ def all_levels_complete():
 def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')
 
+@separated
+def handle_solutions_messages(level, message_id):
+    if message_id == 1:
+        print("Are you sure you want to view the solution for ", end="")
+        print('the current level "{}" in the skill "{}"?'.format(level.name, level.skill.name))
+        print('If so, run `git gud show solution` again with --confirm.')
+    elif message_id == 2:
+        print("No solutions available for this level.")
+    elif message_id == 3:
+        print('Solution for the current level "{}" in the skill "{}":'.format(level.name, level.skill.name))
+    else:
+        raise NotImplementedError
