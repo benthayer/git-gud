@@ -49,9 +49,10 @@ class AllSkills(NamedList):
 
 
 class Skill(NamedList):
-    def __init__(self, name, levels):
+    def __init__(self, name, levels, readable_name=""):
         super().__init__([level.name for level in levels], levels)
         self.name = name
-
+        self.readable_name = readable_name
+        
         for level in levels:
             level.skill = self
