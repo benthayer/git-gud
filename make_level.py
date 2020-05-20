@@ -134,7 +134,10 @@ def write_test(skill_path, level_name):
             "    ), (",
             "        skill[\'{}\'], [".format(level_name),
             "            \'git gud commit\',  # Examples, change to solution for your level",
-            "            \'git merge example\'",
+            "            \'git gud commit\',",
+            "            \'git checkout HEAD^\',",
+            "            \'git checkout -b changes-to-be-made-by-player\',",
+            "            \'git checkout checked-out-branch\'",
             "        ]",
             "    )",
             "]"
