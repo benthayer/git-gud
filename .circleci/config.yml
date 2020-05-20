@@ -21,7 +21,7 @@ jobs:
           command: |
             yes | python3 ./make_level.py testskill testlevel1
             yes | python3 ./make_level.py testskill testlevel2
-     - run:
+      - run:
           name: Running tests
           command: |
             export PATH=$PATH:$HOME/.local/bin
