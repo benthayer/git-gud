@@ -19,8 +19,8 @@ jobs:
       - run:
           name: Level synthesis test 
           command: |
-            yes | python3 ./make_level.py testskill testlevel1
-            yes | python3 ./make_level.py testskill testlevel2
+            echo -e "y\n" | python3 ./make_level.py testskill testlevel1
+            echo -e "y\n" | python3 ./make_level.py testskill testlevel2
       - run:
           name: Running tests
           command: |
