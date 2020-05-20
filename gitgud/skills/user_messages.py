@@ -76,6 +76,5 @@ def default_fail():
 
 @separated
 def handle_load_confirm():
-    print("It doesn't look like you've completed this level yet!")
-    print("Are you sure you want to go to the next level?", end=" ")
-    print("If so, run `git gud load next` again with --force.")
+    print("You haven't completed this level yet!")
+    print("Run `git gud load next` with --force to load the next level.")
