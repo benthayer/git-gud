@@ -7,6 +7,7 @@ from gitgud.skills.user_messages import simulate_command
 from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import default_fail_no_reset
 
+
 class Level1(BasicLevel):
     def __init__(self):
         super().__init__('welcome' , __name__)
@@ -17,7 +18,6 @@ class Level1(BasicLevel):
     def status(self):
         self.display_message("status-1.txt")
         simulate_command("git log")
-        self.display_message("status-2.txt")
     
     def test_failed(self):
         default_fail_no_reset()
@@ -30,6 +30,7 @@ def get_name_and_email():
     name = subprocess.check_output('git config user.name', shell=True).decode().strip()
     email = subprocess.check_output('git config user.email', shell=True).decode().strip()
     return name, email
+
 
 class Level2(BasicLevel):
     def __init__(self):

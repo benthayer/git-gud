@@ -1,8 +1,5 @@
-Great, looks like the commit is still there!
-Of course it is, Git Gud put it there!
-
-"git gud test" will always tell you whether you've completed the level.
 You've completed the first level!
+"git gud test" will always tell you whether you've completed the level.
 
 Now, to load the next level, type
     $ git gud load next

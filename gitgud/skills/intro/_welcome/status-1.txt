@@ -1,2 +1,4 @@
-We are currently in a git repo. Here we have our initial commit:
+To complete the level, type
+    git gud test
 
+(Don't worry about the output below)

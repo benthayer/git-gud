@@ -1,3 +1,6 @@
+Great, looks like the commit is still there!
+Of course it is, Git Gud put it there!
+
 Great, you've completed your first level!
 
 To see the goal for this level, type:

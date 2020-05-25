@@ -3,6 +3,14 @@ import subprocess
 user_has_seen_messages = False
 
 
+def start_marker():
+    return '<' * 7
+
+
+def end_marker():
+    return '=' * 7
+
+
 def separated(func):
     def new_func(*args, **kwargs):
         global user_has_seen_messages
@@ -12,6 +20,7 @@ def separated(func):
             user_has_seen_messages = True
         func(*args, **kwargs)
     return new_func
+
 
 @separated
 def print_user_file(path):
@@ -27,18 +36,19 @@ def show_level_name(level):
     print('Level: "{}"'.format(level.full_name()))
 
 
-def print_git_gud_bar():
-    num_chars = 25
-    print()
-    print('-' * num_chars + 'Git Gud' + '-' * num_chars)
-    print()
+def print_info(message):
+    print("[INFO]: {}".format(message))
+
+
+def mock_simulate(command):
+    print(end_marker(), "Simulating: {}".format(command))
+
 
 @separated
 def simulate_command(command):
-    print("Simulating: {}".format(command))
-    print_git_gud_bar()
+    print(start_marker(), "Simulating: {}".format(command))
     subprocess.call(command, shell=True)
-    print_git_gud_bar()
+    print(end_marker())
 
 
 def show_tree():
