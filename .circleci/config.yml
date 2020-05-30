@@ -17,7 +17,13 @@ jobs:
             git config --global user.name "CircleCI"
             git config --global user.email "circleci@example.com"
       - run:
+          name: Level synthesis test 
+          command: |
+            echo -e "y\n" | python3 ./make_level.py testskill testlevel1
+            echo -e "y\n" | python3 ./make_level.py testskill testlevel2
+      - run:
           name: Running tests
           command: |
             export PATH=$PATH:$HOME/.local/bin
             python3 -m pytest gitgud
+
