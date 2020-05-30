@@ -6,4 +6,3 @@ skill = Skill(
     [
     ]
 )
-
