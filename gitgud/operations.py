@@ -119,7 +119,7 @@ class Operator:
                         skip_hooks=True)
 
             commit_objects[name] = commit_obj
-            self.track_commit(commit_obj, name)
+            self.track_commit(str(commit_obj), '', name)
 
             for branch in branches:
                 self.repo.create_head(branch, self.repo.head.commit)
@@ -239,7 +239,7 @@ class Operator:
 
     def track_commit(self, first_hash, second_hash, action):
         # Used to track rebases, amends and reverts
-        with open(self.commits_json_path, 'a') as commit_tracker_file:
+        with open(self.commits_path, 'a') as commit_tracker_file:
             commit_tracker_file.write(','.join([
                 first_hash,
                 second_hash,
