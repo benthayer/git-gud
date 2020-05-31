@@ -38,7 +38,8 @@ def register_skill_package(skill_name):
         # Write new lines to file
         with open("setup.py", 'w') as fp:
             fp.write(filedata)
-            print("Registered.".format(skill_name))
+
+        print('Registered package "{}" in setup.py'.format(skill_name))
 
 
 def make_folders(skill_name, level_name):
@@ -127,7 +128,7 @@ def write_test(skill_path, level_name):
         with open(test_levels_path, 'w') as fp:
             fp.write(new_test)
             print("Created file: {}".format(test_levels_path))
-            print('Created test case "{}" in {}'.format(level_name, test_levels_path))  # noqa: E501
+            print('Created test case for "{}" in {}'.format(level_name, test_levels_path))  # noqa: E501
     else:
         with open(test_levels_path, 'r') as fp:
             filedata = fp.read()
@@ -215,11 +216,11 @@ def main():
     print()
 
     if not os.path.exists(os.path.join(skill_path, "__init__.py")):
-        print("Registering Skill: {} {}".format(skill_name, level_name))
+        print("Registering Skill:")
         make_skill(skill_name, skill_path)
         print()
 
-    print("Registering Level: {} {}".format(skill_name, level_name))
+    print("Registering Level:")
     make_level(skill_name, skill_path, level_name)
     print()
 
