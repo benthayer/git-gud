@@ -10,6 +10,9 @@ class Intro(BasicLevel):
         self._setup(file_operator)
         self.goal()
 
+    def _test(self, file_operator):
+        return True
+
 
 skill = Skill(
     'intro',

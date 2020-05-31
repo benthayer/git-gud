@@ -52,7 +52,7 @@ class Level:
         show_level_name(self)
 
     def _test(self, file_operator):
-        pass
+        raise NotImplementedError
 
     def test(self, file_operator):
         if self._test(file_operator):
