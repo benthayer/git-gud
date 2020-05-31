@@ -1,7 +1,5 @@
 from importlib_resources import files
 
-import os
-
 from .parsing import test_ancestry
 from .parsing import level_json
 from .parsing import parse_spec
@@ -12,6 +10,7 @@ from .user_messages import print_goal
 from .user_messages import simulate_goal
 from .user_messages import show_tree
 from .user_messages import default_fail
+from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
 
@@ -31,7 +30,7 @@ class Level:
 
     def full_name(self):
         return '{} {}'.format(self.skill.name, self.name)
-    
+
     def _setup(self, file_operator):
         pass
 
@@ -39,7 +38,7 @@ class Level:
         show_level_name(self)
         self._setup(file_operator)
         self.post_setup()
-    
+
     def post_setup(self):
         pass
 
@@ -51,7 +50,7 @@ class Level:
 
     def status(self):
         show_level_name(self)
-    
+
     def _test(self, file_operator):
         pass
 
@@ -65,13 +64,13 @@ class Level:
         if self.next_level is None:
             all_levels_complete()
         elif self.next_level.skill != self.skill:
-            skill_complete(level)
+            skill_complete(self)
         else:
-            level_complete(level)
+            level_complete(self)
 
     def test_failed(self):
         default_fail()
-          
+
 
 class BasicLevel(Level):
     def __init__(self, name, skill_package):
@@ -129,6 +128,4 @@ class BasicLevel(Level):
         if self.passed_path.exists():
             print_user_message(self.passed_path.read_text())
         else:
-            super().test_passed(self)
-            
-
+            super().test_passed()

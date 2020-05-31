@@ -1,7 +1,3 @@
-from importlib_resources import files
-
-import os
-
 from copy import deepcopy
 
 
@@ -46,7 +42,8 @@ def parse_spec(spec_path):
 
         # We know the commit name and parents now
 
-        assert ' ' not in commit_name  # There should never be more than one change or a space in a name
+        # There should never be more than one change or a space in a name
+        assert ' ' not in commit_name
 
         # Process references
         if ref_str:
@@ -84,7 +81,7 @@ def level_json(commits, head):
         'commits': {},
         'HEAD': {},
     }
-    
+
     for commit_name, parents, branches_here, tags_here in commits:
         level['topology'].append(commit_name)
         level['commits'][commit_name] = {
@@ -108,7 +105,7 @@ def level_json(commits, head):
         'target': head,
         'id': 'HEAD'
     }
-    
+
     return level
 
 
@@ -116,14 +113,17 @@ def name_merges(skill, test):
     merge_name_map = {}
     for commit_name in skill['commits']:
         skill_commit = skill['commits'][commit_name]
-        if len(skill_commit['parents']) >= 2:  # TODO Stop here to get list of merges
-            for test_commit_name in test['commits']:  # TODO Do this iteration in an intelligent manner
+        if len(skill_commit['parents']) >= 2:
+            # TODO Stop here to get list of merges
+            for test_commit_name in test['commits']:
+                # TODO Do this iteration in an intelligent manner
                 test_commit = test['commits'][test_commit_name]
                 parents_equal = True
                 skill_parents = skill_commit['parents']
                 test_parents = test_commit['parents']
 
-                for skill_parent, test_parent in zip(skill_parents, test_parents):
+                for skill_parent, test_parent in \
+                        zip(skill_parents, test_parents):
                     if skill_parent != test_parent:
                         parents_equal = False
                         break
@@ -141,16 +141,15 @@ def has_all_branches(skill, test):
     for branch_name in test['branches']:
         if branch_name not in skill['branches']:
             return False
-
     return True
 
 
 def all_branches_correct(skill, test):
     for branch_name in test['branches']:
-        if skill['branches'][branch_name]['target'] != test['branches'][branch_name]['target']:
+        if skill['branches'][branch_name]['target'] != \
+                test['branches'][branch_name]['target']:
             return False
     return True
-
 
 def head_correct(skill, test):
     if skill['HEAD']['target'] != test['HEAD']['target']:
@@ -167,17 +166,18 @@ def has_all_tags(skill, test):
 
 def all_tags_correct(skill, test):
     for tag_name in test['tags']:
-        if skill['tags'][tag_name]['target'] != test['tags'][tag_name]['target']:
+        if skill['tags'][tag_name]['target'] != \
+                test['tags'][tag_name]['target']:
             return False
     return True
 
 
 def check_commits(skill, test):
     for commit_name in test['commits']:
-        
+
         if commit_name not in skill['commits']:
             return False
-        
+
         skill_commit = skill['commits'][commit_name]
         test_commit = test['commits'][commit_name]
 
@@ -191,10 +191,10 @@ def check_commits(skill, test):
 
 
 def test_ancestry(skill, test):
-    # Tests that the graph of the git history matches 
+    # Tests that the graph of the git history matches
 
     # skill = name_merges(skill, test)
-    
+
     if not check_commits(skill, test):
         return False
 
@@ -210,4 +210,3 @@ def test_ancestry(skill, test):
         return False
 
     return True
-

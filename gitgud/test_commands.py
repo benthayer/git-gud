@@ -14,9 +14,7 @@ def test_load(gg):
         ('git gud load rampup-4', all_skills["rampup"]["4"]),
         ('git gud load -2', all_skills["rampup"]["2"])
     ]
-    
+
     for command, level in load_tests:
         subprocess.call(command, shell=True)
         assert level == gg.file_operator.get_level()
-    
-    

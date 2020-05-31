@@ -13,6 +13,7 @@ def separated(func):
         func(*args, **kwargs)
     return new_func
 
+
 @separated
 def print_user_message(message):
     print(message)
@@ -65,12 +66,13 @@ def all_levels_complete():
     print("Wow! You've complete every level, congratulations!")
 
     print("If you want to keep learning git, why not try contributing"
-          " to git-gud by forking the project at https://github.com/benthayer/git-gud/")
+          " to git-gud by forking the project at "
+          "https://github.com/benthayer/git-gud/")
 
     print("We're always looking for contributions and are more than"
           " happy to accept both pull requests and suggestions!")
 
+
 @separated
 def default_fail():
-    print('Level not complete, keep trying. "git gud reset" to start from scratch.')
-
+    print('Level not complete, keep trying. "git gud reset" to start from scratch.')  # noqa: E501

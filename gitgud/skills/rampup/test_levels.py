@@ -7,7 +7,8 @@ from . import skill
 
 level_tests = [
     (
-        skill['detaching'], [  # User would instead check out the commit hash using only one command
+        # User would use something like "git checkout a1b2c3d4"
+        skill['detaching'], [
             'git checkout bugFix',
             'git checkout @^',
             'git checkout @{1}',

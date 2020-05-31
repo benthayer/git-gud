@@ -20,4 +20,3 @@ all_levels = []
 for skill in all_skills:
     for level in skill:
         all_levels.append(level)
-
