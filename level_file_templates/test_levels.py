@@ -7,7 +7,7 @@ from . import skill
 
 level_tests = [
     (
-        skill['{}'], [# Examples, change to solution for your level"
+        skill['{}'], [  # Examples, change to solution for your level"
             'git gud commit',
             'git gud commit',
             'git checkout HEAD^',

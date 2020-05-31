@@ -32,7 +32,7 @@ def test_goal():
 
 
 def test_init_NL():
-    nltest = NamedList(['foo', 'bar'], [511, 522])
+    _ = NamedList(['foo', 'bar'], [511, 522])
 
 
 def test_getitem_NL():
