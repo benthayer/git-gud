@@ -2,14 +2,12 @@ import os
 import shutil
 import datetime as dt
 import email.utils
-import json
 
 from glob import glob
 
 from git import Repo
 
 from gitgud import actor
-from gitgud import actor_string
 from gitgud.skills import all_skills
 
 
@@ -33,12 +31,16 @@ class Operator:
         self.repo.index.add([filename])
 
     def add_and_commit(self, name):
-        # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
         self.add_file_to_index(name)
-        commit = self.repo.index.commit(name, author=actor, committer=actor, skip_hooks=True)
+        commit = self.repo.index.commit(
+            name,
+            author=actor,
+            committer=actor,
+            skip_hooks=True
+        )
 
         return commit
-    
+
     def clear_tree_and_index(self):
         dirs = []
         for x in [('**', '.*'), ('**',)]:
@@ -50,12 +52,11 @@ class Operator:
                     else:
                         dirs.append(path)
 
-        # TODO GitPython set index to working tree
         self.repo.git.add(update=True)
-        # TODO GitPython clear index (for initial commits)
-        self.repo.index.commit("Clearing index", skip_hooks=True)  # Easiest way to clear the index is to commit an empty directory
-
-        dirs.remove(self.path + os.path.sep)  # Don't remove current directory
+        # Easiest way to clear the index is to commit an empty directory
+        self.repo.index.commit("Clearing index", skip_hooks=True)
+        # Remove all directories except current
+        dirs.remove(self.path + os.path.sep)
 
         for path in os.listdir(self.path):
             if path != '.git':
@@ -64,10 +65,11 @@ class Operator:
     def create_tree(self, commits, head):
         branches = self.repo.branches
         try:
-            # TODO GitPython detach head
-            self.repo.git.checkout(self.repo.head.commit)  # Detached head, we can now delete everything
+            # Detached head, we can now delete everything
+            self.repo.git.checkout(self.repo.head.commit)
         except ValueError:
             pass
+
         self.clear_tree_and_index()
 
         for branch in branches:
@@ -77,9 +79,12 @@ class Operator:
         commit_objects = {}
         counter = len(commits)
         for name, parents, branches, tags in commits:
-            committime = dt.datetime.now(dt.timezone.utc).astimezone().replace(microsecond=0)
-            committime_offset = dt.timedelta(seconds=counter) + committime.utcoffset()
-            committime_rfc = email.utils.format_datetime(committime - committime_offset)
+            committime = dt.datetime.now(dt.timezone.utc).astimezone() \
+                    .replace(microsecond=0)
+            committime_offset = dt.timedelta(seconds=counter) + \
+                committime.utcoffset()
+            committime_rfc = email.utils.format_datetime(
+                    committime - committime_offset)
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
@@ -88,16 +93,30 @@ class Operator:
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
+                commit_obj = self.repo.index.commit(
+                        name,
+                        author=actor,
+                        committer=actor,
+                        author_date=committime_rfc,
+                        commit_date=committime_rfc,
+                        parent_commits=parents,
+                        skip_hooks=True)
             else:
                 assert name[0] == 'M'
                 int(name[1:])  # Fails if not a number
 
-                # To handle octopus merges, we merge each branch into the index one by one, then commit
+                # For octopus merges, merge branches one by one
                 for parent in parents[1:]:
                     merge_base = self.repo.merge_base(parents[0], parent)
                     self.repo.index.merge_tree(parent, base=merge_base)
-                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
+                commit_obj = self.repo.index.commit(
+                        name,
+                        author=actor,
+                        committer=actor,
+                        author_date=committime_rfc,
+                        commit_date=committime_rfc,
+                        parent_commits=parents,
+                        skip_hooks=True)
 
             commit_objects[name] = commit_obj
 
@@ -106,10 +125,8 @@ class Operator:
 
             for tag in tags:
                 self.repo.create_tag(tag, self.repo.head.commit)
-            # TODO Log commit hash and info
             counter = counter - 1
 
-        # TODO Checkout using name
         head_is_commit = True
         for branch in self.repo.branches:
             if branch.name == head:
@@ -133,10 +150,14 @@ class Operator:
         repo = self.repo
 
         tree = {
-            'branches': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
-            'tags': {},  # 'tag_name': {'target': 'commit_id', 'id': 'tag_name'}
-            'commits': {},  # '2': {'parents': ['1'], 'id': '1'}
-            'HEAD': {}  # 'target': 'branch_name', 'id': 'HEAD'
+            'branches': {},
+            # Ex: 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
+            'tags': {},
+            # Ex: 'tag_name': {'target': 'commit_id', 'id': 'tag_name'}
+            'commits': {},
+            # Ex: '2': {'parents': ['1'], 'id': '1'}
+            'HEAD': {}
+            # 'target': 'branch_name', 'id': 'HEAD'
         }
 
         commits = set()
@@ -171,8 +192,12 @@ class Operator:
             # If revert detected, modifies commit_name; o/w nothing happens
             commit_name = self.parse_name(commit_name)
 
+            parents = []
+            for parent in cur_commit.parents:
+                parents.append(self.parse_name(parent.message.strip()))
+
             tree['commits'][commit_name] = {
-                'parents': [self.parse_name(parent.message.strip()) for parent in cur_commit.parents],
+                'parents': parents,
                 'id': commit_name
             }
 
@@ -214,7 +239,10 @@ class Operator:
     def track_commit(self, first_hash, second_hash, action):
         # Used to track rebases, amends and reverts
         with open(self.commits_json_path, 'a') as commit_tracker_file:
-            commit_tracker_file.write(','.join([first_hash, second_hash, action]))
+            commit_tracker_file.write(','.join([
+                first_hash,
+                second_hash,
+                action]))
             commit_tracker_file.write('\n')
 
 

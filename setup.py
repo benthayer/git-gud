@@ -40,5 +40,5 @@ setup(
             "git-gud=gitgud.__main__:main"
         ]
     },
-    data_files = [('man/man1', ['git-gud.1'])]
+    data_files=[('man/man1', ['git-gud.1'])]
 )

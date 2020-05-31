@@ -7,7 +7,7 @@ from . import skill
 
 level_tests = [
     (
-        skill['{}'], [# Examples, change to solution for your level"
+        skill['{}'], [  # Examples, change to solution for your level"
             'git gud commit',
             'git gud commit',
             'git checkout HEAD^',
@@ -21,4 +21,3 @@ level_tests = [
 @pytest.mark.parametrize('level,commands', level_tests)
 def test_level(gg, level, commands):
     simulate(gg, level, commands)
-

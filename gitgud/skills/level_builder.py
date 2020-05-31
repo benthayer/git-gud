@@ -1,7 +1,5 @@
 from importlib_resources import files
 
-import os
-
 from .parsing import test_skill
 from .parsing import level_json
 from .parsing import parse_spec
@@ -32,7 +30,7 @@ class Level:
 
     def full_name(self):
         return '{} {}'.format(self.skill.name, self.name)
-    
+
     def _setup(self, file_operator):
         pass
 
@@ -40,7 +38,7 @@ class Level:
         show_level_name(self)
         self._setup(file_operator)
         self.post_setup()
-    
+
     def post_setup(self):
         pass
 
@@ -52,7 +50,7 @@ class Level:
 
     def status(self):
         show_level_name(self)
-    
+
     def _test(self, file_operator):
         pass
 
@@ -72,7 +70,7 @@ class Level:
 
     def test_failed(self):
         default_fail()
-          
+
 
 class BasicLevel(Level):
     def __init__(self, name, skill_package):
@@ -131,5 +129,3 @@ class BasicLevel(Level):
             print_user_message(self.passed_path.read_text())
         else:
             super().test_passed()
-            
-

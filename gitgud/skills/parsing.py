@@ -1,7 +1,3 @@
-from importlib_resources import files
-
-import os
-
 from copy import deepcopy
 
 
@@ -46,7 +42,8 @@ def parse_spec(spec_path):
 
         # We know the commit name and parents now
 
-        assert ' ' not in commit_name  # There should never be more than one change or a space in a name
+        # There should never be more than one change or a space in a name
+        assert ' ' not in commit_name
 
         # Process references
         if ref_str:
@@ -125,14 +122,17 @@ def test_skill(skill, test):
     merge_name_map = {}
     for commit_name in skill['commits']:
         skill_commit = skill['commits'][commit_name]
-        if len(skill_commit['parents']) >= 2:  # TODO Stop here to get list of merges
-            for test_commit_name in test['commits']:  # TODO Do this iteration in an intelligent manner
+        if len(skill_commit['parents']) >= 2:
+            # TODO Stop here to get list of merges
+            for test_commit_name in test['commits']:
+                # TODO Do this iteration in an intelligent manner
                 test_commit = test['commits'][test_commit_name]
                 parents_equal = True
                 skill_parents = skill_commit['parents']
                 test_parents = test_commit['parents']
 
-                for skill_parent, test_parent in zip(skill_parents, test_parents):
+                for skill_parent, test_parent in \
+                        zip(skill_parents, test_parents):
                     if skill_parent != test_parent:
                         parents_equal = False
                         break
@@ -158,7 +158,8 @@ def test_skill(skill, test):
         # Commits must have the same number of parents and be in the same order
         if len(skill_commit['parents']) != len(test_commit['parents']):
             return False
-        for skill_parent, test_parent in zip(skill_commit['parents'], test_commit['parents']):
+        for skill_parent, test_parent in \
+                zip(skill_commit['parents'], test_commit['parents']):
             if skill_parent != test_parent:
                 return False
 
@@ -168,8 +169,10 @@ def test_skill(skill, test):
     for branch_name in test['branches']:
         if branch_name not in skill['branches']:
             return False
-        if skill['branches'][branch_name]['target'] != test['branches'][branch_name]['target']:
-            if merge_name_map[test['branches'][branch_name]['target']] != skill['branches'][branch_name]['target']:
+        if skill['branches'][branch_name]['target'] != \
+                test['branches'][branch_name]['target']:
+            if merge_name_map[test['branches'][branch_name]['target']] != \
+                    skill['branches'][branch_name]['target']:
                 return False  # It's also not a known merge
 
     # Check tags
@@ -178,7 +181,8 @@ def test_skill(skill, test):
     for tag_name in test['tags']:
         if tag_name not in skill['tags']:
             return False
-        if skill['tags'][tag_name]['target'] != test['tags'][tag_name]['target']:
+        if skill['tags'][tag_name]['target'] != \
+                test['tags'][tag_name]['target']:
             return False
 
     # Check HEAD
