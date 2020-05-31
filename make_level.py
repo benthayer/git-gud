@@ -39,7 +39,6 @@ def register_skill_package(skill_name):
         with open("setup.py", 'w') as fp:
             fp.write(filedata)
             print("Registered.".format(skill_name))
-            print()
 
 
 def make_folders(skill_name, level_name):
@@ -62,55 +61,58 @@ def make_folders(skill_name, level_name):
     return skill_path, level_path
 
 
-def write_init(skill_name, skill_path, level_name):
-    # If skills/<new_skill>/__init__.py doesn't exist, create a basic version
-    if not os.path.exists(os.path.join(skill_path, "__init__.py")):
-        copyfile(
-                "level_file_templates/__init__.py",
-                skill_path + "/__init__.py")
-        with open(os.path.join(skill_path, "__init__.py"), 'r') as fp:
-            level_setup = fp.read()
+def make_skill(skill_name, skill_path):
+    # Fill out template for skills/<skill>/__init__.py
+    with open("level_file_templates/__init__.py", 'r') as fp:
+        level_file = fp.read()
 
-        level_setup = level_setup.replace("{}", skill_name)
+    level_file = level_file.replace("{}", skill_name)
 
-        with open(os.path.join(skill_path, "__init__.py"), 'w') as fp:
-            fp.write(level_setup)
+    with open(os.path.join(skill_path, "__init__.py"), 'w') as fp:
+        fp.write(level_file)
 
-        with open(os.path.join("gitgud", "skills", "__init__.py"), 'r') as fp:
-            filedata = fp.read()
+    # Register skill to skills/__init__.py
+    with open(os.path.join("gitgud", "skills", "__init__.py"), 'r') as fp:
+        filedata = fp.read()
 
-        # Add import statement into skills/__init__.py
-        new_import = "\n".join([
-            "from gitgud.skills.{0} import skill as {0}_skill".format(skill_name),  # noqa: E501
-            "",
-            "from gitgud.skills.util import AllSkills"
-        ])
-        filedata = filedata.replace("\nfrom gitgud.skills.util import AllSkills", new_import)  # noqa: E501
+    # Add import statement into skills/__init__.py
+    new_import = "\n".join([
+        "from gitgud.skills.{0} import skill as {0}_skill".format(skill_name),  # noqa: E501
+        "",
+        "from gitgud.skills.util import AllSkills"
+    ])
+    filedata = filedata.replace("\nfrom gitgud.skills.util import AllSkills", new_import)  # noqa: E501
 
-        # Add skill to AllSkills
-        replace = ",\n    {}_skill\n]".format(skill_name)
-        filedata = filedata.replace("\n]", replace)
+    # Add skill to AllSkills
+    replace = ",\n    {}_skill\n]".format(skill_name)
+    filedata = filedata.replace("\n]", replace)
 
-        # Write to file
-        filepath = os.path.join("gitgud", "skills", "__init__.py")
-        with open(filepath, 'w') as fp:
-            fp.write(filedata)
-            print("Registered skill \"{}\" in {}".format(skill_name, filepath))
+    # Write to file
+    filepath = os.path.join("gitgud", "skills", "__init__.py")
+    with open(filepath, 'w') as fp:
+        fp.write(filedata)
 
-        write_init(skill_name, skill_path, level_name)
-    else:
-        # Add level to skills/<new_skill>/__init__.py
-        filepath = os.path.join(skill_path, "__init__.py")
-        with open(filepath, 'r') as fp:
-            filedata = fp.read()
+    print("Registered skill \"{}\" in {}".format(skill_name, filepath))
 
-        replace = ",\n        BasicLevel('{level_name}', __name__)\n    ]".format(level_name=level_name)  # noqa: E501
-        filedata = filedata.replace("\n    ]", replace)
-        filedata = filedata.replace("[,", "[")
 
-        with open(filepath, 'w') as fp:
-            fp.write(filedata)
-            print("Registered level \"{}\" in {}".format(level_name, filepath))
+def make_level(skill_name, skill_path, level_name):
+    # Add level to skills/<new_skill>/__init__.py
+    filepath = os.path.join(skill_path, "__init__.py")
+    with open(filepath, 'r') as fp:
+        filedata = fp.read()
+
+    basic_level_import_string = "from gitgud.skills.level_builder import BasicLevel\n"  # noqa: E501
+    if basic_level_import_string not in filedata:
+        filedata = basic_level_import_string + filedata
+
+    replace = ",\n        BasicLevel('{level_name}', __name__)\n    ]".format(level_name=level_name)  # noqa: E501
+    filedata = filedata.replace("\n    ]", replace)
+    filedata = filedata.replace("[,", "[")
+
+    with open(filepath, 'w') as fp:
+        fp.write(filedata)
+
+    print("Registered level \"{}\" in {}".format(level_name, filepath))
 
 
 def write_test(skill_path, level_name):
@@ -212,8 +214,13 @@ def main():
     skill_path, level_path = make_folders(skill_name, level_name)
     print()
 
+    if not os.path.exists(os.path.join(skill_path, "__init__.py")):
+        print("Registering Skill: {} {}".format(skill_name, level_name))
+        make_skill(skill_name, skill_path)
+        print()
+
     print("Registering Level: {} {}".format(skill_name, level_name))
-    write_init(skill_name, skill_path, level_name)
+    make_level(skill_name, skill_path, level_name)
     print()
 
     print("Creating Test Case:")
