@@ -72,7 +72,8 @@ def parse_spec(spec_path):
 
 
 def level_json(commits, head):
-    # Used with test spec files, return a json object to be compared with the tree of the level
+    # Used with test spec files
+    # return json object representing the current commits
 
     level = {
         'topology': [],
@@ -107,7 +108,6 @@ def level_json(commits, head):
     }
 
     return level
-
 
 
 def has_all_branches(skill, test):
@@ -159,7 +159,8 @@ def check_commits(skill, test):
         # Commits must have the same number of parents and be in the same order
         if len(skill_commit['parents']) != len(test_commit['parents']):
             return False
-        for skill_parent, test_parent in zip(skill_commit['parents'], test_commit['parents']):
+        for skill_parent, test_parent in \
+                zip(skill_commit['parents'], test_commit['parents']):
             if skill_parent != test_parent:
                 return False
     return True
@@ -174,11 +175,13 @@ def name_from_map(level_tree, mapping):
 
     # Update refernces to merges in branches
     for branch in level_tree['branches']:
-        level_tree['branches'][branch]['target'] = mapping[level_tree['branches'][branch]['target']]
+        level_tree['branches'][branch]['target'] = \
+                mapping[level_tree['branches'][branch]['target']]
 
     # Update refernces to merges in tags
     for tag in level_tree['tags']:
-        level_tree['tags'][tag]['target'] = mapping[level_tree['tags'][tag]['target']]
+        level_tree['tags'][tag]['target'] = \
+                mapping[level_tree['tags'][tag]['target']]
 
     # Update HEAD if it points to a merge
     if level_tree['HEAD']['target'] in mapping:
@@ -219,6 +222,7 @@ def name_merges(skill, test):
             mapping[merge_name] = commit_name
 
     name_from_map(skill, mapping)
+
 
 def test_ancestry(skill, test):
     # Tests that the graph of the git history matches

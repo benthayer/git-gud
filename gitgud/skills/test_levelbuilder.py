@@ -1,8 +1,5 @@
-import os
-
-from gitgud.skills import all_skills, all_levels
-from gitgud.skills.util import NamedList, Skill
-from gitgud.skills.level_builder import Level
+from gitgud.skills import all_skills
+from gitgud.skills.util import NamedList
 
 
 def test_init_NL():

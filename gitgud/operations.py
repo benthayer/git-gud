@@ -250,7 +250,6 @@ class Operator:
         else:
             raise KeyError('Original hash not found')
 
-
     def track_commit(self, name, commit_hash):
         with open(self.commits_path, 'a') as commit_file:
             commit_file.write(','.join([name, commit_hash]))
@@ -271,14 +270,14 @@ class Operator:
                 diff = self.repo.git.diff(
                         '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
                         commit_hash)
-                reverse_diff = self.repo.git.diff(
+                anti_diff = self.repo.git.diff(
                         commit_hash,
                         '4b825dc642cb6eb9a060e54bf8d69288fbee4904')
             else:
                 diff = self.repo.git.diff(commit_hash + '~', commit_hash)
-                reverse_diff = self.repo.git.diff(commit_hash, commit_hash + '~')
+                anti_diff = self.repo.git.diff(commit_hash, commit_hash + '~')
             diffs[diff] = commit_name + "'"
-            diffs[reverse_diff] = commit_name + '-'
+            diffs[anti_diff] = commit_name + '-'
 
         return diffs
 
