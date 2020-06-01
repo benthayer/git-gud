@@ -1,17 +1,19 @@
 from copy import deepcopy
 
+
 def parse_solution(solution_path):
     solution_commands = []
 
     if not solution_path:
         return solution_commands
-    
+
     solution_data = solution_path.read_text()
     for command in solution_data.split('\n'):
         if not command or command.strip()[0] == '#':
-            continue    
+            continue
         solution_commands.append(command)
     return solution_commands
+
 
 def parse_spec(spec_path):
     # The purpose of this method is to get a more computer-readable commit tree

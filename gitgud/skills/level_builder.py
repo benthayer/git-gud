@@ -1,5 +1,4 @@
 from importlib_resources import files
-from importlib import import_module
 
 from .parsing import test_ancestry
 from .parsing import level_json
@@ -43,7 +42,7 @@ class Level:
         show_level_name(self)
         self._setup(file_operator)
         self.post_setup()
-    
+
     def post_setup(self):
         pass
 
@@ -91,11 +90,11 @@ class BasicLevel(Level):
         self.instructions_path = self.level_dir.joinpath('instructions.txt')
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
-        
+
         self.solution_path = self.level_dir.joinpath('solution.txt')
         if not self.solution_path.exists():
             self.solution_path = None
-        
+
         self.solution_commands = parse_solution(self.solution_path)
 
     def _setup(self, file_operator):
@@ -128,7 +127,7 @@ class BasicLevel(Level):
 
     def goal(self):
         print_goal(self)
-    
+
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
 

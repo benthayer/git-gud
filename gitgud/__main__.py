@@ -200,7 +200,7 @@ class GitGud:
             'show': self.handle_show,
             'contributors': self.handle_contrib,
             'issues': self.handle_issues,
-            'solution': self.handle_solution    
+            'solution': self.handle_solution
         }
 
     def is_initialized(self):
@@ -331,7 +331,7 @@ class GitGud:
 
     def handle_goal(self, args):
         self.assert_initialized()
-        self.file_operator.get_level().goal()   
+        self.file_operator.get_level().goal()
 
     def handle_reset(self, args):
         self.assert_initialized()
@@ -343,7 +343,7 @@ class GitGud:
         self.assert_initialized()
         level = self.file_operator.get_level()
         level.test(self.file_operator)
-    
+
     def handle_solution(self, args):
         self.assert_initialized()
         current_level = self.file_operator.get_level()
@@ -353,12 +353,11 @@ class GitGud:
             if not current_level.solution_commands:
                 handle_solution_none_available()
                 return
-            
+
             handle_solution_print_header(current_level)
             for command in current_level.solution_commands:
                 print('\t' + command)
-        
-    
+
     def handle_skills(self, args):
         if self.is_initialized():
             try:
