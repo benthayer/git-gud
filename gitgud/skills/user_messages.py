@@ -74,13 +74,13 @@ def all_levels_complete():
 def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')
 
-def handle_solutions_confirmation(level):
+def handle_solution_confirmation(level):
     print("Are you sure you want to view the solution for ", end="")
     print('"{}": "{}"?'.format(level.name, level.skill.name))
     print('If so, run `git gud show solution` with --confirm.')
 
-def handle_solutions_none_available():
+def handle_solution_none_available():
     print("No solutions available for this level.")
 
-def handle_solutions_print_header(level):
+def handle_solution_print_header(level):
     print('Solution for the current level "{}" in the skill "{}":'.format(level.name, level.skill.name))

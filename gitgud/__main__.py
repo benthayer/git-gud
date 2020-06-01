@@ -16,7 +16,9 @@ from gitgud.operations import Operator
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
-from gitgud.skills.user_messages import handle_solutions_messages
+from gitgud.skills.user_messages import handle_solution_confirmation
+from gitgud.skills.user_messages import handle_solution_none_available
+from gitgud.skills.user_messages import handle_solution_print_header
 from gitgud.hooks import all_hooks
 
 
@@ -261,9 +263,7 @@ class GitGud:
         current_level = self.file_operator.get_level()
         skill_name = current_level.skill.name
         if not args.confirm:
-            print("Are you sure you want to view the solution for ", end="")
-            print('the current level "{}" in the skill "{}"?'.format(current_level.name, skill_name))
-            print('If so, run `git gud solution` again with --confirm.')
+            handle_solution_confirmation(current_level)
         else:
             tests_module = import_module('.test_levels', 'gitgud.skills.' + skill_name)
             level_tests = tests_module.level_tests
@@ -274,10 +274,10 @@ class GitGud:
                     solution_set = commands
                     break
             else:
-                print("No solutions available for this level.")
+                handle_solution_none_available()
                 return
             
-            print('Solution for the current level "{}" in the skill "{}":'.format(current_level.name, skill_name))
+            handle_solution_print_header(current_level)
             for command in solution_set:
                 print('\t' + command)
         
