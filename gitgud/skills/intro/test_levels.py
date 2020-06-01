@@ -6,12 +6,8 @@ from . import skill
 
 
 level_tests = [
-    (
-        skill['intro'], [
-        ]
-    )
+    (level, level.solution_commands) for level in skill
 ]
-
 
 @pytest.mark.parametrize('level,commands', level_tests)
 def test_level(gg, level, commands):
