@@ -77,7 +77,7 @@ def default_fail():
 def handle_solution_confirmation(level):
     print("Are you sure you want to view the solution for ", end="")
     print('"{}": "{}"?'.format(level.name, level.skill.name))
-    print('If so, run `git gud show solution` with --confirm.')
+    print('If so, run `git gud solution` with --confirm.')
 
 def handle_solution_none_available():
     print("No solutions available for this level.")

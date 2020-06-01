@@ -1,0 +1,2 @@
+git checkout -b bugFix
+git gud commit

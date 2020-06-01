@@ -261,24 +261,15 @@ class GitGud:
     def handle_solution(self, args):
         self.assert_initialized()
         current_level = self.file_operator.get_level()
-        skill_name = current_level.skill.name
         if not args.confirm:
             handle_solution_confirmation(current_level)
         else:
-            tests_module = import_module('.test_levels', 'gitgud.skills.' + skill_name)
-            level_tests = tests_module.level_tests
-            solution_set = None
-
-            for level, commands in level_tests:
-                if level is current_level and commands:
-                    solution_set = commands
-                    break
-            else:
+            if not current_level.solution_commands:
                 handle_solution_none_available()
                 return
             
             handle_solution_print_header(current_level)
-            for command in solution_set:
+            for command in current_level.solution_commands:
                 print('\t' + command)
         
     

@@ -6,6 +6,7 @@ import os
 from .parsing import test_skill
 from .parsing import level_json
 from .parsing import parse_spec
+from .parsing import parse_solution
 
 from .user_messages import print_user_message
 from .user_messages import show_level_name
@@ -89,6 +90,12 @@ class BasicLevel(Level):
         self.instructions_path = self.level_dir.joinpath('instructions.txt')
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
+        
+        self.solution_path = self.level_dir.joinpath('solution.txt')
+        if not self.solution_path.exists():
+            self.solution_path = None
+        
+        self.solution_commands = parse_solution(self.solution_path)
 
     def _setup(self, file_operator):
         commits, head = parse_spec(self.setup_spec_path)
@@ -120,16 +127,6 @@ class BasicLevel(Level):
 
     def goal(self):
         print_goal(self)
-    
-    def solutions(self):
-        tests_module = import_module('.test_levels', 'gitgud.skills.' + self.skill.name)
-        level_tests = tests_module.level_tests
-        solution_set = []
-        for level, commands in level_tests:
-            if level is self and commands:
-                solution_set = commands
-                break
-        return solution_set
     
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
