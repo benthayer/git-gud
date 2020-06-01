@@ -137,6 +137,13 @@ class GitGud:
                 help="Command to get help on", nargs='?'
         )
 
+        solution_parser = self.subparsers.add_parser(
+                'solution',
+                help='Show solution for the given level',
+                description='Show the solution for the given level'
+        )
+        solution_parser.add_argument('--confirm', action='store_true')
+
         init_parser = self.subparsers.add_parser(
                 'init',
                 help='Init Git Gud and load first level',
