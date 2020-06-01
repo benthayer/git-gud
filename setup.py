@@ -21,6 +21,7 @@ setup(
         'gitgud.skills.basics',
         'gitgud.skills.extras',
         'gitgud.skills.rampup',
+        'gitgud.skills.rework',
         'gitgud.skills.intro',
     ],
     package_data={
@@ -29,6 +30,7 @@ setup(
         'gitgud.skills.basics': ['_*/*'],
         'gitgud.skills.extras': ['_*/*'],
         'gitgud.skills.rampup': ['_*/*'],
+        'gitgud.skills.rework': ['_*/*'],
     },
     python_requires='>=3.6',
     install_requires=[
