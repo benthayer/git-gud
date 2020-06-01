@@ -49,19 +49,13 @@ def test_test_spec_has_no_duplicate_commits(level):
 
 
 @pytest.mark.parametrize('level', all_levels)
-def test_setup_spec_rebases_have_originals(level):
-    commits = parse_spec(level.setup_spec_path)[0]
-    names = [commit[0] for commit in commits]
-    rebases = [name for name in names if name[-1] == "'"]
+def test_rebases_have_originals(level):
+    setup_commits = parse_spec(level.setup_spec_path)[0]
+    test_commits = parse_spec(level.test_spec_path)[0]
+    all_commits = setup_commits + test_commits
 
-    for rebase in rebases:
-        assert rebase[:-1] in names
+    names = [commit[0] for commit in all_commits]
 
-
-@pytest.mark.parametrize('level', all_levels)
-def test_test_spec_rebases_have_originals(level):
-    commits = parse_spec(level.test_spec_path)[0]
-    names = [commit[0] for commit in commits]
     rebases = [name for name in names if name[-1] == "'"]
 
     for rebase in rebases:

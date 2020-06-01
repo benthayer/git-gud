@@ -109,48 +109,6 @@ def level_json(commits, head):
     return level
 
 
-def name_merges(skill, test):
-    # List merges.
-    merges = {}  # (parent1, parent2, ...): "Name"
-    for commit_name, commit_info in skill['commits'].items():
-        if len(commit_info['parents']) >= 2:
-            merges[tuple(commit_info['parents'])] = commit_name
-
-    # This doesn't work if merges have other merges as parents
-    # Use test to create a mapping for merges
-    mapping = {}
-    for commit_name, commit_info in test['commits'].items():
-        if len(commit_info['parents']) >= 2:
-            parents = tuple(commit_info['parents'])
-            merge_name = merges[parents]
-            mapping[merge_name] = commit_name
-
-    # Map other commits to themselves
-    for commit_name in skill['commits']:
-        if commit_name not in mapping:
-            mapping[commit_name] = commit_name
-
-    # Update refernces to merges in branches
-    for branch in skill['branches']:
-        skill['branches'][branch]['target'] = mapping[skill['branches'][branch]['target']]
-
-    # Update refernces to merges in tags
-    for tag in skill['tags']:
-        skill['tags'][tag]['target'] = mapping[skill['tags'][tag]['target']]
-
-    # Update HEAD if it points to a merge
-    if skill['HEAD']['target'] in mapping:
-        skill['HEAD']['target'] = mapping[skill['HEAD']['target']]
-
-    new_commits = {}
-    for commit_name, commit_info in skill['commits'].items():
-        new_commits[mapping[commit_name]] = {
-            'parents': [mapping[parent] for parent in commit_info['parents']],
-            'id': mapping[commit_name]
-        }
-
-    skill['commits'] = new_commits
-
 
 def has_all_branches(skill, test):
     # Has all the other specified branches
@@ -192,7 +150,6 @@ def all_tags_correct(skill, test):
 
 def check_commits(skill, test):
     for commit_name in test['commits']:
-
         if commit_name not in skill['commits']:
             return False
 
@@ -208,10 +165,63 @@ def check_commits(skill, test):
     return True
 
 
+def name_from_map(level_tree, mapping):
+    # Map other commits to themselves
+    mapping = deepcopy(mapping)
+    for commit_name in level_tree['commits']:
+        if commit_name not in mapping:
+            mapping[commit_name] = commit_name
+
+    # Update refernces to merges in branches
+    for branch in level_tree['branches']:
+        level_tree['branches'][branch]['target'] = mapping[level_tree['branches'][branch]['target']]
+
+    # Update refernces to merges in tags
+    for tag in level_tree['tags']:
+        level_tree['tags'][tag]['target'] = mapping[level_tree['tags'][tag]['target']]
+
+    # Update HEAD if it points to a merge
+    if level_tree['HEAD']['target'] in mapping:
+        level_tree['HEAD']['target'] = mapping[level_tree['HEAD']['target']]
+
+    new_commits = {}
+    for commit_name, commit_info in level_tree['commits'].items():
+        new_commits[mapping[commit_name]] = {
+            'parents': [mapping[parent] for parent in commit_info['parents']],
+            'id': mapping[commit_name]
+        }
+
+    level_tree['commits'] = new_commits
+
+
+def get_non_merges(skill):
+    non_merges = []
+    for commit_name, commit_info in skill['commits'].items():
+        if len(commit_info['parents']) <= 1:
+            non_merges.append(commit_name)
+    return non_merges
+
+
+def name_merges(skill, test):
+    # List merges.
+    merges = {}  # (parent1, parent2, ...): "Name"
+    for commit_name, commit_info in skill['commits'].items():
+        if len(commit_info['parents']) >= 2:
+            merges[tuple(commit_info['parents'])] = commit_name
+
+    # This doesn't work if merges have other merges as parents
+    # Use test to create a mapping for merges
+    mapping = {}
+    for commit_name, commit_info in test['commits'].items():
+        if len(commit_info['parents']) >= 2:
+            parents = tuple(commit_info['parents'])
+            merge_name = merges[parents]
+            mapping[merge_name] = commit_name
+
+    name_from_map(skill, mapping)
+
 def test_ancestry(skill, test):
     # Tests that the graph of the git history matches
-
-    name_merges(skill, test)
 
     if not check_commits(skill, test):
         return False

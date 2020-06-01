@@ -478,6 +478,7 @@ class GitGud:
 
         commit = self.file_operator.add_and_commit(commit_name)
         print("New Commit: {}".format(commit.hexsha[:7]))
+        self.file_operator.track_commit(commit_name, commit.hexsha)
 
         # Next "git gud commit" name
         if int(commit_name) > int(last_commit):

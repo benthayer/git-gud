@@ -1,3 +1,4 @@
+import csv
 import os
 import shutil
 import datetime as dt
@@ -119,7 +120,7 @@ class Operator:
                         skip_hooks=True)
 
             commit_objects[name] = commit_obj
-            self.track_commit(str(commit_obj), '', name)
+            self.track_commit(name, commit_obj.hexsha)
 
             for branch in branches:
                 self.repo.create_head(branch, self.repo.head.commit)
@@ -166,15 +167,14 @@ class Operator:
 
         for branch in repo.branches:
             commits.add(branch.commit)
-            commit_name = branch.commit.message.strip()
-            commit_name = self.parse_name(commit_name)
+            commit_name = branch.commit.hexsha
             tree['branches'][branch.name] = {
                 "target": commit_name,
                 "id": branch.name
             }
 
         for tag in repo.tags:
-            commit_name = tag.commit.message.strip()
+            commit_name = tag.commit.hexsha
             tree['tags'][tag.name] = {
                 'target': commit_name,
                 'id': tag.name
@@ -189,13 +189,13 @@ class Operator:
 
         while len(visited) > 0:
             cur_commit = visited.pop()
-            commit_name = cur_commit.message.strip()
+            commit_name = cur_commit.hexsha
             # If revert detected, modifies commit_name; o/w nothing happens
             commit_name = self.parse_name(commit_name)
 
             parents = []
             for parent in cur_commit.parents:
-                parents.append(self.parse_name(parent.message.strip()))
+                parents.append(self.parse_name(parent.hexsha))
 
             tree['commits'][commit_name] = {
                 'parents': parents,
@@ -203,7 +203,7 @@ class Operator:
             }
 
         if repo.head.is_detached:
-            target = repo.commit('HEAD').message.strip()
+            target = repo.commit('HEAD').hexsha
         else:
             target = repo.head.ref.name
 
@@ -237,14 +237,70 @@ class Operator:
         with open(self.commits_path, 'w'):
             pass
 
-    def track_commit(self, first_hash, second_hash, action):
-        # Used to track rebases, amends and reverts
-        with open(self.commits_path, 'a') as commit_tracker_file:
-            commit_tracker_file.write(','.join([
-                first_hash,
-                second_hash,
-                action]))
-            commit_tracker_file.write('\n')
+    def track_rebase(self, original_hash, rebase_hash):
+        rebase_name = None
+        with open(self.commits_path, 'r') as commit_file:
+            reader = csv.reader(commit_file)
+            for name, commit_hash in reader:
+                if commit_hash == original_hash:
+                    rebase_name = name + "'"
+                    break
+        if rebase_name is not None:
+            self.track_commit(rebase_name, rebase_hash)
+        else:
+            raise KeyError('Original hash not found')
+
+
+    def track_commit(self, name, commit_hash):
+        with open(self.commits_path, 'a') as commit_file:
+            commit_file.write(','.join([name, commit_hash]))
+            commit_file.write('\n')
+
+    def get_known_commits(self):
+        known_commits = {}
+        with open(self.commits_path, 'r') as commit_file:
+            reader = csv.reader(commit_file)
+            for name, commit_hash in reader:
+                known_commits[commit_hash] = name
+        return known_commits
+
+    def get_diffs(self, known_commits):
+        diffs = {}
+        for commit_hash, commit_name in known_commits.items():
+            if commit_name == '1':
+                diff = self.repo.git.diff(
+                        '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
+                        commit_hash)
+                reverse_diff = self.repo.git.diff(
+                        commit_hash,
+                        '4b825dc642cb6eb9a060e54bf8d69288fbee4904')
+            else:
+                diff = self.repo.git.diff(commit_hash + '~', commit_hash)
+                reverse_diff = self.repo.git.diff(commit_hash, commit_hash + '~')
+            diffs[diff] = commit_name + "'"
+            diffs[reverse_diff] = commit_name + '-'
+
+        return diffs
+
+    def get_copy_mapping(self, non_merges, known_commits):
+        existing_commits = {}
+        unlabeled_commits = []
+
+        for commit_hash in non_merges:
+            if commit_hash in known_commits:
+                existing_commits[commit_hash] = known_commits[commit_hash]
+            else:
+                unlabeled_commits.append(commit_hash)
+
+        diffs = self.get_diffs(existing_commits)
+
+        mapping = {}
+        for commit_hash in unlabeled_commits:
+            diff = self.repo.git.diff(commit_hash + '~', commit_hash)
+            if diff in diffs:
+                mapping[commit_hash] = diffs[diff]
+
+        return mapping
 
 
 def get_operator():
