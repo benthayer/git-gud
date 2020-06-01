@@ -6,11 +6,7 @@ from . import skill
 
 
 level_tests = [
-    (
-        skill['octopus'], [
-            'git merge feature1 feature2'
-        ]
-    )
+    (level, level.solution_commands) for level in skill
 ]
 
 
