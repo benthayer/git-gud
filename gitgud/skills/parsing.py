@@ -12,8 +12,9 @@ def parse_solution(solution_path):
     
     solution_data = solution_path.read_text()
     for command in solution_data.split('\n'):
-        if command:
-            solution_commands.append(command)
+        if not command or command.strip()[0] == '#':
+            continue    
+        solution_commands.append(command)
     return solution_commands
 
 def parse_spec(spec_path):
