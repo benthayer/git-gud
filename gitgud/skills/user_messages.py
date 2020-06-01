@@ -2,7 +2,7 @@ import subprocess
 
 user_has_seen_messages = False
 
-
+# This decorator separates two blocks of text with one empty line. 
 def separated(func):
     def new_func(*args, **kwargs):
         global user_has_seen_messages
@@ -74,15 +74,13 @@ def all_levels_complete():
 def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')
 
-@separated
-def handle_solutions_messages(level, message_id):
-    if message_id == 1:
-        print("Are you sure you want to view the solution for ", end="")
-        print('"{}": "{}"?'.format(level.name, level.skill.name))
-        print('If so, run `git gud show solution` with --confirm.')
-    elif message_id == 2:
-        print("No solutions available for this level.")
-    elif message_id == 3:
-        print('Solution for the current level "{}" in the skill "{}":'.format(level.name, level.skill.name))
-    else:
-        raise NotImplementedError
+def handle_solutions_confirmation(level):
+    print("Are you sure you want to view the solution for ", end="")
+    print('"{}": "{}"?'.format(level.name, level.skill.name))
+    print('If so, run `git gud show solution` with --confirm.')
+
+def handle_solutions_none_available():
+    print("No solutions available for this level.")
+
+def handle_solutions_print_header(level):
+    print('Solution for the current level "{}" in the skill "{}":'.format(level.name, level.skill.name))
