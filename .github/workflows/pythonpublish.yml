@@ -15,6 +15,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Validate version
+      run: |
+        version=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,') | sed -e 's/^v//'
+        echo Version=$version
+        [ $version == $( cat gitgud/version.txt ) ]
+
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
