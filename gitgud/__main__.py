@@ -71,14 +71,12 @@ class GitGud:
             "\n",
         ])
 
-        show_description = "".join([
+        show_description = "\n".join([
             "Helper command to show certain information.",
-            "\n\n",
+            "\n",
             "Subcommands:",
-            "\n",
             "  <command>",
-            "\n",
-            "    tree", "\t", "Show the current state of the branching tree"
+            "    tree\tShow the current state of the branching tree"
         ])
 
         self.subparsers = self.parser.add_subparsers(
