@@ -123,8 +123,6 @@ def write_test(skill_path, level_name):
         with open(test_levels_path, 'r') as fp:
             new_test = fp.read()
 
-        new_test = new_test.replace("{}", level_name)
-
         with open(test_levels_path, 'w') as fp:
             fp.write(new_test)
             print("Created file: {}".format(test_levels_path))
