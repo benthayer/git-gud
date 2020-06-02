@@ -1,16 +1,18 @@
 from importlib_resources import files
 
-import os
-
-from .parsing import test_skill
+from .parsing import test_ancestry
 from .parsing import level_json
 from .parsing import parse_spec
+from .parsing import name_from_map
+from .parsing import get_non_merges
+from .parsing import name_merges
 
 from .user_messages import print_user_file
 from .user_messages import print_user_message
 from .user_messages import show_level_name
 from .user_messages import show_tree
 from .user_messages import default_fail
+from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
 
@@ -30,14 +32,14 @@ class Level:
 
     def full_name(self):
         return '{} {}'.format(self.skill.name, self.name)
-    
+
     def _setup(self, file_operator):
         pass
 
     def setup(self, file_operator):
         self._setup(file_operator)
         self.post_setup()
-    
+
     def post_setup(self):
         show_level_name(self)
 
@@ -51,7 +53,7 @@ class Level:
         show_level_name(self)
 
     def _test(self, file_operator):
-        pass
+        raise NotImplementedError
 
     def test(self, file_operator):
         if self._test(file_operator):
@@ -63,13 +65,13 @@ class Level:
         if self.next_level is None:
             all_levels_complete()
         elif self.next_level.skill != self.skill:
-            skill_complete(level)
+            skill_complete(self)
         else:
-            level_complete(level)
+            level_complete(self)
 
     def test_failed(self):
         default_fail()
-          
+
 
 class BasicLevel(Level):
     def __init__(self, name, skill_package):
@@ -81,7 +83,7 @@ class BasicLevel(Level):
         self.test_spec_path = self.level_dir.joinpath('test.spec')
 
         self.instructions_path = self.level_dir.joinpath('instructions.txt')
-        
+
         self.goal_path = self.level_dir.joinpath('goal.txt')
 
         if not self.instructions_path.exists():
@@ -121,7 +123,30 @@ class BasicLevel(Level):
 
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
+
+        # Get commit trees
         test_tree = level_json(commits, head)
         level_tree = file_operator.get_current_tree()
-        return test_skill(level_tree, test_tree)
 
+        # Get commit info
+        non_merges = get_non_merges(level_tree)
+
+        # Name known commits
+        known_commits = file_operator.get_known_commits()
+        name_from_map(level_tree, known_commits)
+
+        # Name rebases and cherrypicks
+        diff_map = file_operator.get_copy_mapping(non_merges, known_commits)
+        name_from_map(level_tree, diff_map)
+
+        # Name merges
+        name_merges(level_tree, test_tree)
+
+        # Test for similarity
+        return test_ancestry(level_tree, test_tree)
+
+    def test_passed(self):
+        if self.passed_path.exists():
+            print_user_message(self.passed_path.read_text())
+        else:
+            super().test_passed()

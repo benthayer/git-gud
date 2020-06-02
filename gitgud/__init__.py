@@ -1,7 +1,6 @@
 from importlib_resources import files
 
 import sys
-import os
 import subprocess
 
 from git import Actor
@@ -11,9 +10,11 @@ actor_string = "Git Gud <git-gud@example.com>"
 
 
 def create_alias():
-    python = sys.executable.replace('\\', '/')  # Git uses unix-like path separators
+    # Git uses unix-like path separators
+    python = sys.executable.replace('\\', '/')
 
-    subprocess.call(['git', 'config', '--global', 'alias.gud', '! "{}" -m gitgud'.format(python)])
+    subprocess.call(['git config --global alias.gud ! "{}" -m gitgud'
+                    .format(python)])
 
-__version__ = \
-    files('gitgud').joinpath('version.txt').read_text().strip()
+
+__version__ = files('gitgud').joinpath('version.txt').read_text().strip()

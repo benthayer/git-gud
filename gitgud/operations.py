@@ -1,15 +1,14 @@
+import csv
 import os
 import shutil
 import datetime as dt
 import email.utils
-import json
 
 from glob import glob
 
 from git import Repo
 
 from gitgud import actor
-from gitgud import actor_string
 from gitgud.skills import all_skills
 
 
@@ -25,7 +24,7 @@ class Operator:
         self.hooks_path = os.path.join(self.git_path, 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
-        self.commits_json_path = os.path.join(self.gg_path, 'commits.csv')
+        self.commits_path = os.path.join(self.gg_path, 'commits.csv')
         self.level_path = os.path.join(self.gg_path, 'current_level.txt')
 
     def add_file_to_index(self, filename):
@@ -33,12 +32,16 @@ class Operator:
         self.repo.index.add([filename])
 
     def add_and_commit(self, name):
-        # TODO Commits with the same time have arbitrary order when using git log, set time of commit to fix
         self.add_file_to_index(name)
-        commit = self.repo.index.commit(name, author=actor, committer=actor, skip_hooks=True)
+        commit = self.repo.index.commit(
+            name,
+            author=actor,
+            committer=actor,
+            skip_hooks=True
+        )
 
         return commit
-    
+
     def clear_tree_and_index(self):
         dirs = []
         for x in [('**', '.*'), ('**',)]:
@@ -50,12 +53,11 @@ class Operator:
                     else:
                         dirs.append(path)
 
-        # TODO GitPython set index to working tree
         self.repo.git.add(update=True)
-        # TODO GitPython clear index (for initial commits)
-        self.repo.index.commit("Clearing index", skip_hooks=True)  # Easiest way to clear the index is to commit an empty directory
-
-        dirs.remove(self.path + os.path.sep)  # Don't remove current directory
+        # Easiest way to clear the index is to commit an empty directory
+        self.repo.index.commit("Clearing index", skip_hooks=True)
+        # Remove all directories except current
+        dirs.remove(self.path + os.path.sep)
 
         for path in os.listdir(self.path):
             if path != '.git':
@@ -64,10 +66,11 @@ class Operator:
     def create_tree(self, commits, head):
         branches = self.repo.branches
         try:
-            # TODO GitPython detach head
-            self.repo.git.checkout(self.repo.head.commit)  # Detached head, we can now delete everything
+            # Detached head, we can now delete everything
+            self.repo.git.checkout(self.repo.head.commit)
         except ValueError:
             pass
+
         self.clear_tree_and_index()
 
         for branch in branches:
@@ -77,9 +80,12 @@ class Operator:
         commit_objects = {}
         counter = len(commits)
         for name, parents, branches, tags in commits:
-            committime = dt.datetime.now(dt.timezone.utc).astimezone().replace(microsecond=0)
-            committime_offset = dt.timedelta(seconds=counter) + committime.utcoffset()
-            committime_rfc = email.utils.format_datetime(committime - committime_offset)
+            committime = dt.datetime.now(dt.timezone.utc).astimezone() \
+                    .replace(microsecond=0)
+            committime_offset = dt.timedelta(seconds=counter) + \
+                committime.utcoffset()
+            committime_rfc = email.utils.format_datetime(
+                    committime - committime_offset)
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
@@ -88,28 +94,41 @@ class Operator:
             if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
-                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
+                commit_obj = self.repo.index.commit(
+                        name,
+                        author=actor,
+                        committer=actor,
+                        author_date=committime_rfc,
+                        commit_date=committime_rfc,
+                        parent_commits=parents,
+                        skip_hooks=True)
             else:
                 assert name[0] == 'M'
                 int(name[1:])  # Fails if not a number
 
-                # To handle octopus merges, we merge each branch into the index one by one, then commit
+                # For octopus merges, merge branches one by one
                 for parent in parents[1:]:
                     merge_base = self.repo.merge_base(parents[0], parent)
                     self.repo.index.merge_tree(parent, base=merge_base)
-                commit_obj = self.repo.index.commit(name, author=actor, committer=actor, author_date=committime_rfc, commit_date=committime_rfc, parent_commits=parents, skip_hooks=True)
+                commit_obj = self.repo.index.commit(
+                        name,
+                        author=actor,
+                        committer=actor,
+                        author_date=committime_rfc,
+                        commit_date=committime_rfc,
+                        parent_commits=parents,
+                        skip_hooks=True)
 
             commit_objects[name] = commit_obj
+            self.track_commit(name, commit_obj.hexsha)
 
             for branch in branches:
                 self.repo.create_head(branch, self.repo.head.commit)
 
             for tag in tags:
                 self.repo.create_tag(tag, self.repo.head.commit)
-            # TODO Log commit hash and info
             counter = counter - 1
 
-        # TODO Checkout using name
         head_is_commit = True
         for branch in self.repo.branches:
             if branch.name == head:
@@ -133,10 +152,14 @@ class Operator:
         repo = self.repo
 
         tree = {
-            'branches': {},  # 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
-            'tags': {},  # 'tag_name': {'target': 'commit_id', 'id': 'tag_name'}
-            'commits': {},  # '2': {'parents': ['1'], 'id': '1'}
-            'HEAD': {}  # 'target': 'branch_name', 'id': 'HEAD'
+            'branches': {},
+            # Ex: 'branch_name': {'target': 'commit_id', 'id': 'branch_name'}
+            'tags': {},
+            # Ex: 'tag_name': {'target': 'commit_id', 'id': 'tag_name'}
+            'commits': {},
+            # Ex: '2': {'parents': ['1'], 'id': '1'}
+            'HEAD': {}
+            # 'target': 'branch_name', 'id': 'HEAD'
         }
 
         commits = set()
@@ -144,15 +167,14 @@ class Operator:
 
         for branch in repo.branches:
             commits.add(branch.commit)
-            commit_name = branch.commit.message.strip()
-            commit_name = self.parse_name(commit_name)
+            commit_name = branch.commit.hexsha
             tree['branches'][branch.name] = {
                 "target": commit_name,
                 "id": branch.name
             }
 
         for tag in repo.tags:
-            commit_name = tag.commit.message.strip()
+            commit_name = tag.commit.hexsha
             tree['tags'][tag.name] = {
                 'target': commit_name,
                 'id': tag.name
@@ -167,17 +189,21 @@ class Operator:
 
         while len(visited) > 0:
             cur_commit = visited.pop()
-            commit_name = cur_commit.message.strip()
+            commit_name = cur_commit.hexsha
             # If revert detected, modifies commit_name; o/w nothing happens
             commit_name = self.parse_name(commit_name)
 
+            parents = []
+            for parent in cur_commit.parents:
+                parents.append(self.parse_name(parent.hexsha))
+
             tree['commits'][commit_name] = {
-                'parents': [self.parse_name(parent.message.strip()) for parent in cur_commit.parents],
+                'parents': parents,
                 'id': commit_name
             }
 
         if repo.head.is_detached:
-            target = repo.commit('HEAD').message.strip()
+            target = repo.commit('HEAD').hexsha
         else:
             target = repo.head.ref.name
 
@@ -208,14 +234,72 @@ class Operator:
             last_commit_file.write(name)
 
     def clear_tracked_commits(self):
-        with open(self.commits_json_path, 'w'):
+        with open(self.commits_path, 'w'):
             pass
 
-    def track_commit(self, first_hash, second_hash, action):
-        # Used to track rebases, amends and reverts
-        with open(self.commits_json_path, 'a') as commit_tracker_file:
-            commit_tracker_file.write(','.join([first_hash, second_hash, action]))
-            commit_tracker_file.write('\n')
+    def track_rebase(self, original_hash, rebase_hash):
+        rebase_name = None
+        with open(self.commits_path, 'r') as commit_file:
+            reader = csv.reader(commit_file)
+            for name, commit_hash in reader:
+                if commit_hash == original_hash:
+                    rebase_name = name + "'"
+                    break
+        if rebase_name is not None:
+            self.track_commit(rebase_name, rebase_hash)
+        else:
+            raise KeyError('Original hash not found')
+
+    def track_commit(self, name, commit_hash):
+        with open(self.commits_path, 'a') as commit_file:
+            commit_file.write(','.join([name, commit_hash]))
+            commit_file.write('\n')
+
+    def get_known_commits(self):
+        known_commits = {}
+        with open(self.commits_path, 'r') as commit_file:
+            reader = csv.reader(commit_file)
+            for name, commit_hash in reader:
+                known_commits[commit_hash] = name
+        return known_commits
+
+    def get_diffs(self, known_commits):
+        diffs = {}
+        for commit_hash, commit_name in known_commits.items():
+            if commit_name == '1':
+                diff = self.repo.git.diff(
+                        '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
+                        commit_hash)
+                anti_diff = self.repo.git.diff(
+                        commit_hash,
+                        '4b825dc642cb6eb9a060e54bf8d69288fbee4904')
+            else:
+                diff = self.repo.git.diff(commit_hash + '~', commit_hash)
+                anti_diff = self.repo.git.diff(commit_hash, commit_hash + '~')
+            diffs[diff] = commit_name + "'"
+            diffs[anti_diff] = commit_name + '-'
+
+        return diffs
+
+    def get_copy_mapping(self, non_merges, known_commits):
+        existing_commits = {}
+        unlabeled_commits = []
+
+        for commit_hash in non_merges:
+            if commit_hash in known_commits:
+                existing_commits[commit_hash] = known_commits[commit_hash]
+            else:
+                unlabeled_commits.append(commit_hash)
+
+        diffs = self.get_diffs(existing_commits)
+
+        mapping = {}
+        for commit_hash in unlabeled_commits:
+            diff = self.repo.git.diff(commit_hash + '~', commit_hash)
+            if diff in diffs:
+                mapping[commit_hash] = diffs[diff]
+
+        return mapping
 
 
 def get_operator():
@@ -227,4 +311,3 @@ def get_operator():
         if os.path.isdir(gg_path):
             return Operator(path)
     return None
-

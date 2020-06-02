@@ -21,6 +21,9 @@ class Welcome(BasicLevel):
     def test_passed(self):
         self.display_message("passed.txt")
 
+    def _test(self, file_operator):
+        return True
+
 
 def get_name_and_email():
     name = subprocess.check_output('git config user.name', shell=True) \
