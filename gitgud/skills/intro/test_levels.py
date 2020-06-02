@@ -10,7 +10,9 @@ level_tests = [
         skill['welcome'], [
         ]
     ), (
-        skill['level2'], [
+        skill['config'], [
+            'git config user.name "Git Gud Test"',
+            'git config user.email "ggtest@example.com"'
         ]
     )
 ]
