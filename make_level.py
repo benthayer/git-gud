@@ -231,6 +231,7 @@ def main():
     create_level_file(level_path, "goal.txt")
     create_level_file(level_path, "setup.spec")
     create_level_file(level_path, "test.spec")
+    create_level_file(level_path, "solution.txt")
     print()
 
     print("Done.")
