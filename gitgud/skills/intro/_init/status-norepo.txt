@@ -1,0 +1,5 @@
+We are not in a Git Repo!
+
+To initialize a Git Repo in this folder, type
+    git init
+

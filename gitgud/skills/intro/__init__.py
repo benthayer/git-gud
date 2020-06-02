@@ -59,10 +59,36 @@ class Config(BasicLevel):
         self.display_message("passed.txt")
 
 
+class Init(BasicLevel):
+    def setup(self, file_operator):
+        # Make sure we are not in a git repo
+        pass
+
+    def post_setup(self):
+        self.display_message("post-setup.txt")
+
+    def status(self):
+        if self._test():
+            self.display_message("status-repo.txt")
+        else:
+            self.display_message("status-norepo.txt")
+
+    def _test(self, file_operator):
+        # Check if we are in a git repo
+        return True
+    
+    def test_failed(self):
+        default_fail_no_reset()
+    
+    def test_passed(self):
+        self.display_message("passed.txt")
+
+
 skill = Skill(
     'intro',
     [
         Welcome('welcome', __name__),
-        Config('config', __name__)
+        Config('config', __name__),
+        Init('init', __name__),
     ]
 )
