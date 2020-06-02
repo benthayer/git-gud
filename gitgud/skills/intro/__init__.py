@@ -4,7 +4,6 @@ from gitgud.skills.util import Skill
 from gitgud.skills.level_builder import BasicLevel
 
 from gitgud.skills.user_messages import simulate_command
-from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import default_fail_no_reset
 
 
@@ -15,7 +14,7 @@ class Welcome(BasicLevel):
     def status(self):
         self.display_message("status-1.txt")
         simulate_command("git log")
-    
+
     def test_failed(self):
         default_fail_no_reset()
 
@@ -24,8 +23,10 @@ class Welcome(BasicLevel):
 
 
 def get_name_and_email():
-    name = subprocess.check_output('git config user.name', shell=True).decode().strip()
-    email = subprocess.check_output('git config user.email', shell=True).decode().strip()
+    name = subprocess.check_output('git config user.name', shell=True) \
+        .decode().strip()
+    email = subprocess.check_output('git config user.email', shell=True) \
+        .decode().strip()
     return name, email
 
 
@@ -47,10 +48,10 @@ class Config(BasicLevel):
     def _test(self, file_operator):
         name, email = get_name_and_email()
         return name and email
-    
+
     def test_failed(self):
         default_fail_no_reset()
-    
+
     def test_passed(self):
         self.display_message("passed.txt")
 
