@@ -7,7 +7,12 @@ from . import skill
 
 level_tests = [
     (
-        skill['intro'], [
+        skill['welcome'], [
+        ]
+    ), (
+        skill['config'], [
+            'git config user.name "Git Gud Test"',
+            'git config user.email "ggtest@example.com"'
         ]
     )
 ]
