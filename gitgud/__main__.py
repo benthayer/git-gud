@@ -358,7 +358,7 @@ class GitGud:
         if not args.confirm:
             handle_solution_confirmation(current_level)
         else:
-            current_level.goal()
+            current_level.solution()
 
     def handle_skills(self, args):
         if self.is_initialized():

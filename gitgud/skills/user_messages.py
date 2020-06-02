@@ -3,9 +3,6 @@ import subprocess
 user_has_seen_messages = False
 
 
-<<<<<<< HEAD
-# This decorator separates two blocks of text with one empty line.
-=======
 def start_marker():
     return '<' * 7
 
@@ -14,7 +11,6 @@ def end_marker():
     return '=' * 7
 
 
->>>>>>> upstream/master
 def separated(func):
     def new_func(*args, **kwargs):
         global user_has_seen_messages
@@ -97,7 +93,6 @@ def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')  # noqa: E501
 
 
-<<<<<<< HEAD
 def handle_solution_confirmation(level):
     print("Are you sure you want to view the solution for ", end="")
     print('"{}": "{}"?'.format(level.name, level.skill.name))
@@ -110,8 +105,8 @@ def no_solutions_available():
 
 def solution_print_header(level):
     print('Solution for the current level "{}" in the skill "{}":'.format(level.name, level.skill.name))  # noqa: E501
-=======
+
+
 @separated
 def default_fail_no_reset():
     print('Level not complete, keep trying.')
->>>>>>> upstream/master

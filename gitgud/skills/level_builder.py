@@ -91,17 +91,15 @@ class BasicLevel(Level):
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
 
-<<<<<<< HEAD
         self.solution_path = self.level_dir.joinpath('solution.txt')
         if not self.solution_path.exists():
             self.solution_path = None
 
         self.solution_commands = self.solution_list()
-=======
+
     def display_message(self, message_path):
         path = self.level_dir.joinpath(message_path)
         print_user_file(path)
->>>>>>> upstream/master
 
     def _setup(self, file_operator):
         commits, head = parse_spec(self.setup_spec_path)
@@ -152,7 +150,7 @@ class BasicLevel(Level):
             solution_print_header(self)
             for command in solution:
                 print('\t' + command)
- 
+
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
 
