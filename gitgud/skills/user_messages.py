@@ -85,9 +85,9 @@ def handle_solution_confirmation(level):
     print('If so, run `git gud solution` with --confirm.')
 
 
-def handle_solution_none_available():
+def no_solutions_available():
     print("No solutions available for this level.")
 
 
-def handle_solution_print_header(level):
+def solution_print_header(level):
     print('Solution for the current level "{}" in the skill "{}":'.format(level.name, level.skill.name))  # noqa: E501

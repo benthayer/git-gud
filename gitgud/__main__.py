@@ -14,8 +14,7 @@ from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import handle_solution_confirmation
-from gitgud.skills.user_messages import handle_solution_none_available
-from gitgud.skills.user_messages import handle_solution_print_header
+
 from gitgud.hooks import all_hooks
 
 
@@ -355,13 +354,7 @@ class GitGud:
         if not args.confirm:
             handle_solution_confirmation(current_level)
         else:
-            if not current_level.solution_commands:
-                handle_solution_none_available()
-                return
-
-            handle_solution_print_header(current_level)
-            for command in current_level.solution_commands:
-                print('\t' + command)
+            current_level.goal()
 
     def handle_skills(self, args):
         if self.is_initialized():

@@ -4,8 +4,9 @@ from gitgud.skills.testing import simulate
 
 from . import skill
 
+
 level_tests = [
-    (level, level.solution_commands) for level in skill
+    (level, level.solution_list()) for level in skill
 ]
 
 

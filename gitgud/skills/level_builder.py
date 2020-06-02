@@ -3,7 +3,6 @@ from importlib_resources import files
 from .parsing import test_ancestry
 from .parsing import level_json
 from .parsing import parse_spec
-from .parsing import parse_solution
 from .parsing import name_from_map
 from .parsing import get_non_merges
 from .parsing import name_merges
@@ -17,6 +16,8 @@ from .user_messages import default_fail
 from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
+from .user_messages import solution_print_header
+from .user_messages import no_solutions_available
 
 
 class Level:
@@ -95,7 +96,7 @@ class BasicLevel(Level):
         if not self.solution_path.exists():
             self.solution_path = None
 
-        self.solution_commands = parse_solution(self.solution_path)
+        self.solution_commands = self.solution_list()
 
     def _setup(self, file_operator):
         commits, head = parse_spec(self.setup_spec_path)
@@ -128,6 +129,28 @@ class BasicLevel(Level):
     def goal(self):
         print_goal(self)
 
+    def solution_list(self):
+        solution_commands = []
+
+        if not self.solution_path:
+            return solution_commands
+
+        solution_data = self.solution_path.read_text()
+        for command in solution_data.split('\n'):
+            if not command or command.strip()[0] == '#':
+                continue
+            solution_commands.append(command)
+        return solution_commands
+
+    def solution(self):
+        solution = self.solution_list()
+        if not solution:
+            no_solutions_available()
+        else:
+            solution_print_header(self)
+            for command in solution:
+                print('\t' + command)
+ 
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
 
