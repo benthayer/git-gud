@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess
 import webbrowser
 
 import argparse
@@ -14,7 +15,8 @@ from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import handle_solution_confirmation
-
+from gitgud.skills.user_messages import mock_simulate
+from gitgud.skills.user_messages import print_info
 from gitgud.hooks import all_hooks
 
 
@@ -212,8 +214,7 @@ class GitGud:
 
     def assert_initialized(self, skip_level_check=False):
         if not self.is_initialized():
-            raise InitializationError(
-                    'Git gud has not been initialized. Use "git gud init" to initialize')  # noqa: E501
+            raise InitializationError('Git gud has not been initialized. Use "git gud init" to initialize')  # noqa: E501
 
         if not skip_level_check:
             try:
@@ -270,7 +271,7 @@ class GitGud:
                 print('Current directory is nonempty. Use --force to force initialize here.')  # noqa: E501
                 return
         else:
-            print('Force initializing git gud.')
+            print('Force initializing Git Gud.')
             if not self.file_operator:
                 self.file_operator = Operator(
                         os.getcwd(),
@@ -281,6 +282,9 @@ class GitGud:
             self.file_operator.repo = Repo(self.file_operator.path)
         except InvalidGitRepositoryError:
             self.file_operator.repo = Repo.init(self.file_operator.path)
+
+        # Disable pager so "git gud status" can use the output easily
+        subprocess.call("git config core.pager ''", shell=True)
 
         if not os.path.exists(self.file_operator.gg_path):
             os.mkdir(self.file_operator.gg_path)
@@ -326,7 +330,7 @@ class GitGud:
                 print('Currently on unregistered level: "{}"'
                       .format(level_name))
         else:
-            print("Git gud not initialized.")
+            print("Git Gud not initialized.")
             print('Initialize using "git gud init"')
 
     def handle_instructions(self, args):
@@ -488,12 +492,12 @@ class GitGud:
             except ValueError:
                 pass
 
-        print('Simulating: Create file "{}"'.format(commit_name))
-        print('Simulating: git add {}'.format(commit_name))
-        print('Simulating: git commit -m "{}"'.format(commit_name))
+        print_info('Created file "{}"'.format(commit_name))
+        mock_simulate('git add {}'.format(commit_name))
+        mock_simulate('git commit -m "{}"'.format(commit_name))
 
         commit = self.file_operator.add_and_commit(commit_name)
-        print("New Commit: {}".format(commit.hexsha[:7]))
+        print_info("New Commit: {}".format(commit.hexsha[:7]))
         self.file_operator.track_commit(commit_name, commit.hexsha)
 
         # Next "git gud commit" name
@@ -523,7 +527,7 @@ class GitGud:
         if args.command is None:
             if not self.is_initialized():
                 print('Currently in an uninitialized directory.')
-                print('Get started by running "git gud init" in a new directory!')  # noqa: E501
+                print('Get started by running "git gud init" in an empty directory!')  # noqa: E501
             else:
                 self.parser.print_help()
         else:
