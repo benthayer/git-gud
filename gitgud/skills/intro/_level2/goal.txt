@@ -1,5 +1,0 @@
-Configure your name and email for Git.
-
-Type "git gud status" will show you what to do. 
-Type "git gud test" when done.
-

@@ -227,3 +227,4 @@ def get_operator():
         if os.path.isdir(gg_path):
             return Operator(path)
     return None
+

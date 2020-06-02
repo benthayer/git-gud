@@ -8,10 +8,7 @@ from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import default_fail_no_reset
 
 
-class Level1(BasicLevel):
-    def __init__(self):
-        super().__init__('welcome' , __name__)
-
+class Welcome(BasicLevel):
     def post_setup(self):
         self.display_message("post-setup.txt")
 
@@ -32,10 +29,7 @@ def get_name_and_email():
     return name, email
 
 
-class Level2(BasicLevel):
-    def __init__(self):
-        super().__init__('level2' , __name__)
-
+class Config(BasicLevel):
     def post_setup(self):
         self.display_message("post-setup.txt")
 
@@ -48,7 +42,7 @@ class Level2(BasicLevel):
         print('user.name: "{}"'.format(name))
         print('user.email: "{}"'.format(email))
 
-        self.display_message("how-to-configure.txt")
+        self.display_message("status-2.txt")
 
     def _test(self, file_operator):
         name, email = get_name_and_email()
@@ -64,7 +58,7 @@ class Level2(BasicLevel):
 skill = Skill(
     'intro',
     [
-        Level1(),
-        Level2(),
+        Welcome('welcome', __name__),
+        Config('config', __name__)
     ]
 )
