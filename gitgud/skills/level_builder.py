@@ -92,8 +92,6 @@ class BasicLevel(Level):
             self.instructions_path = self.goal_path
 
         self.solution_path = self.level_dir.joinpath('solution.txt')
-        if not self.solution_path.exists():
-            self.solution_path = None
 
         self.solution_commands = self.solution_list()
 
@@ -132,14 +130,11 @@ class BasicLevel(Level):
     def solution_list(self):
         solution_commands = []
 
-        if not self.solution_path:
-            return solution_commands
+        solution_data = self.solution_path.read_text().split('\n')
+        for command in solution_data:
+            if command and command.strip()[0] != "#":
+                solution_commands.append(command)
 
-        solution_data = self.solution_path.read_text()
-        for command in solution_data.split('\n'):
-            if not command or command.strip()[0] == '#':
-                continue
-            solution_commands.append(command)
         return solution_commands
 
     def solution(self):
