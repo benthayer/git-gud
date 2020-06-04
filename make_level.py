@@ -120,38 +120,7 @@ def write_test(skill_path, level_name):
     test_levels_path = os.path.join(skill_path, "test_levels.py")
     if not os.path.exists(test_levels_path):
         copyfile("level_file_templates/test_levels.py", test_levels_path)
-        with open(test_levels_path, 'r') as fp:
-            new_test = fp.read()
-
-        with open(test_levels_path, 'w') as fp:
-            fp.write(new_test)
-            print("Created file: {}".format(test_levels_path))
-            print('Created test case for "{}" in {}'.format(level_name, test_levels_path))  # noqa: E501
-    else:
-        with open(test_levels_path, 'r') as fp:
-            filedata = fp.read()
-
-        replace = "\n".join([
-            "    ), (",
-            "        skill[\'{}\'], [".format(level_name),
-            "            \'git gud commit\',  # Examples, change to solution for your level",  # noqa: E501
-            "            \'git gud commit\',",
-            "            \'git checkout HEAD^\',",
-            "            \'git checkout -b changes-to-be-made-by-player\',",
-            "            \'git checkout checked-out-branch\'",
-            "        ]",
-            "    )",
-            "]"
-        ])
-
-        filedata = filedata.replace("\n".join([
-            "    )",
-            "]"
-        ]), replace)
-
-        with open(test_levels_path, 'w') as fp:
-            fp.write(filedata)
-            print('Created test case "{}" in {}'.format(level_name, test_levels_path))  # noqa: E501
+    print('Created test case "{}" in {}'.format(level_name, test_levels_path))  # noqa: E501
 
 
 def create_level_file(level_path, filename):
