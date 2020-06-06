@@ -216,16 +216,6 @@ class GitGud:
                         'Currently loaded level does not exist: "{}"'
                         .format(level_name))
 
-    def load_level(self, level):
-        # Clear remotes
-        self.assert_initialized(skip_level_check=True)
-        level_repo = self.file_operator.repo
-        for remote in level_repo.remotes:
-            level_repo.delete_remote(remote)
-        self.file_operator.clear_tracked_commits()
-        level.setup(self.file_operator)
-        self.file_operator.write_level(level)
-
     def handle_help(self, args):
         if args.command_name is None:
             self.parser.print_help()
@@ -306,7 +296,7 @@ class GitGud:
             mode |= (mode & 0o444) >> 2
             os.chmod(path, mode)
 
-        self.load_level(all_skills["0"]["1"])
+        all_skills["0"]["1"].setup(self.file_operator)
 
     def handle_status(self, args):
         if self.is_initialized():
@@ -333,7 +323,7 @@ class GitGud:
         self.assert_initialized()
 
         level = self.file_operator.get_level()
-        self.load_level(level)
+        level.setup(self.file_operator)
 
     def handle_test(self, args):
         self.assert_initialized()
@@ -406,7 +396,26 @@ class GitGud:
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
 
-        argskillset = args.skill_name.split("-", 1)
+        # Check if we're just going forward or back
+        if args.skill_name.lower() in {"next", "prev", "previous"}:
+            query = args.skill_name.lower()
+            level = self.file_operator.get_level()
+
+            if query == "next":
+                level_to_load = level.next_level
+            else:
+                query = "previous"
+                level_to_load = level.prev_level
+
+            if level_to_load is not None:
+                level_to_load.setup(self.file_operator)
+            else:
+                if query == "next":
+                    all_levels_complete()
+                else:
+                    print('Already on the first level. To reload the level, use "git gud reload".')  # noqa: E501
+                print('\nTo view levels/skills, use "git gud levels" or "git gud skills"')  # noqa: E501
+            return
 
         # Set up args.level_name and args.skill_name
         if args.level_name:
@@ -414,44 +423,21 @@ class GitGud:
                 # Replace the dash with the current skill's name.
                 args.skill_name = self.file_operator.get_level().skill.name
         else:
-            if len(argskillset) == 2:
-                args.skill_name, args.level_name = tuple(argskillset)
+            skill_and_level = args.skill_name.split("-", 1)
+            if len(skill_and_level) == 2:
+                args.skill_name, args.level_name = tuple(skill_and_level)
             else:
-                args.skill_name, args.level_name = argskillset[0], None
+                args.skill_name = skill_and_level[0]
+                args.level_name = '1'
 
-        skill_to_load = self.file_operator.get_level().skill.name
-        if args.skill_name:
-            if args.skill_name.lower() in {"next", "prev", "previous"}:
-                query = args.skill_name.lower()
-                level = self.file_operator.get_level()
+        if not args.skill_name:
+            args.skill_name = self.file_operator.get_level().skill.name
 
-                if query == "next":
-                    level_to_load = level.next_level
-                else:
-                    query = "previous"
-                    level_to_load = level.prev_level
-
-                if level_to_load is not None:
-                    self.load_level(level_to_load)
-                else:
-                    if query == "next":
-                        all_levels_complete()
-                    else:
-                        print('Already on the first level. To reload the level, use "git gud reload".')  # noqa: E501
-                    print('\nTo view levels/skills, use "git gud levels" or "git gud skills"')  # noqa: E501
-                return
-            else:
-                skill_to_load = args.skill_name
-
-        level_to_load = '1'
-        if args.level_name:
-            level_to_load = args.level_name
-
-        if skill_to_load in all_skills.keys():
-            skill = all_skills[skill_to_load]
-            if level_to_load in skill.keys():
-                level = skill[level_to_load]
-                self.load_level(level)
+        if args.skill_name in all_skills.keys():
+            skill = all_skills[args.skill_name]
+            if args.level_name in skill.keys():
+                level = skill[args.level_name]
+                level.setup(self.file_operator)
             else:
                 print('Level "{}" does not exist'.format(args.level_name))
                 print('To view levels/skills, use "git gud levels" or "git gud skills"\n')  # noqa: E501

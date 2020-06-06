@@ -218,11 +218,14 @@ class Operator:
             return level_file.read()
 
     def get_level(self):
-        skill_name, level_name = self.read_level_file().split()
-        return all_skills[skill_name][level_name]
+        try:
+            skill_name, level_name = self.read_level_file().split()
+            return all_skills[skill_name][level_name]
+        except FileNotFoundError:
+            return None
 
     def write_level(self, level):
-        with open(self.level_path, 'w+') as skill_file:
+        with open(self.level_path, 'w') as skill_file:
             skill_file.write(' '.join([level.skill.name, level.name]))
 
     def get_last_commit(self):

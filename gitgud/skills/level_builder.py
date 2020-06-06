@@ -38,9 +38,17 @@ class Level:
         pass
 
     def setup(self, file_operator):
+        # Clear remotes
+        level_repo = file_operator.repo
+        for remote in level_repo.remotes:
+            level_repo.delete_remote(remote)
+        file_operator.clear_tracked_commits()
+
         show_level_name(self)
         self._setup(file_operator)
         self.post_setup()
+
+        file_operator.write_level(self)
 
     def post_setup(self):
         pass
