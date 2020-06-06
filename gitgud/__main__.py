@@ -355,7 +355,8 @@ class GitGud:
     def handle_solution(self, args):
         self.assert_initialized()
         current_level = self.file_operator.get_level()
-        if not args.confirm:
+        if not args.confirm and \
+                not current_level.has_ever_been_completed(self.file_operator):
             handle_solution_confirmation(current_level)
         else:
             current_level.solution()

@@ -54,6 +54,9 @@ class Level:
     def status(self):
         show_level_name(self)
 
+    def has_ever_been_completed(self, file_operator):
+        return self._test(file_operator)
+
     def _test(self, file_operator):
         raise NotImplementedError
 
@@ -85,14 +88,11 @@ class BasicLevel(Level):
         self.test_spec_path = self.level_dir.joinpath('test.spec')
 
         self.instructions_path = self.level_dir.joinpath('instructions.txt')
-
         self.goal_path = self.level_dir.joinpath('goal.txt')
-
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
 
         self.solution_path = self.level_dir.joinpath('solution.txt')
-
         self.solution_commands = self.solution_list()
 
     def display_message(self, message_path):
@@ -130,8 +130,7 @@ class BasicLevel(Level):
     def solution_list(self):
         solution_commands = []
 
-        solution_data = self.solution_path.read_text().split('\n')
-        for command in solution_data:
+        for command in self.solution_path.read_text().split('\n'):
             if command and command.strip()[0] != "#":
                 solution_commands.append(command)
 
@@ -144,7 +143,7 @@ class BasicLevel(Level):
         else:
             solution_print_header(self)
             for command in solution:
-                print('\t' + command)
+                print(' '*4 + command)
 
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)

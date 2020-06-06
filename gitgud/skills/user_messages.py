@@ -94,7 +94,8 @@ def default_fail():
 
 
 def handle_solution_confirmation(level):
-    print('Are you sure you want to view the solution for "{}": "{}"? If so, run `git gud solution` with --confirm.'.format(level.name, level.skill.name))  # noqa: E501
+    print('Are you sure you want to view the solution for "{}": "{}"?'.format(level.name, level.skill.name))  # noqa: E501
+    print('If so, run `git gud solution --confirm`')
 
 
 def no_solutions_available():
