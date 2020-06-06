@@ -86,6 +86,8 @@ class BasicLevel(Level):
 
         self.goal_path = self.level_dir.joinpath('goal.txt')
 
+        self.passed_path = self.level_dir.joinpath('passed.txt')
+
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
 
