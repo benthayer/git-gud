@@ -5,7 +5,6 @@ import datetime as dt
 import email.utils
 
 from glob import glob
-import pickle
 
 from git import Repo
 
@@ -26,7 +25,6 @@ class Operator():
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
         self.commits_path = os.path.join(self.gg_path, 'commits.csv')
         self.level_path = os.path.join(self.gg_path, 'current_level.txt')
-        self.pickle_path = os.path.join(self.gg_path, '.fileoperator.pickle')
 
 
     def add_file_to_index(self, filename):
@@ -67,7 +65,6 @@ class Operator():
 
     def create_repo(self):
         self.repo = Repo(os.getcwd())
-        write_operator(self)
 
     def destroy_repo(self):
         for path in set(os.path.join(self.git_path, path) for path in os.listdir(self.git_path)):
@@ -76,7 +73,6 @@ class Operator():
             elif not os.path.isdir(path):
                 os.unlink(path)
         self.repo = None
-        write_operator(self)
 
     def create_tree(self, commits, head):
         branches = self.repo.branches
@@ -313,22 +309,18 @@ class Operator():
         return mapping
 
 
+_operator = None
 def get_operator():
+    if _operator:
+        return _operator
+
     cwd = os.getcwd().split(os.path.sep)
+
     for i in reversed(range(len(cwd))):
+        path = os.path.sep.join(cwd[:i+1])
         gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
         if os.path.isdir(gg_path):
-            file_operator_pickle_path = \
-                os.path.sep.join(cwd[:i+1] + ['.git', 'gud', '.fileoperator.pickle'])  # noqa: E501
-            if os.path.exists(file_operator_pickle_path):
-                with open(file_operator_pickle_path, 'rb') as pickle_handle:
-                    return pickle.load(pickle_handle)
-            else:
-                return None
+            return Operator(path)
     return None
 
 
-def write_operator(file_operator):
-    with open(file_operator.pickle_path, 'wb') as pickle_handle:
-        pickle.dump(file_operator, pickle_handle)
-    return file_operator
