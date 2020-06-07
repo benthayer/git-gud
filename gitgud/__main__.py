@@ -14,6 +14,7 @@ from gitgud.operations import Operator
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
+from gitgud.skills.user_messages import handle_solution_confirmation
 from gitgud.skills.user_messages import mock_simulate
 from gitgud.skills.user_messages import print_info
 from gitgud.hooks import all_hooks
@@ -71,14 +72,12 @@ class GitGud:
             "\n",
         ])
 
-        show_description = "".join([
+        show_description = "\n".join([
             "Helper command to show certain information.",
-            "\n\n",
+            "\n",
             "Subcommands:",
-            "\n",
             "  <command>",
-            "\n",
-            "    tree", "\t", "Show the current state of the branching tree"
+            "    tree\tShow the current state of the branching tree"
         ])
 
         self.subparsers = self.parser.add_subparsers(
@@ -138,6 +137,13 @@ class GitGud:
                 metavar='cmd',
                 help="Command to get help on", nargs='?'
         )
+
+        solution_parser = self.subparsers.add_parser(
+                'solution',
+                help='Show solution for the given level',
+                description='Show the solution for the given level'
+        )
+        solution_parser.add_argument('--confirm', action='store_true')
 
         init_parser = self.subparsers.add_parser(
                 'init',
@@ -199,7 +205,8 @@ class GitGud:
             'show-tree': self.handle_show_tree,
             'show': self.handle_show,
             'contributors': self.handle_contrib,
-            'issues': self.handle_issues
+            'issues': self.handle_issues,
+            'solution': self.handle_solution
         }
 
     def is_initialized(self):
@@ -344,6 +351,15 @@ class GitGud:
         self.assert_initialized()
         level = self.file_operator.get_level()
         level.test(self.file_operator)
+
+    def handle_solution(self, args):
+        self.assert_initialized()
+        current_level = self.file_operator.get_level()
+        if not args.confirm and \
+                not current_level.has_ever_been_completed(self.file_operator):
+            handle_solution_confirmation(current_level)
+        else:
+            current_level.solution()
 
     def handle_skills(self, args):
         if self.is_initialized():

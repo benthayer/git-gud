@@ -116,44 +116,13 @@ def make_level(skill_name, skill_path, level_name):
     print("Registered level \"{}\" in {}".format(level_name, filepath))
 
 
-def write_test(skill_path, level_name):
+def write_test(skill_path, skill_name):
     test_levels_path = os.path.join(skill_path, "test_levels.py")
     if not os.path.exists(test_levels_path):
         copyfile("level_file_templates/test_levels.py", test_levels_path)
-        with open(test_levels_path, 'r') as fp:
-            new_test = fp.read()
-
-        new_test = new_test.replace("{}", level_name)
-
-        with open(test_levels_path, 'w') as fp:
-            fp.write(new_test)
-            print("Created file: {}".format(test_levels_path))
-            print('Created test case for "{}" in {}'.format(level_name, test_levels_path))  # noqa: E501
+        print('Created: {}'.format(test_levels_path))
     else:
-        with open(test_levels_path, 'r') as fp:
-            filedata = fp.read()
-
-        replace = "\n".join([
-            "    ), (",
-            "        skill[\'{}\'], [".format(level_name),
-            "            \'git gud commit\',  # Examples, change to solution for your level",  # noqa: E501
-            "            \'git gud commit\',",
-            "            \'git checkout HEAD^\',",
-            "            \'git checkout -b changes-to-be-made-by-player\',",
-            "            \'git checkout checked-out-branch\'",
-            "        ]",
-            "    )",
-            "]"
-        ])
-
-        filedata = filedata.replace("\n".join([
-            "    )",
-            "]"
-        ]), replace)
-
-        with open(test_levels_path, 'w') as fp:
-            fp.write(filedata)
-            print('Created test case "{}" in {}'.format(level_name, test_levels_path))  # noqa: E501
+        print('Exists: {}'.format(test_levels_path))
 
 
 def create_level_file(level_path, filename):
@@ -233,6 +202,7 @@ def main():
     create_level_file(level_path, "goal.txt")
     create_level_file(level_path, "setup.spec")
     create_level_file(level_path, "test.spec")
+    create_level_file(level_path, "solution.txt")
     print()
 
     print("Done.")

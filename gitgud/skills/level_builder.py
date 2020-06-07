@@ -15,6 +15,8 @@ from .user_messages import default_fail
 from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
+from .user_messages import solution_print_header
+from .user_messages import no_solutions_available
 
 
 class Level:
@@ -52,6 +54,9 @@ class Level:
     def status(self):
         show_level_name(self)
 
+    def has_ever_been_completed(self, file_operator):
+        return self._test(file_operator)
+
     def _test(self, file_operator):
         raise NotImplementedError
 
@@ -83,13 +88,15 @@ class BasicLevel(Level):
         self.test_spec_path = self.level_dir.joinpath('test.spec')
 
         self.instructions_path = self.level_dir.joinpath('instructions.txt')
-
         self.goal_path = self.level_dir.joinpath('goal.txt')
 
         self.passed_path = self.level_dir.joinpath('passed.txt')
 
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
+
+        self.solution_path = self.level_dir.joinpath('solution.txt')
+        self.solution_commands = self.solution_list()
 
     def display_message(self, message_path):
         path = self.level_dir.joinpath(message_path)
@@ -122,6 +129,24 @@ class BasicLevel(Level):
 
     def goal(self):
         self.display_message("goal.txt")
+
+    def solution_list(self):
+        solution_commands = []
+
+        for command in self.solution_path.read_text().split('\n'):
+            if command and command.strip()[0] != "#":
+                solution_commands.append(command)
+
+        return solution_commands
+
+    def solution(self):
+        solution = self.solution_list()
+        if not solution:
+            no_solutions_available()
+        else:
+            solution_print_header(self)
+            for command in solution:
+                print(' '*4 + command)
 
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
