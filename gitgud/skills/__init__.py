@@ -11,7 +11,7 @@ all_skills = AllSkills([
     basics_skill,
     rampup_skill,
     rework_skill,
-    extras_skill,
+    extras_skill
 ])
 
 all_levels = []
