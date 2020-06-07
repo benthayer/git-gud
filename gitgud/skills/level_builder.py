@@ -7,10 +7,9 @@ from .parsing import name_from_map
 from .parsing import get_non_merges
 from .parsing import name_merges
 
+from .user_messages import print_user_file
 from .user_messages import print_user_message
 from .user_messages import show_level_name
-from .user_messages import print_goal
-from .user_messages import simulate_goal
 from .user_messages import show_tree
 from .user_messages import default_fail
 from .user_messages import level_complete
@@ -52,7 +51,7 @@ class Level:
         file_operator.write_level(self)
 
     def post_setup(self):
-        pass
+        show_level_name(self)
 
     def instructions(self):
         pass
@@ -92,12 +91,19 @@ class BasicLevel(Level):
 
         self.setup_spec_path = self.level_dir.joinpath('setup.spec')
         self.test_spec_path = self.level_dir.joinpath('test.spec')
-        self.passed_path = self.level_dir.joinpath('passed.txt')
+
+        self.instructions_path = self.level_dir.joinpath('instructions.txt')
 
         self.goal_path = self.level_dir.joinpath('goal.txt')
-        self.instructions_path = self.level_dir.joinpath('instructions.txt')
+
+        self.passed_path = self.level_dir.joinpath('passed.txt')
+
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
+
+    def display_message(self, message_path):
+        path = self.level_dir.joinpath(message_path)
+        print_user_file(path)
 
     def _setup(self, file_operator):
         commits, head = parse_spec(self.setup_spec_path)
@@ -114,7 +120,7 @@ class BasicLevel(Level):
         file_operator.write_last_commit(latest_commit)
 
     def post_setup(self):
-        simulate_goal(self)
+        self.display_message('goal.txt')
         show_tree()
 
     def instructions(self):
@@ -124,11 +130,8 @@ class BasicLevel(Level):
             else:
                 print(line.strip())
 
-    def goal_str(self):
-        return self.goal_path.read_text().strip()
-
     def goal(self):
-        print_goal(self)
+        self.display_message("goal.txt")
 
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)

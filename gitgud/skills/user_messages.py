@@ -3,6 +3,14 @@ import subprocess
 user_has_seen_messages = False
 
 
+def start_marker():
+    return '<' * 7
+
+
+def end_marker():
+    return '=' * 7
+
+
 def separated(func):
     def new_func(*args, **kwargs):
         global user_has_seen_messages
@@ -15,6 +23,11 @@ def separated(func):
 
 
 @separated
+def print_user_file(path):
+    print(path.read_text().strip())
+
+
+@separated
 def print_user_message(message):
     print(message)
 
@@ -24,21 +37,23 @@ def show_level_name(level):
     print('Level: "{}"'.format(level.full_name()))
 
 
-@separated
-def print_goal(level):
-    print(level.goal_str())
+def print_info(message):
+    print("[INFO]: {}".format(message))
+
+
+def mock_simulate(command):
+    print(end_marker(), "Simulating: {}".format(command))
 
 
 @separated
-def simulate_goal(level):
-    print("Simulating: git gud goal")
-    print(level.goal_str())
+def simulate_command(command):
+    print(start_marker(), "Simulating: {}".format(command))
+    subprocess.call(command, shell=True)
+    print(end_marker())
 
 
-@separated
 def show_tree():
-    print("Simulating: git log --graph --oneline --all ")
-    subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
+    simulate_command("git log --graph --oneline --all")
 
 
 @separated
@@ -76,3 +91,8 @@ def all_levels_complete():
 @separated
 def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')  # noqa: E501
+
+
+@separated
+def default_fail_no_reset():
+    print('Level not complete, keep trying.')
