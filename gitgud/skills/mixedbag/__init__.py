@@ -1,8 +1,9 @@
-from collections import OrderedDict
+from gitgud.skills.level_builder import BasicLevel
+from gitgud.skills.util import Skill
 
-import pkg_resources
-
-from gitgud.levels.util import BasicChallenge
-
-all_challenges = OrderedDict()
-all_challenges['onecommit'] = BasicChallenge('onecommit', pkg_resources.resource_filename(__name__, '_onecommit/'))
+skill = Skill(
+    'mixedbag',
+    [
+        BasicLevel('onecommit', __name__)
+    ]
+)
