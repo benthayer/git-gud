@@ -6,6 +6,7 @@ from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.user_messages import simulate_command
 from gitgud.skills.user_messages import default_fail_no_reset
 
+from gitgud import operations
 
 class Welcome(BasicLevel):
     def post_setup(self):
@@ -62,7 +63,9 @@ class Config(BasicLevel):
 class Init(BasicLevel):
     def setup(self):
         # Make sure we are not in a git repo
-        pass
+        file_operator = operations.get_operator()
+        if file_operator.repo is not None:
+            file_operator.destroy_repo()
 
     def post_setup(self):
         self.display_message("post-setup.txt")
@@ -75,6 +78,7 @@ class Init(BasicLevel):
 
     def _test(self):
         # Check if we are in a git repo
+        
         return True
 
     def test_failed(self):

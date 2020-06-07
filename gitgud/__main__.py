@@ -224,6 +224,9 @@ class GitGud:
         if level_repo:
             for remote in level_repo.remotes:
                 level_repo.delete_remote(remote)
+        else:
+            file_operator.repo = Repo.init(file_operator.path)
+            operations.write_operator(file_operator)
         file_operator.clear_tracked_commits()
         level.setup()
         file_operator.write_level(level)
@@ -315,7 +318,7 @@ class GitGud:
             mode |= (mode & 0o444) >> 2
             os.chmod(path, mode)
 
-        operations.set_operator(file_operator)
+        operations.write_operator(file_operator)
         self.load_level(all_skills["0"]["1"])
 
     def handle_status(self, args):
