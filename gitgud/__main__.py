@@ -9,8 +9,8 @@ from git import Repo
 from git.exc import InvalidGitRepositoryError
 
 import gitgud
-from gitgud.operations import get_operator
 from gitgud.operations import Operator
+from gitgud import operations
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
@@ -26,8 +26,6 @@ class InitializationError(Exception):
 class GitGud:
     def __init__(self):
         # Only gets operator if Git Gud has been initialized
-        self.file_operator = get_operator()
-
         self.parser = argparse.ArgumentParser(prog='git gud')
         self.parser.add_argument(
                 '--version',
@@ -203,7 +201,7 @@ class GitGud:
         }
 
     def is_initialized(self):
-        return self.file_operator is not None
+        return operations.get_operator() is not None
 
     def assert_initialized(self, skip_level_check=False):
         if not self.is_initialized():
@@ -213,23 +211,25 @@ class GitGud:
             try:
                 self.get_level()
             except KeyError:
-                level_name = self.file_operator.read_level_file()
+                level_name = operations.get_operator().read_level_file()
                 raise InitializationError(
                         'Currently loaded level does not exist: "{}"'
                         .format(level_name))
 
     def load_level(self, level):
         # Clear remotes
+        file_operator = operations.get_operator()
         self.assert_initialized(skip_level_check=True)
-        level_repo = self.file_operator.repo
-        for remote in level_repo.remotes:
-            level_repo.delete_remote(remote)
-        self.file_operator.clear_tracked_commits()
-        level.setup(self.file_operator)
-        self.file_operator.write_level(level)
+        level_repo = file_operator.repo
+        if level_repo:
+            for remote in level_repo.remotes:
+                level_repo.delete_remote(remote)
+        file_operator.clear_tracked_commits()
+        level.setup()
+        file_operator.write_level(level)
 
     def get_level(self):
-        skill_name, level_name = self.file_operator.read_level_file().split()
+        skill_name, level_name = operations.get_operator().read_level_file().split()  # noqa: E501
         return all_skills[skill_name][level_name]
 
     def handle_help(self, args):
@@ -246,51 +246,51 @@ class GitGud:
 
     def handle_init(self, args):
         # Make sure it's safe to initialize
+        file_operator = operations.get_operator()
         if not args.force:
             # We aren't forcing
-            if self.file_operator:
+            if file_operator:
                 print('Repo {} already initialized for git gud.'
-                      .format(self.file_operator.path))
+                      .format(file_operator.path))
                 print('Use --force to initialize {}.'.format(os.getcwd()))
                 return
 
-            self.file_operator = Operator(os.getcwd(), initialize_repo=False)
+            file_operator = Operator(os.getcwd(), initialize_repo=False)
 
-            if os.path.exists(self.file_operator.git_path):
-                # Current directory is a git repo
-                print('Currently in a git repo. Use --force to force initialize here.')  # noqa: E501
-                return
-            if os.path.exists(self.file_operator.gg_path):
+            if os.path.exists(file_operator.gg_path):
                 # Current directory is a git repo
                 print('Git gud has already initialized. Use --force to force initialize again.')  # noqa: E501
                 return
-            if len(os.listdir(self.file_operator.path)) != 0:
+            if os.path.exists(os.path.join(file_operator.git_path, 'HEAD')):
+                # Current directory is a git repo
+                print('Currently in a git repo. Use --force to force initialize here.')  # noqa: E501
+                return
+            elif len(os.listdir(file_operator.path)) != 0:
                 print('Current directory is nonempty. Use --force to force initialize here.')  # noqa: E501
                 return
         else:
             print('Force initializing Git Gud.')
-            if not self.file_operator:
-                self.file_operator = Operator(
-                        os.getcwd(),
-                        initialize_repo=False)
+            if not file_operator:
+                file_operator = Operator(os.getcwd(), initialize_repo=False)
 
+        assert file_operator is not None
         # After here, we initialize everything
         try:
-            self.file_operator.repo = Repo(self.file_operator.path)
+            file_operator.repo = Repo(file_operator.path)
         except InvalidGitRepositoryError:
-            self.file_operator.repo = Repo.init(self.file_operator.path)
+            file_operator.repo = Repo.init(file_operator.path)
 
         # Disable pager so "git gud status" can use the output easily
         subprocess.call("git config core.pager ''", shell=True)
 
-        if not os.path.exists(self.file_operator.gg_path):
-            os.mkdir(self.file_operator.gg_path)
+        if not os.path.exists(file_operator.gg_path):
+            os.mkdir(file_operator.gg_path)
 
         # Git uses unix-like path separators
         python_exec = sys.executable.replace('\\', '/')
 
         for git_hook_name, module_hook_name, accepts_args in all_hooks:
-            path = os.path.join(self.file_operator.hooks_path, git_hook_name)
+            path = os.path.join(file_operator.hooks_path, git_hook_name)
             if accepts_args:
                 forward_stdin = 'cat - |'
                 passargs = ' "$@"'
@@ -315,6 +315,7 @@ class GitGud:
             mode |= (mode & 0o444) >> 2
             os.chmod(path, mode)
 
+        operations.set_operator(file_operator)
         self.load_level(all_skills["0"]["1"])
 
     def handle_status(self, args):
@@ -323,7 +324,7 @@ class GitGud:
                 level = self.get_level()
                 level.status()
             except KeyError:
-                level_name = self.file_operator.read_level_file()
+                level_name = operations.get_operator().read_level_file()
                 print('Currently on unregistered level: "{}"'
                       .format(level_name))
         else:
@@ -347,7 +348,7 @@ class GitGud:
     def handle_test(self, args):
         self.assert_initialized()
         level = self.get_level()
-        level.test(self.file_operator)
+        level.test()
 
     def handle_skills(self, args):
         if self.is_initialized():
@@ -383,14 +384,15 @@ class GitGud:
 
     def handle_levels(self, args):
         key_error_flag = False
+        file_operator = operations.get_operator()
         if args.skill_name is None:
-            if self.file_operator is None:
+            if file_operator is None:
                 self.subparsers.choices['levels'].print_help()
                 return
             try:
                 skill = self.get_level().skill
             except KeyError:
-                skill_name = self.file_operator.read_level_file().split()[0]
+                skill_name = file_operator.read_level_file().split()[0]
                 print('Cannot find any levels in skill: "{}"'.format(skill_name))  # noqa: E501
                 return
         else:
@@ -470,8 +472,8 @@ class GitGud:
 
     def handle_commit(self, args):
         self.assert_initialized()
-
-        last_commit = self.file_operator.get_last_commit()
+        file_operator = operations.get_operator()
+        last_commit = file_operator.get_last_commit()
         commit_name = str(int(last_commit) + 1)
 
         if args.file is not None:
@@ -485,13 +487,13 @@ class GitGud:
         mock_simulate('git add {}'.format(commit_name))
         mock_simulate('git commit -m "{}"'.format(commit_name))
 
-        commit = self.file_operator.add_and_commit(commit_name)
+        commit = file_operator.add_and_commit(commit_name)
         print_info("New Commit: {}".format(commit.hexsha[:7]))
-        self.file_operator.track_commit(commit_name, commit.hexsha)
+        file_operator.track_commit(commit_name, commit.hexsha)
 
         # Next "git gud commit" name
         if int(commit_name) > int(last_commit):
-            self.file_operator.write_last_commit(commit_name)
+            file_operator.write_last_commit(commit_name)
 
     def handle_show(self, args):
         if args.cmd == "tree":
@@ -514,7 +516,7 @@ class GitGud:
     def parse(self):
         args, _ = self.parser.parse_known_args()
         if args.command is None:
-            if not self.is_initialized():
+            if operations.get_operator() is None:
                 print('Currently in an uninitialized directory.')
                 print('Get started by running "git gud init" in an empty directory!')  # noqa: E501
             else:

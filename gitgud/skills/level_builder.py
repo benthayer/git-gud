@@ -16,6 +16,8 @@ from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
 
+from gitgud import operations
+
 
 class Level:
     def __init__(self, name):
@@ -33,11 +35,11 @@ class Level:
     def full_name(self):
         return '{} {}'.format(self.skill.name, self.name)
 
-    def _setup(self, file_operator):
+    def _setup(self):
         pass
 
-    def setup(self, file_operator):
-        self._setup(file_operator)
+    def setup(self):
+        self._setup()
         self.post_setup()
 
     def post_setup(self):
@@ -52,11 +54,11 @@ class Level:
     def status(self):
         show_level_name(self)
 
-    def _test(self, file_operator):
+    def _test(self):
         raise NotImplementedError
 
-    def test(self, file_operator):
-        if self._test(file_operator):
+    def test(self):
+        if self._test():
             self.test_passed()
         else:
             self.test_failed()
@@ -93,7 +95,8 @@ class BasicLevel(Level):
         path = self.level_dir.joinpath(message_path)
         print_user_file(path)
 
-    def _setup(self, file_operator):
+    def _setup(self):
+        file_operator = operations.get_operator()
         commits, head = parse_spec(self.setup_spec_path)
         file_operator.create_tree(commits, head)
 
@@ -121,7 +124,8 @@ class BasicLevel(Level):
     def goal(self):
         self.display_message("goal.txt")
 
-    def _test(self, file_operator):
+    def _test(self):
+        file_operator = operations.get_operator()
         commits, head = parse_spec(self.test_spec_path)
 
         # Get commit trees

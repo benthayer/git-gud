@@ -26,6 +26,7 @@ class Operator:
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
         self.commits_path = os.path.join(self.gg_path, 'commits.csv')
         self.level_path = os.path.join(self.gg_path, 'current_level.txt')
+        self.pickle_path = os.path.join(self.gg_path, '.fileoperator.pickle')
 
     def add_file_to_index(self, filename):
         open('{}/{}'.format(self.path, filename), 'w+').close()
@@ -91,7 +92,7 @@ class Operator:
             if parents:
                 # TODO GitPython detach head
                 self.repo.git.checkout(parents[0])
-            if len(parents) < 2:
+            if len(parents) < 22:
                 # Not a merge
                 self.add_file_to_index(name)
                 commit_obj = self.repo.index.commit(
@@ -217,7 +218,6 @@ class Operator:
         with open(self.level_path) as level_file:
             return level_file.read()
 
-
     def write_level(self, level):
         with open(self.level_path, 'w+') as skill_file:
             skill_file.write(' '.join([level.skill.name, level.name]))
@@ -299,21 +299,22 @@ class Operator:
         return mapping
 
 
+def set_operator(file_operator):
+    with open(file_operator.pickle_path, 'wb') as pickle_handle:
+        pickle.dump(file_operator, pickle_handle)
+    return file_operator
+
+
 def get_operator():
     cwd = os.getcwd().split(os.path.sep)
-
     for i in reversed(range(len(cwd))):
-        path = os.path.sep.join(cwd[:i+1])
         gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
         if os.path.isdir(gg_path):
             file_operator_pickle_path = \
-                os.path.sep.join(cwd[:i+1] + ['.git', 'gud', '.fileoperator.pickle']) # noqa: E501
+                os.path.sep.join(cwd[:i+1] + ['.git', 'gud', '.fileoperator.pickle'])  # noqa: E501
             if os.path.exists(file_operator_pickle_path):
                 with open(file_operator_pickle_path, 'rb') as pickle_handle:
                     return pickle.load(pickle_handle)
             else:
-                file_operator = Operator(path)
-                with open(file_operator_pickle_path, 'wb') as pickle_handle:
-                    pickle.dump(file_operator, pickle_handle)
-                return file_operator
+                return None
     return None

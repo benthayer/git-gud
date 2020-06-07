@@ -21,7 +21,7 @@ class Welcome(BasicLevel):
     def test_passed(self):
         self.display_message("passed.txt")
 
-    def _test(self, file_operator):
+    def _test(self):
         return True
 
 
@@ -48,7 +48,7 @@ class Config(BasicLevel):
 
         self.display_message("status-2.txt")
 
-    def _test(self, file_operator):
+    def _test(self):
         name, email = get_name_and_email()
         return name and email
 
@@ -60,7 +60,7 @@ class Config(BasicLevel):
 
 
 class Init(BasicLevel):
-    def setup(self, file_operator):
+    def setup(self):
         # Make sure we are not in a git repo
         pass
 
@@ -73,13 +73,13 @@ class Init(BasicLevel):
         else:
             self.display_message("status-norepo.txt")
 
-    def _test(self, file_operator):
+    def _test(self):
         # Check if we are in a git repo
         return True
-    
+
     def test_failed(self):
         default_fail_no_reset()
-    
+
     def test_passed(self):
         self.display_message("passed.txt")
 
