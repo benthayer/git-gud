@@ -118,12 +118,11 @@ def make_level(skill_name, skill_path, level_name):
 
 def write_test(skill_path, skill_name):
     test_levels_path = os.path.join(skill_path, "test_levels.py")
-    print()
     if not os.path.exists(test_levels_path):
-        print('Creating test file for skill "{}" at {}'.format(skill_name, test_levels_path))  # noqa: E501
         copyfile("level_file_templates/test_levels.py", test_levels_path)
+        print('Created: {}'.format(test_levels_path))
     else:
-        print('test_levels.py for skill "{}" already exists.'.format(skill_name))  # noqa: E501
+        print('Exists: {}'.format(test_levels_path))
 
 
 def create_level_file(level_path, filename):
