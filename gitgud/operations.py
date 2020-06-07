@@ -281,23 +281,14 @@ class Operator:
                 anti_diff = self.repo.git.diff(commit_hash, commit_hash + '~')
             diffs[diff] = commit_name + "'"
             diffs[anti_diff] = commit_name + '-'
-
         return diffs
 
     def get_copy_mapping(self, non_merges, known_commits):
-        existing_commits = {}
-        unlabeled_commits = []
-
+        diffs = self.get_diffs(known_commits)
+        mapping = {}
         for commit_hash in non_merges:
             if commit_hash in known_commits:
-                existing_commits[commit_hash] = known_commits[commit_hash]
-            else:
-                unlabeled_commits.append(commit_hash)
-
-        diffs = self.get_diffs(existing_commits)
-
-        mapping = {}
-        for commit_hash in unlabeled_commits:
+                continue
             diff = self.repo.git.diff(commit_hash + '~', commit_hash)
             if diff in diffs:
                 mapping[commit_hash] = diffs[diff]

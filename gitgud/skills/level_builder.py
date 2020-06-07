@@ -42,6 +42,7 @@ class Level:
         level_repo = file_operator.repo
         for remote in level_repo.remotes:
             level_repo.delete_remote(remote)
+
         file_operator.clear_tracked_commits()
 
         show_level_name(self)
@@ -144,7 +145,10 @@ class BasicLevel(Level):
         name_from_map(level_tree, known_commits)
 
         # Name rebases and cherrypicks
-        diff_map = file_operator.get_copy_mapping(non_merges, known_commits)
+        known_non_merges = {commit_hash: name
+                            for commit_hash, name in known_commits.items()
+                            if name[:1] != 'M'}
+        diff_map = file_operator.get_copy_mapping(non_merges, known_non_merges)
         name_from_map(level_tree, diff_map)
 
         # Name merges
