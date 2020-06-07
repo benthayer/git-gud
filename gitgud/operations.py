@@ -5,11 +5,11 @@ import datetime as dt
 import email.utils
 
 from glob import glob
+import pickle
 
 from git import Repo
 
 from gitgud import actor
-from gitgud.skills import all_skills
 
 
 class Operator:
@@ -217,9 +217,6 @@ class Operator:
         with open(self.level_path) as level_file:
             return level_file.read()
 
-    def get_level(self):
-        skill_name, level_name = self.read_level_file().split()
-        return all_skills[skill_name][level_name]
 
     def write_level(self, level):
         with open(self.level_path, 'w+') as skill_file:
@@ -309,5 +306,14 @@ def get_operator():
         path = os.path.sep.join(cwd[:i+1])
         gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
         if os.path.isdir(gg_path):
-            return Operator(path)
+            file_operator_pickle_path = \
+                os.path.sep.join(cwd[:i+1] + ['.git', 'gud', '.fileoperator.pickle']) # noqa: E501
+            if os.path.exists(file_operator_pickle_path):
+                with open(file_operator_pickle_path, 'rb') as pickle_handle:
+                    return pickle.load(pickle_handle)
+            else:
+                file_operator = Operator(path)
+                with open(file_operator_pickle_path, 'wb') as pickle_handle:
+                    pickle.dump(file_operator, pickle_handle)
+                return file_operator
     return None

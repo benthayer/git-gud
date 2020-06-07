@@ -17,4 +17,4 @@ def test_load(gg):
 
     for command, level in load_tests:
         subprocess.call(command, shell=True)
-        assert level == gg.file_operator.get_level()
+        assert level == gg.get_level()

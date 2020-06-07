@@ -211,7 +211,7 @@ class GitGud:
 
         if not skip_level_check:
             try:
-                self.file_operator.get_level()
+                self.get_level()
             except KeyError:
                 level_name = self.file_operator.read_level_file()
                 raise InitializationError(
@@ -227,6 +227,10 @@ class GitGud:
         self.file_operator.clear_tracked_commits()
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
+
+    def get_level(self):
+        skill_name, level_name = self.file_operator.read_level_file().split()
+        return all_skills[skill_name][level_name]
 
     def handle_help(self, args):
         if args.command_name is None:
@@ -316,7 +320,7 @@ class GitGud:
     def handle_status(self, args):
         if self.is_initialized():
             try:
-                level = self.file_operator.get_level()
+                level = self.get_level()
                 level.status()
             except KeyError:
                 level_name = self.file_operator.read_level_file()
@@ -328,27 +332,27 @@ class GitGud:
 
     def handle_instructions(self, args):
         self.assert_initialized()
-        self.file_operator.get_level().instructions()
+        self.get_level().instructions()
 
     def handle_goal(self, args):
         self.assert_initialized()
-        self.file_operator.get_level().goal()
+        self.get_level().goal()
 
     def handle_reset(self, args):
         self.assert_initialized()
 
-        level = self.file_operator.get_level()
+        level = self.get_level()
         self.load_level(level)
 
     def handle_test(self, args):
         self.assert_initialized()
-        level = self.file_operator.get_level()
+        level = self.get_level()
         level.test(self.file_operator)
 
     def handle_skills(self, args):
         if self.is_initialized():
             try:
-                cur_skill = self.file_operator.get_level().skill
+                cur_skill = self.get_level().skill
                 print('Currently on skill: "{}"'.format(cur_skill.name))
                 print()
             except KeyError:
@@ -384,7 +388,7 @@ class GitGud:
                 self.subparsers.choices['levels'].print_help()
                 return
             try:
-                skill = self.file_operator.get_level().skill
+                skill = self.get_level().skill
             except KeyError:
                 skill_name = self.file_operator.read_level_file().split()[0]
                 print('Cannot find any levels in skill: "{}"'.format(skill_name))  # noqa: E501
@@ -395,7 +399,7 @@ class GitGud:
             except KeyError:
                 print('There is no skill "{}".'.format(args.skill_name))
                 print('You may run "git gud skills" to print all the skills. \n')  # noqa: E501
-                skill = self.file_operator.get_level().skill
+                skill = self.get_level().skill
                 key_error_flag = True
 
         if key_error_flag or args.skill_name is None:
@@ -417,18 +421,18 @@ class GitGud:
         if args.level_name:
             if args.skill_name == "-":
                 # Replace the dash with the current skill's name.
-                args.skill_name = self.file_operator.get_level().skill.name
+                args.skill_name = self.get_level().skill.name
         else:
             if len(argskillset) == 2:
                 args.skill_name, args.level_name = tuple(argskillset)
             else:
                 args.skill_name, args.level_name = argskillset[0], None
 
-        skill_to_load = self.file_operator.get_level().skill.name
+        skill_to_load = self.get_level().skill.name
         if args.skill_name:
             if args.skill_name.lower() in {"next", "prev", "previous"}:
                 query = args.skill_name.lower()
-                level = self.file_operator.get_level()
+                level = self.get_level()
 
                 if query == "next":
                     level_to_load = level.next_level
