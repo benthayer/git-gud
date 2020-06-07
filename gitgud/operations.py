@@ -12,7 +12,7 @@ from git import Repo
 from gitgud import actor
 
 
-class Operator:
+class Operator(object):
     def __init__(self, path, initialize_repo=True):
         self.path = path
         if initialize_repo:
@@ -27,6 +27,11 @@ class Operator:
         self.commits_path = os.path.join(self.gg_path, 'commits.csv')
         self.level_path = os.path.join(self.gg_path, 'current_level.txt')
         self.pickle_path = os.path.join(self.gg_path, '.fileoperator.pickle')
+
+    def __setattr__(self, name, value):
+        super().__setattr__(name, value)
+        # Update the file operator
+        set_operator(self)
 
     def add_file_to_index(self, filename):
         open('{}/{}'.format(self.path, filename), 'w+').close()
@@ -63,6 +68,12 @@ class Operator:
         for path in os.listdir(self.path):
             if path != '.git':
                 shutil.rmtree(path)
+
+    def destroy_repo(self):
+        for path in os.listdir(self.git_path):
+            if path != 'gud':
+                shutil.rmtree(path)
+        self.repo = None
 
     def create_tree(self, commits, head):
         branches = self.repo.branches
@@ -299,12 +310,6 @@ class Operator:
         return mapping
 
 
-def set_operator(file_operator):
-    with open(file_operator.pickle_path, 'wb') as pickle_handle:
-        pickle.dump(file_operator, pickle_handle)
-    return file_operator
-
-
 def get_operator():
     cwd = os.getcwd().split(os.path.sep)
     for i in reversed(range(len(cwd))):
@@ -318,3 +323,9 @@ def get_operator():
             else:
                 return None
     return None
+
+
+def set_operator(file_operator):
+    with open(file_operator.pickle_path, 'wb') as pickle_handle:
+        pickle.dump(file_operator, pickle_handle)
+    return file_operator
