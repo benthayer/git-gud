@@ -9,6 +9,7 @@ from glob import glob
 from git import Repo
 
 from gitgud import actor
+from gitgud import global_file_operator
 
 
 class Operator():
@@ -323,11 +324,9 @@ class Operator():
         return mapping
 
 
-_operator = None
-_operator_kwargs = None
 def get_operator(**operator_kwargs):
-    if _operator and operator_kwargs == _operator_kwargs:
-        return _operator
+    if global_file_operator['file_operator'] is not None:
+        return global_file_operator['file_operator']
 
     cwd = os.getcwd().split(os.path.sep)
 
@@ -335,8 +334,9 @@ def get_operator(**operator_kwargs):
         path = os.path.sep.join(cwd[:i+1])
         gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
         if os.path.isdir(gg_path):
-            _operator = Operator(path, **operator_kwargs)
-            _operator_kwargs = operator_kwargs
+            global_file_operator['file_operator'] = Operator(path, **operator_kwargs)
+            global_file_operator['operator_kwargs'] = operator_kwargs
+            return global_file_operator['file_operator']
     return None
 
 

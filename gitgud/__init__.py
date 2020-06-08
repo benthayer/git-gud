@@ -8,6 +8,10 @@ from git import Actor
 actor = Actor("Git Gud", "git-gud@example.com")
 actor_string = "Git Gud <git-gud@example.com>"
 
+global_file_operator = {
+    'file_operator': None,
+    'operator_kwargs': None
+}
 
 def create_alias():
     # Git uses unix-like path separators
