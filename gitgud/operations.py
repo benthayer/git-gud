@@ -25,7 +25,7 @@ class Operator():
 
         if initialize_repo:
             self.repo = Repo.init(self.path)
-    
+
     def add_file_to_index(self, filename):
         self.setup_repo()
         open('{}/{}'.format(self.path, filename), 'w+').close()
@@ -68,7 +68,7 @@ class Operator():
         if self.repo_exists():
             self.clear_tree_and_index()
         # Clear all in .git/ directory
-        for path in set(os.path.join(self.git_path, path) for path in os.listdir(self.git_path)):
+        for path in set(os.path.join(self.git_path, path) for path in os.listdir(self.git_path)):  # noqa: E501
             if os.path.isdir(path) and path != self.gg_path:
                 shutil.rmtree(path)
             elif not os.path.isdir(path):
@@ -327,24 +327,21 @@ class Operator():
 def get_operator(*operator_args, **operator_kwargs):
     constructed_operator = None
     if global_file_operator.file_operator is not None \
-        and operator_kwargs == global_file_operator.operator_kwargs \
-        and operator_args == global_file_operator.operator_args:
+            and operator_kwargs == global_file_operator.operator_kwargs \
+            and operator_args == global_file_operator.operator_args:
         return global_file_operator.file_operator
-    
+
     if operator_args:
         constructed_operator = Operator(*operator_args, **operator_kwargs)
     else:
         cwd = os.getcwd().split(os.path.sep)
-
         for i in reversed(range(len(cwd))):
             path = os.path.sep.join(cwd[:i+1])
             gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
             if os.path.isdir(gg_path):
                 constructed_operator = Operator(path, **operator_kwargs)
-    
+
     global_file_operator.file_operator = constructed_operator
     global_file_operator.operator_kwargs = operator_kwargs
     global_file_operator.oeprator_args = operator_args
     return constructed_operator
-
-

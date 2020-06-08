@@ -8,6 +8,7 @@ from gitgud.skills.user_messages import default_fail_no_reset
 
 from gitgud import operations
 
+
 class Welcome(BasicLevel):
     def post_setup(self):
         self.display_message("post-setup.txt")

@@ -15,6 +15,7 @@ global_file_operator.file_operator = None
 global_file_operator.operator_kwargs = None
 global_file_operator.operator_args = None
 
+
 def create_alias():
     # Git uses unix-like path separators
     python = sys.executable.replace('\\', '/')

@@ -9,7 +9,6 @@ from git import Repo
 from git.exc import InvalidGitRepositoryError
 
 import gitgud
-from gitgud.operations import Operator
 from gitgud import operations
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
