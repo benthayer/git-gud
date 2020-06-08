@@ -272,7 +272,7 @@ class GitGud:
         else:
             print('Force initializing Git Gud.')
             if not file_operator:
-                file_operator = Operator(os.getcwd())
+                file_operator = operations.get_operator(os.getcwd())
 
         assert file_operator is not None
         # After here, we initialize everything
