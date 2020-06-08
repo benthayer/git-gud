@@ -257,7 +257,7 @@ class GitGud:
                 print('Use --force to initialize {}.'.format(os.getcwd()))
                 return
 
-            file_operator = operations.get_operator()
+            file_operator = operations.get_operator(os.getcwd())
 
             if os.path.exists(file_operator.gg_path):
                 # Current directory is a git repo

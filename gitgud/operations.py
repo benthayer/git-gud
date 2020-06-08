@@ -324,20 +324,27 @@ class Operator():
         return mapping
 
 
-def get_operator(**operator_kwargs):
-    if global_file_operator.file_operator is not None and operator_kwargs == global_file_operator.operator_kwargs:
-        print("Successfully reused file-operator")
+def get_operator(*operator_args, **operator_kwargs):
+    constructed_operator = None
+    if global_file_operator.file_operator is not None \
+        and operator_kwargs == global_file_operator.operator_kwargs \
+        and operator_args == global_file_operator.operator_args:
         return global_file_operator.file_operator
+    
+    if operator_args:
+        constructed_operator = Operator(*operator_args, **operator_kwargs)
+    else:
+        cwd = os.getcwd().split(os.path.sep)
 
-    cwd = os.getcwd().split(os.path.sep)
-
-    for i in reversed(range(len(cwd))):
-        path = os.path.sep.join(cwd[:i+1])
-        gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
-        if os.path.isdir(gg_path):
-            global_file_operator.file_operator = Operator(path, **operator_kwargs)
-            global_file_operator.operator_kwargs = operator_kwargs
-            return global_file_operator.file_operator
-    return None
+        for i in reversed(range(len(cwd))):
+            path = os.path.sep.join(cwd[:i+1])
+            gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
+            if os.path.isdir(gg_path):
+                constructed_operator = Operator(path, **operator_kwargs)
+    
+    global_file_operator.file_operator = constructed_operator
+    global_file_operator.operator_kwargs = operator_kwargs
+    global_file_operator.oeprator_args = operator_args
+    return constructed_operator
 
 
