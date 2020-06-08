@@ -326,7 +326,7 @@ class Operator():
 _operator = None
 _operator_kwargs = None
 def get_operator(**operator_kwargs):
-    if _operator:
+    if _operator and operator_kwargs == _operator_kwargs:
         return _operator
 
     cwd = os.getcwd().split(os.path.sep)
@@ -335,7 +335,8 @@ def get_operator(**operator_kwargs):
         path = os.path.sep.join(cwd[:i+1])
         gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
         if os.path.isdir(gg_path):
-            return Operator(path, **operator_kwargs)
+            _operator = Operator(path, **operator_kwargs)
+            _operator_kwargs = operator_kwargs
     return None
 
 
