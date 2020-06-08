@@ -12,22 +12,21 @@ from gitgud import actor
 
 
 class Operator():
-    def __init__(self, path, initialize_repo=True):
+    def __init__(self, path, initialize_repo=False):
         self.path = path
-        if initialize_repo:
-            self.repo = Repo(os.getcwd())
-        else:
-            self.repo = None
-
         self.git_path = os.path.join(self.path, '.git')
         self.hooks_path = os.path.join(self.git_path, 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
         self.commits_path = os.path.join(self.gg_path, 'commits.csv')
         self.level_path = os.path.join(self.gg_path, 'current_level.txt')
+        self.repo = None
 
-
+        if initialize_repo:
+            self.repo = Repo.init(self.path)
+    
     def add_file_to_index(self, filename):
+        self.setup_repo()
         open('{}/{}'.format(self.path, filename), 'w+').close()
         self.repo.index.add([filename])
 
@@ -43,6 +42,7 @@ class Operator():
         return commit
 
     def clear_tree_and_index(self):
+        self.setup_repo()
         dirs = []
         for x in [('**', '.*'), ('**',)]:
             path_spec = os.path.join(self.path, *x)
@@ -52,7 +52,6 @@ class Operator():
                         os.unlink(path)
                     else:
                         dirs.append(path)
-
         self.repo.git.add(update=True)
         # Easiest way to clear the index is to commit an empty directory
         self.repo.index.commit("Clearing index", skip_hooks=True)
@@ -63,10 +62,11 @@ class Operator():
             if path != '.git':
                 shutil.rmtree(path)
 
-    def create_repo(self):
-        self.repo = Repo(os.getcwd())
-
     def destroy_repo(self):
+        # Clear all in installation directory
+        if self.repo_exists():
+            self.clear_tree_and_index()
+        # Clear all in .git/ directory
         for path in set(os.path.join(self.git_path, path) for path in os.listdir(self.git_path)):
             if os.path.isdir(path) and path != self.gg_path:
                 shutil.rmtree(path)
@@ -74,7 +74,19 @@ class Operator():
                 os.unlink(path)
         self.repo = None
 
+    def repo_exists(self):
+        head_exists = os.path.exists(os.path.join(self.git_path, 'HEAD'))
+        if head_exists and self.repo is None:
+            self.repo = Repo(self.git_path)
+        return head_exists
+
+    def setup_repo(self):
+        if not self.repo_exists():
+            self.repo = Repo.init(self.path)
+        return self.repo
+
     def create_tree(self, commits, head):
+        self.setup_repo()
         branches = self.repo.branches
         try:
             # Detached head, we can now delete everything
@@ -102,7 +114,7 @@ class Operator():
             if parents:
                 # TODO GitPython detach head
                 self.repo.git.checkout(parents[0])
-            if len(parents) < 22:
+            if len(parents) < 2:
                 # Not a merge
                 self.add_file_to_index(name)
                 commit_obj = self.repo.index.commit(
@@ -158,6 +170,7 @@ class Operator():
         return commit_msg
 
     def get_current_tree(self):
+        self.setup_repo()
         # Return a json object with the same structure as in level_json
 
         repo = self.repo
@@ -271,6 +284,7 @@ class Operator():
         return known_commits
 
     def get_diffs(self, known_commits):
+        self.setup_repo()
         diffs = {}
         for commit_hash, commit_name in known_commits.items():
             if commit_name == '1':
@@ -310,7 +324,8 @@ class Operator():
 
 
 _operator = None
-def get_operator():
+_operator_kwargs = None
+def get_operator(**operator_kwargs):
     if _operator:
         return _operator
 
@@ -320,7 +335,7 @@ def get_operator():
         path = os.path.sep.join(cwd[:i+1])
         gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
         if os.path.isdir(gg_path):
-            return Operator(path)
+            return Operator(path, **operator_kwargs)
     return None
 
 

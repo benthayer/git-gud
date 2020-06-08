@@ -218,14 +218,14 @@ class GitGud:
 
     def load_level(self, level):
         # Clear remotes
-        file_operator = operations.get_operator()
         self.assert_initialized(skip_level_check=True)
-        level_repo = file_operator.repo
+        file_operator = operations.get_operator()
+        level_repo = file_operator.setup_repo()
         if level_repo:
             for remote in level_repo.remotes:
                 level_repo.delete_remote(remote)
         else:
-            file_operator.repo = Repo.init(file_operator.path)
+            file_operator.setup_repo()
         file_operator.clear_tracked_commits()
         level.setup()
         file_operator.write_level(level)
@@ -257,7 +257,7 @@ class GitGud:
                 print('Use --force to initialize {}.'.format(os.getcwd()))
                 return
 
-            file_operator = Operator(os.getcwd(), initialize_repo=False)
+            file_operator = Operator(os.getcwd())
 
             if os.path.exists(file_operator.gg_path):
                 # Current directory is a git repo
@@ -273,7 +273,7 @@ class GitGud:
         else:
             print('Force initializing Git Gud.')
             if not file_operator:
-                file_operator = Operator(os.getcwd(), initialize_repo=False)
+                file_operator = Operator(os.getcwd())
 
         assert file_operator is not None
         # After here, we initialize everything

@@ -61,10 +61,10 @@ class Config(BasicLevel):
 
 
 class Init(BasicLevel):
-    def setup(self):
+    def _setup(self):
         # Make sure we are not in a git repo
         file_operator = operations.get_operator()
-        if file_operator.repo is not None:
+        if file_operator.repo_exists():
             file_operator.destroy_repo()
 
     def post_setup(self):
@@ -78,8 +78,8 @@ class Init(BasicLevel):
 
     def _test(self):
         # Check if we are in a git repo
-        
-        return True
+        file_operator = operations.get_operator()
+        return file_operator.repo_exists()
 
     def test_failed(self):
         default_fail_no_reset()

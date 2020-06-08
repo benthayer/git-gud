@@ -14,6 +14,10 @@ level_tests = [
             'git config user.name "Git Gud Test"',
             'git config user.email "ggtest@example.com"'
         ]
+    ), (
+        skill['init'], [
+            'git init'
+        ]
     )
 ]
 

@@ -96,7 +96,7 @@ class BasicLevel(Level):
         print_user_file(path)
 
     def _setup(self):
-        file_operator = operations.get_operator()
+        file_operator = operations.get_operator(initialize_repo=True)
         commits, head = parse_spec(self.setup_spec_path)
         file_operator.create_tree(commits, head)
 
