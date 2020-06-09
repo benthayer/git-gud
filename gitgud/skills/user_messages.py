@@ -1,5 +1,4 @@
 import subprocess
-from . import all_skills
 
 user_has_seen_messages = False
 
@@ -112,15 +111,18 @@ def default_fail_no_reset():
     print('Level not complete, keep trying.')
 
 
-def skills_levels_tree(focus_level, short=False, display_focus_only=False, display_levels=True, display_other_skills=False):
+def skills_levels_tree(focus_level, all_skills, short=False, display_focus_only=False, display_levels=True, display_other_skills=False):
     middle_entry_bookend = '├── '
     last_entry_bookend = '└── '
-    root_skill = focus_level.skill
-    skills_to_show = [root_skill if not display_other_skills or display_focus_only else skill for skill in all_skills]
-    for skill in skills_to_show:  # length restricted by display_other_skills and display_focus
+    root_skill = focus_level.skill if focus_level else None
+    if display_focus_only or not display_other_skills and root_skill is not None:
+        skills_to_show = [root_skill]
+    else:
+        skills_to_show = [skill for skill in all_skills]
+    for skill in skills_to_show:
         skill_index = all_skills.get_index(skill.name)
         print("{}. {}".format(skill_index, skill.name if short else skill.readable_name))
-        if display_focus_only:
+        if display_focus_only and focus_level is not None:
             print("{}{}. {}".format(
                     last_entry_bookend, 
                     skill.get_index(focus_level.name), 
@@ -130,7 +132,7 @@ def skills_levels_tree(focus_level, short=False, display_focus_only=False, displ
             break
         if display_levels:
             for level in skill:
-                skill_length = len(skill)
+                skill_length = str(len(skill))
                 level_index = skill.get_index(level.name)
                 print("{}{}. {}".format(
                         middle_entry_bookend if level_index != skill_length else last_entry_bookend,
