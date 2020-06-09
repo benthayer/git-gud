@@ -1,0 +1,4 @@
+# User would instead check out the commit hash using only one command
+git checkout bugFix
+git checkout @^
+git checkout @{1}

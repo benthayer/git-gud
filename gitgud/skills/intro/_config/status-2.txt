@@ -1,0 +1,6 @@
+If this looks right, go ahead and run "git gud test"
+
+If you need to, configure the values above using the commands below
+
+    git config --global user.name "Your Name"
+    git config --global user.email "me@example.com"

@@ -1,0 +1,5 @@
+In this level, we want you to configure your name and email for Git.
+
+Type "git gud status" for more information
+Type "git gud test" when done
+

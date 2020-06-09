@@ -1,0 +1,10 @@
+Great, your name and email are set! Git knows who you are! 
+
+"git config" can be used to configure other things too, like your favorite text
+editor, but for now, the most important thing is your name and email.
+
+Now that Git knows who you are, you're one step closer to using Git!
+
+To load the next level, run:
+    git gud load next
+

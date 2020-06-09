@@ -6,10 +6,7 @@ from . import skill
 
 
 level_tests = [
-    (
-        skill['intro'], [
-        ]
-    )
+    (level, level.solution_list()) for level in skill
 ]
 
 

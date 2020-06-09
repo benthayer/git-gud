@@ -1,0 +1,8 @@
+You'll see some things you don't understand, but for now that's okay.
+We just care that we can see it.
+
+To see that it's there for yourself, type 
+    $ git log
+
+To have Git Gud check that it's there, type 
+    $ git gud test

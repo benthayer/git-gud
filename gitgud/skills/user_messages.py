@@ -3,6 +3,14 @@ import subprocess
 user_has_seen_messages = False
 
 
+def start_marker():
+    return '<' * 7
+
+
+def end_marker():
+    return '=' * 7
+
+
 def separated(func):
     def new_func(*args, **kwargs):
         global user_has_seen_messages
@@ -12,6 +20,12 @@ def separated(func):
             user_has_seen_messages = True
         func(*args, **kwargs)
     return new_func
+
+
+@separated
+def print_user_file(path):
+    print(path.read_text().strip())
+
 
 @separated
 def print_user_message(message):
@@ -23,23 +37,23 @@ def show_level_name(level):
     print('Level: "{}"'.format(level.full_name()))
 
 
-@separated
-def print_goal(level):
-    print(level.goal_str())
+def print_info(message):
+    print("[INFO]: {}".format(message))
+
+
+def mock_simulate(command):
+    print(end_marker(), "Simulating: {}".format(command))
 
 
 @separated
-def simulate_goal(level):
-    print("Simulating: git gud goal")
-    print(level.goal_str())
+def simulate_command(command):
+    print(start_marker(), "Simulating: {}".format(command))
+    subprocess.call(command, shell=True)
+    print(end_marker())
 
 
-@separated
 def show_tree():
-    simulated_command_header()
-    print("git log --graph --oneline --all ")
-    subprocess.call(["git", "log", "--graph", "--oneline", "--all"])
-    simulated_command_footer()
+    simulate_command("git log --graph --oneline --all")
 
 
 @separated
@@ -67,17 +81,39 @@ def all_levels_complete():
     print("Wow! You've complete every level, congratulations!")
 
     print("If you want to keep learning git, why not try contributing"
-          " to git-gud by forking the project at https://github.com/benthayer/git-gud/")
+          " to git-gud by forking the project at "
+          "https://github.com/benthayer/git-gud/")
 
     print("We're always looking for contributions and are more than"
           " happy to accept both pull requests and suggestions!")
 
+
 @separated
 def default_fail():
-    print('Level not complete, keep trying. "git gud reset" to start from scratch.')
+    print('Level not complete, keep trying. "git gud reset" to start from scratch.')  # noqa: E501
 
+
+def handle_solution_confirmation(level):
+    print('Are you sure you want to view the solution for "{}": "{}"?'.format(level.name, level.skill.name))  # noqa: E501
+    print('If so, run `git gud solution --confirm`')
+
+
+<<<<<<< HEAD
 def simulated_command_header():
     print('<<<<<<<', end=" ")
 
 def simulated_command_footer():
     print('=======')
+=======
+def no_solutions_available():
+    print("No solutions available for this level.")
+
+
+def solution_print_header(level):
+    print('Solution for the current level "{}" in the skill "{}":'.format(level.name, level.skill.name))  # noqa: E501
+
+
+@separated
+def default_fail_no_reset():
+    print('Level not complete, keep trying.')
+>>>>>>> upstream/master
