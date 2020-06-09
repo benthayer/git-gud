@@ -18,6 +18,7 @@ from gitgud.skills.user_messages import handle_solution_confirmation
 from gitgud.skills.user_messages import mock_simulate
 from gitgud.skills.user_messages import print_info
 from gitgud.skills.user_messages import skills_levels_tree
+from gitgud.skills.user_messages import simulate_command
 from gitgud.hooks import all_hooks
 
 class InitializationError(Exception):
@@ -235,6 +236,10 @@ class GitGud:
         for remote in level_repo.remotes:
             level_repo.delete_remote(remote)
         self.file_operator.clear_tracked_commits()
+        skills_levels_tree(level, all_skills, 
+            display_focus_only=True
+        )
+        print()
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
 
@@ -365,36 +370,8 @@ class GitGud:
             current_level.solution()
 
     def handle_skills(self, args):
-        if self.is_initialized():
-            try:
-                cur_skill = self.file_operator.get_level().skill
-                print('Currently on skill: "{}"'.format(cur_skill.name))
-                print()
-            except KeyError:
-                pass
-
-        # Add two for quotes
-        skill_formatted_len = max(len(skill.name) for skill in all_skills) + 2
-
-        skill_format_template = 'Skill ' \
-            '{skill_number} - {formatted_skill_name} : ' \
-            '{num_levels:>2} level{plural}'
-        level_format_template = "    Level {:>2} : {:<3}"
-
-        for skill_number, skill in enumerate(all_skills):
-            # TODO Add description
-            print(skill_format_template.format(
-                skill_number=skill_number,
-                formatted_skill_name='"{}"'
-                .format(skill.name).ljust(skill_formatted_len),
-                num_levels=len(skill),
-                plural="s" if len(skill) > 1 else ""
-            ))
-
-            for index, level in enumerate(skill):
-                print(level_format_template.format(index + 1, level.name))
-
-        print("\nLoad a level with `git gud load`")
+        print_info('The functionality of "git gud skills" will be replaced by "git gud levels".')
+        simulate_command("git gud levels --all")
 
     def handle_levels(self, args):
         if args.opt_all or args.opt_skills:
@@ -412,8 +389,8 @@ class GitGud:
             if args.skill_name is not None:
                 try:
                     skill = all_skills[args.skill_name]
-                    print('Levels in skill "{}":'.format(skill.name))
-                    skills_levels_tree(skill['1'], all_skills,
+                    print('Levels in skill "{}" : \n'.format(skill.name))
+                    skills_levels_tree(next(iter(skill)), all_skills,
                         short=args.opt_short,
                         display_other_skills=False,
                         display_levels=True
@@ -430,7 +407,7 @@ class GitGud:
                 print('Levels in the current skill "{}" : \n'.format(current_skill.name))
                 skills_levels_tree(current_level, all_skills)
                 
-        print('\nTo see levels in all skills, run "git gud levels --all".')
+        print("\nLoad a level with `git gud load`")
 
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
@@ -483,10 +460,10 @@ class GitGud:
                 self.load_level(level)
             else:
                 print('Level "{}" does not exist'.format(args.level_name))
-                print('To view levels/skills, use "git gud levels --all"\n')  # noqa: E501
+                print('\nTo view levels/skills, use "git gud levels --all"')  # noqa: E501
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
-            print('To view levels/skills, use "git gud levels --all"\n')  # noqa: E501
+            print('\nTo view levels/skills, use "git gud levels --all"')  # noqa: E501
 
     def handle_commit(self, args):
         self.assert_initialized()
