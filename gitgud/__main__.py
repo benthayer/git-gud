@@ -284,7 +284,7 @@ class GitGud:
             self.file_operator.repo = Repo.init(self.file_operator.path)
 
         # Disable pager so "git gud status" can use the output easily
-        subprocess.call("git config core.pager ''", shell=True)
+        self.file_operator.shutoff_pager()
 
         if not os.path.exists(self.file_operator.gg_path):
             os.mkdir(self.file_operator.gg_path)
