@@ -330,7 +330,6 @@ def get_operator(*operator_args, **operator_kwargs):
             and operator_kwargs == global_file_operator.operator_kwargs \
             and operator_args == global_file_operator.operator_args:
         return global_file_operator.file_operator
-
     if operator_args:
         constructed_operator = Operator(*operator_args, **operator_kwargs)
     else:
@@ -343,5 +342,5 @@ def get_operator(*operator_args, **operator_kwargs):
 
     global_file_operator.file_operator = constructed_operator
     global_file_operator.operator_kwargs = operator_kwargs
-    global_file_operator.oeprator_args = operator_args
+    global_file_operator.operator_args = operator_args
     return constructed_operator
