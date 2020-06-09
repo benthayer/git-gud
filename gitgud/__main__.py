@@ -172,6 +172,10 @@ class GitGud:
                 help='List levels in a skill',
                 description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud skills`.')  # noqa: E501
         levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
+        levels_parser.add_argument('--skills', dest='opt_skills', action='store_true')
+        levels_parser.add_argument('--levels', dest='opt_levels', action='store_true')
+        levels_parser.add_argument('--all', dest='opt_all', action='store_true')
+        levels_parser.add_argument('--short', dest='opt_short', action='store_true')
 
         commit_parser = self.subparsers.add_parser(
                 'commit',
