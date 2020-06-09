@@ -46,7 +46,7 @@ class GitGud:
             "   git gud load <skill>-<level>",
             "\n",
             "<skill> and <level> could either be the name of the skill/level or the number of the skill/level.",  # noqa: E501
-            "Running `git gud skills` will help you find the number and name associated with each skill/level.",  # noqa: E501
+            "Running `git gud levels --all --short` will help you find the number and name associated with each skill/level.",  # noqa: E501
             "\n",
             "Here are example uses which load the same level:",
             "\n",
@@ -170,7 +170,7 @@ class GitGud:
         levels_parser = self.subparsers.add_parser(
                 'levels',
                 help='List levels in a skill',
-                description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud skills`.')  # noqa: E501
+                description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud levels --all`.')  # noqa: E501
         levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
         levels_parser.add_argument('--skills', dest='opt_skills', action='store_true', help="Prints all available skills.")
         levels_parser.add_argument('--all', dest='opt_all', action='store_true', help="Prints all available skills with levels. Overrides --skills.")
@@ -430,7 +430,7 @@ class GitGud:
                 print('Levels in the current skill "{}" : \n'.format(current_skill.name))
                 skills_levels_tree(current_level, all_skills)
                 
-        print('\nTo see levels in all skills, run "git gud skills".')
+        print('\nTo see levels in all skills, run "git gud levels --all".')
 
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
@@ -467,7 +467,7 @@ class GitGud:
                         all_levels_complete()
                     else:
                         print('Already on the first level. To reload the level, use "git gud reload".')  # noqa: E501
-                    print('\nTo view levels/skills, use "git gud levels" or "git gud skills"')  # noqa: E501
+                    print('\nTo view levels/skills, use "git gud levels --all"')  # noqa: E501
                 return
             else:
                 skill_to_load = args.skill_name
@@ -483,10 +483,10 @@ class GitGud:
                 self.load_level(level)
             else:
                 print('Level "{}" does not exist'.format(args.level_name))
-                print('To view levels/skills, use "git gud levels" or "git gud skills"\n')  # noqa: E501
+                print('To view levels/skills, use "git gud levels --all"\n')  # noqa: E501
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
-            print('To view levels/skills, use "git gud levels" or "git gud skills"\n')  # noqa: E501
+            print('To view levels/skills, use "git gud levels --all"\n')  # noqa: E501
 
     def handle_commit(self, args):
         self.assert_initialized()
