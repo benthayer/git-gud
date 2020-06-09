@@ -63,6 +63,9 @@ class Operator:
             if path != '.git':
                 shutil.rmtree(path)
 
+    def shutoff_pager(self):
+        self.repo.config_writer().set_value("core", "pager", '').release()
+
     def create_tree(self, commits, head):
         branches = self.repo.branches
         try:
