@@ -1,4 +1,5 @@
 import subprocess
+from . import all_skills
 
 user_has_seen_messages = False
 
@@ -109,3 +110,31 @@ def solution_print_header(level):
 @separated
 def default_fail_no_reset():
     print('Level not complete, keep trying.')
+
+
+def skills_levels_tree(focus_level, short=False, display_focus_only=False, display_levels=True, display_other_skills=False):
+    middle_entry_bookend = '├── '
+    last_entry_bookend = '└── '
+    root_skill = focus_level.skill
+    skills_to_show = [root_skill if not display_other_skills or display_focus_only else skill for skill in all_skills]
+    for skill in skills_to_show:  # length restricted by display_other_skills and display_focus
+        skill_index = all_skills.get_index(skill.name)
+        print("{}. {}".format(skill_index, skill.name if short else skill.readable_name))
+        if display_focus_only:
+            print("{}{}. {}".format(
+                    last_entry_bookend, 
+                    skill.get_index(focus_level.name), 
+                    focus_level.name if short else focus_level.readable_name
+                )
+            )
+            break
+        if display_levels:
+            for level in skill:
+                skill_length = len(skill)
+                level_index = skill.get_index(level.name)
+                print("{}{}. {}".format(
+                        middle_entry_bookend if level_index != skill_length else last_entry_bookend,
+                        level_index,
+                        level.name if short else level.readable_name
+                    )
+                )
