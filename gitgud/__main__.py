@@ -398,10 +398,10 @@ class GitGud:
                 except KeyError:
                     print('There is no skill "{}".'.format(args.skill_name))
                     print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
-                    if self.file_operator is None:
-                        self.subparsers.choices['levels'].print_help()
-                        return
             else:
+                if self.file_operator is None:
+                    self.subparsers.choices['levels'].print_help()
+                    return
                 current_level = self.file_operator.get_level()
                 current_skill = current_level.skill
                 print('Levels in the current skill "{}" : \n'.format(current_skill.name))
