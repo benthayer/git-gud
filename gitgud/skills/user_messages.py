@@ -98,13 +98,6 @@ def handle_solution_confirmation(level):
     print('If so, run `git gud solution --confirm`')
 
 
-<<<<<<< HEAD
-def simulated_command_header():
-    print('<<<<<<<', end=" ")
-
-def simulated_command_footer():
-    print('=======')
-=======
 def no_solutions_available():
     print("No solutions available for this level.")
 
@@ -116,4 +109,3 @@ def solution_print_header(level):
 @separated
 def default_fail_no_reset():
     print('Level not complete, keep trying.')
->>>>>>> upstream/master

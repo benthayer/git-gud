@@ -8,5 +8,6 @@ skill = Skill(
         BasicLevel('relrefs1', __name__, "Relative References I: Using (^)"),
         BasicLevel('relrefs2', __name__, "Relative References II: Using (~)"),
         BasicLevel('reversing', __name__, "Reversing Changes in Git")
-    ]
+    ],
+    'Basics'
 )

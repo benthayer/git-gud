@@ -8,5 +8,6 @@ skill = Skill(
         BasicLevel('branching', __name__, 'Branching in Git'),
         BasicLevel('merging', __name__, 'Merging in Git'),
         BasicLevel('rebasing', __name__, 'Introduction to Rebasing')
-    ]
+    ],
+    'Basics'
 )

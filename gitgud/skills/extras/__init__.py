@@ -5,5 +5,6 @@ skill = Skill(
     'extras',
     [
         BasicLevel('octopus', __name__, 'The Octopus Merge')
-    ]
+    ],
+    'Extras'
 )

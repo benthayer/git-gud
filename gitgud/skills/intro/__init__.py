@@ -64,5 +64,6 @@ skill = Skill(
     [
         Welcome('welcome', __name__),
         Config('config', __name__)
-    ]
+    ],
+    'Introduction'
 )

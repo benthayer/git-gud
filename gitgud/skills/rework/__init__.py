@@ -5,5 +5,6 @@ skill = Skill(
     'rework',
     [
         BasicLevel('cherrypicking', __name__)
-    ]
+    ],
+    'Rework'
 )
