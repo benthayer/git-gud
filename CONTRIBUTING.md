@@ -17,10 +17,24 @@ git gud init # Initializes a git repository and lets us start using the git gud 
 Once you have the code downloaded, I would recommend having two terminals open at all times, one in the test directory you just created, and one in the git-gud directory. 
 This allows you to both work with your code and test your code at the same time.
 
-## Testing
+## Testing (Pytest)
+Our tests make sure that each of the levels can be properly solved and that various other things work as expected.
+If you're fixing a bug, you should probably add a test that fails if that bug is present.
+#### To run tests:
+Please make sure you are running tests for the gitgud subdirectory
+```
+pytest gitgud
+```
+or
+```
+cd gitgud
+pytest .
+```
+Pytest will search for files that start with `test_` and will run methods starting with `test_` as tests.The search ir run for all subdirectories, so all tests defined will automatically be found and don't need to be registered.
 
-Tests are an important part of the development process. To make sure you don't fail the test cases, you simply have to run `pytest .` from the `git-gud/` directory (the root of this repo). That'll run all tests and you can make sure that you haven't broken anything. Additionally, once you push, CircleCI will run tests and will show the results directly on GitHub. If you're fixing a bug, you should probably add a test that fails if that bug is present.
-
+#### CircleCI
+Once you push and make a pull request, CircleCI will run tests and will show the results directly on GitHub. 
+Sometimes tests will pass locally but fail on CircleCI, if that happens, either try to resolve the issue yourself or tag @benthayer for help.
 
 ## Project Layout
 #### `GitPython`
