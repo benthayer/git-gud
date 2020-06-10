@@ -367,7 +367,7 @@ class GitGud:
             current_level.solution()
 
     def handle_skills(self, args):
-        print_info('The functionality of "git gud skills" will be replaced by "git gud levels".')  # noqa: E501
+        print_info('The functionality of "git gud skills" will be replaced by "git gud levels --all".')  # noqa: E501
         simulate_command("git gud levels --all")
 
     def handle_levels(self, args):
