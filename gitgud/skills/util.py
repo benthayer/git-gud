@@ -26,7 +26,7 @@ class NamedList:
     def __contains__(self, item):
         return item in self._items
 
-    def get_index(self, name):
+    def index(self, name):
         return self._index_dict[name]
     
     def values(self):
