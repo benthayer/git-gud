@@ -1,11 +1,14 @@
 class NamedList:
     def __init__(self, names, items, start_index=1):
         assert len(names) == len(items)
-        self._name_dict = {name: index for index, name in enumerate(names)}
-        index_mappings = [str(index + start_index) for index in range(len(names))]
-        self._name_dict.update({mapped_index: index for index, mapped_index in enumerate(index_mappings)})
-        self._index_dict = {name: mapped_index for name, mapped_index in zip(names, index_mappings)}
         self._items = items
+        self._name_dict = {}
+        self._index_dict = {}
+        for index, name in enumerate(names):
+            mapped_index = str(index + start_index)
+            self._name_dict.update({name: index})  # key to list
+            self._name_dict.update({mapped_index: index}) # index to list
+            self._index_dict.update({name: mapped_index})
 
     def __getitem__(self, query):
         return self._items[self._name_dict[query]]
