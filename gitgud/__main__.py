@@ -21,6 +21,7 @@ from gitgud.skills.user_messages import skills_levels_tree
 from gitgud.skills.user_messages import simulate_command
 from gitgud.hooks import all_hooks
 
+
 class InitializationError(Exception):
     pass
 
@@ -173,9 +174,9 @@ class GitGud:
                 help='List levels in a skill',
                 description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud levels --all`.')  # noqa: E501
         levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
-        levels_parser.add_argument('--skills', dest='opt_skills', action='store_true', help="Prints all available skills.")
-        levels_parser.add_argument('--all', dest='opt_all', action='store_true', help="Prints all available skills with levels. Overrides --skills.")
-        levels_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills/levels usable with `git gud load`.")
+        levels_parser.add_argument('--skills', dest='opt_skills', action='store_true', help="Prints all available skills.")  # noqa: E501
+        levels_parser.add_argument('--all', dest='opt_all', action='store_true', help="Prints all available skills with levels. Overrides --skills.")  # noqa: E501
+        levels_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
 
         commit_parser = self.subparsers.add_parser(
                 'commit',
@@ -236,8 +237,6 @@ class GitGud:
         for remote in level_repo.remotes:
             level_repo.delete_remote(remote)
         self.file_operator.clear_tracked_commits()
-        skills_levels_tree([level.skill, level], expand_skills=False)
-        print()
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
 
@@ -368,7 +367,7 @@ class GitGud:
             current_level.solution()
 
     def handle_skills(self, args):
-        print_info('The functionality of "git gud skills" will be replaced by "git gud levels".')
+        print_info('The functionality of "git gud skills" will be replaced by "git gud levels".')  # noqa: E501
         simulate_command("git gud levels --all")
 
     def handle_levels(self, args):
@@ -392,7 +391,11 @@ class GitGud:
                 try:
                     skill = all_skills[args.skill_name]
                     print('Levels in skill "{}" : \n'.format(skill.name))
-                    skills_levels_tree([skill], expand_skills=True, show_human_names=not args.opt_short)
+                    skills_levels_tree(
+                        [skill],
+                        expand_skills=True,
+                        show_human_names=not args.opt_short
+                    )
                 except KeyError:
                     print('There is no skill "{}".'.format(args.skill_name))
                     print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
@@ -402,9 +405,13 @@ class GitGud:
                     return
                 current_level = self.file_operator.get_level()
                 current_skill = current_level.skill
-                print('Levels in the current skill "{}" : \n'.format(current_skill.name))
-                skills_levels_tree([current_skill], expand_skills=True, show_human_names=not args.opt_short)
-                
+                print('Levels in the current skill "{}" : \n'.format(current_skill.name))  # noqa: E501
+                skills_levels_tree(
+                    [current_skill],
+                    expand_skills=True,
+                    show_human_names=not args.opt_short
+                )
+
         print("\nLoad a level with `git gud load`")
 
     def handle_load(self, args):

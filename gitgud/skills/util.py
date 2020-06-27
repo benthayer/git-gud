@@ -7,7 +7,7 @@ class NamedList:
         for index, name in enumerate(names):
             mapped_index = str(index + start_index)
             self._name_dict.update({name: index})  # key to list
-            self._name_dict.update({mapped_index: index}) # index to list
+            self._name_dict.update({mapped_index: index})  # index to list
             self._index_dict.update({name: mapped_index})
 
     def __getitem__(self, query):
@@ -31,7 +31,7 @@ class NamedList:
 
     def index(self, name):
         return self._index_dict[name]
-    
+
     def values(self):
         return self._items
 
@@ -60,6 +60,6 @@ class Skill(NamedList):
         super().__init__([level.name for level in levels], levels)
         self.name = name
         self.readable_name = readable_name
-        
+
         for level in levels:
             level.skill = self

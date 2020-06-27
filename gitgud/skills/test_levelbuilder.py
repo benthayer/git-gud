@@ -31,6 +31,7 @@ def test_contains_NL():
     assert all_skills['1'] in all_skills
     assert all_skills['1']['1'] in all_skills['1']
 
+
 def test_get_index_NL():
     nltest = NamedList(['foo', 'bar', 'baz'], [51, 72, 93], start_index=3)
     assert nltest.index('foo') == '3'
