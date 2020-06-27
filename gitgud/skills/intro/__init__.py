@@ -65,8 +65,7 @@ class Init(BasicLevel):
     def _setup(self):
         # Make sure we are not in a git repo
         file_operator = operations.get_operator()
-        if file_operator.repo_exists():
-            file_operator.destroy_repo()
+        file_operator.destroy_repo()
 
     def post_setup(self):
         self.display_message("post-setup.txt")
