@@ -44,6 +44,7 @@ class AllSkills(NamedList):
                 start_index=0)
         last_level = None
         for skill in self:
+            skill.all_skills = self
             for level in skill:
                 if last_level is not None:
                     last_level.next_level = level
@@ -52,7 +53,7 @@ class AllSkills(NamedList):
 
 
 class Skill(NamedList):
-    def __init__(self, name, levels, readable_name):
+    def __init__(self, readable_name, name, levels):
         super().__init__([level.name for level in levels], levels)
         self.name = name
         self.readable_name = readable_name

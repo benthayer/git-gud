@@ -2,9 +2,9 @@ from gitgud.skills.util import Skill
 from gitgud.skills.level_builder import BasicLevel
 
 skill = Skill(
+    'Extras',
     'extras',
     [
-        BasicLevel('octopus', __name__, 'The Octopus Merge')
-    ],
-    'Extras'
+        BasicLevel('The Octopus Merge', 'octopus', __name__)
+    ]
 )

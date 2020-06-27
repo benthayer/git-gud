@@ -2,12 +2,12 @@ from gitgud.skills.util import Skill
 from gitgud.skills.level_builder import BasicLevel
 
 skill = Skill(
+    'Rampup',
     'rampup',
     [
-        BasicLevel('detaching', __name__, "Detaching HEAD"),
-        BasicLevel('relrefs1', __name__, "Relative References I: Using (^)"),
-        BasicLevel('relrefs2', __name__, "Relative References II: Using (~)"),
-        BasicLevel('reversing', __name__, "Reversing Changes in Git")
-    ],
-    'Basics'
+        BasicLevel("Detaching HEAD", 'detaching', __name__),
+        BasicLevel("Relative References I: Using (^)", 'relrefs1', __name__),
+        BasicLevel("Relative References II: Using (~)", 'relrefs2', __name__),
+        BasicLevel("Reversing Changes in Git", 'reversing', __name__)
+    ]
 )

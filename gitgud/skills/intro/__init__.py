@@ -60,10 +60,10 @@ class Config(BasicLevel):
 
 
 skill = Skill(
+    'Introduction',
     'intro',
     [
-        Welcome('welcome', __name__, 'Welcome'),
-        Config('config', __name__, 'Configuring')
+        Welcome('Welcome', 'welcome', __name__),
+        Config('Configuring', 'config', __name__)
     ],
-    'Introduction'
 )

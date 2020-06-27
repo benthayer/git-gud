@@ -20,7 +20,7 @@ from .user_messages import no_solutions_available
 
 
 class Level:
-    def __init__(self, name, readable_name):
+    def __init__(self, readable_name, name):
         self.name = name
         self.readable_name = readable_name
         self.skill = None
@@ -80,8 +80,8 @@ class Level:
 
 
 class BasicLevel(Level):
-    def __init__(self, name, skill_package, readable_name=""):
-        super().__init__(name, readable_name)
+    def __init__(self, readable_name, name, skill_package):
+        super().__init__(readable_name, name)
 
         self.level_dir = files(skill_package).joinpath('_{}/'.format(name))
 

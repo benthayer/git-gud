@@ -2,12 +2,12 @@ from gitgud.skills.util import Skill
 from gitgud.skills.level_builder import BasicLevel
 
 skill = Skill(
+    'Basics',
     'basics',
     [
-        BasicLevel('committing', __name__, 'Introduction to Commits'),
-        BasicLevel('branching', __name__, 'Branching in Git'),
-        BasicLevel('merging', __name__, 'Merging in Git'),
-        BasicLevel('rebasing', __name__, 'Introduction to Rebasing')
-    ],
-    'Basics'
+        BasicLevel('Introduction to Commits', 'committing', __name__),
+        BasicLevel('Branching in Git', 'branching', __name__),
+        BasicLevel('Merging in Git', 'merging', __name__),
+        BasicLevel('Introduction to Rebasing', 'rebasing', __name__)
+    ]
 )
