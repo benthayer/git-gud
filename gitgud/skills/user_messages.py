@@ -1,4 +1,5 @@
 import subprocess
+from .util import Skill
 
 user_has_seen_messages = False
 
@@ -111,32 +112,43 @@ def default_fail_no_reset():
     print('Level not complete, keep trying.')
 
 
-def skills_levels_tree(focus_level, all_skills, short=False, display_focus_only=False, display_levels=True, display_other_skills=False):
+def skills_levels_tree(items_to_show, show_human_names=True, show_code_names=True, expand_skills=False):
     middle_entry_bookend = '├── '
     last_entry_bookend = '└── '
-    root_skill = focus_level.skill if focus_level else None
-    if display_focus_only or not display_other_skills and root_skill is not None:
-        skills_to_show = [root_skill]
+
+    format_string = "{}. "
+    if show_code_names and show_human_names:
+        format_string += "{name} ({code})"
+    elif show_human_names:
+        format_string += "{name}"
+    elif show_code_names:
+        format_string += "{code}"
     else:
-        skills_to_show = [skill for skill in all_skills]
-    for skill in skills_to_show:
-        skill_index = all_skills.get_index(skill.name)
-        print("{}. {}".format(skill_index, skill.name if short else skill.readable_name))
-        if display_focus_only and focus_level is not None:
-            print("{}{}. {}".format(
-                    last_entry_bookend, 
-                    skill.get_index(focus_level.name), 
-                    focus_level.name if short else focus_level.readable_name
-                )
-            )
-            break
-        if display_levels:
-            for level in skill:
-                skill_length = str(len(skill))
-                level_index = skill.get_index(level.name)
-                print("{}{}. {}".format(
-                        middle_entry_bookend if level_index != skill_length else last_entry_bookend,
-                        level_index,
-                        level.name if short else level.readable_name
-                    )
-                )
+        raise Exception
+
+    def display_entry(index, human_name="", code_name="", indent=middle_entry_bookend):
+        print(indent + format_string.format(index, name=human_name, code=code_name))
+
+    def is_last_level(item):
+        return int(item.skill.index(item.name)) == len(item.skill)
+
+    def index(item):
+        if isinstance(item, Skill):
+            return item.all_skills.index(item.name)
+        else:
+            return item.skill.index(item.name)
+
+    for item in items_to_show:
+        if isinstance(item, Skill):
+            display_entry(index(item), human_name=item.readable_name, code_name=item.name, indent="")
+            if expand_skills:
+                for level in item:
+                    if is_last_level(level):
+                        display_entry(index(level), human_name=level.readable_name, code_name=level.name, indent=last_entry_bookend)
+                    else:
+                        display_entry(index(level), human_name=level.readable_name, code_name=level.name)
+        else:
+            if is_last_level(item):
+                display_entry(index(item), human_name=item.readable_name, code_name=item.name, indent=last_entry_bookend)
+            else:
+                display_entry(index(item), human_name=item.readable_name, code_name=item.name)

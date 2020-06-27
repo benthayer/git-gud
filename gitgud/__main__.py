@@ -236,9 +236,7 @@ class GitGud:
         for remote in level_repo.remotes:
             level_repo.delete_remote(remote)
         self.file_operator.clear_tracked_commits()
-        skills_levels_tree(level, all_skills, 
-            display_focus_only=True
-        )
+        skills_levels_tree([level.skill, level], expand_skills=False)
         print()
         level.setup(self.file_operator)
         self.file_operator.write_level(level)
@@ -376,25 +374,25 @@ class GitGud:
     def handle_levels(self, args):
         if args.opt_all or args.opt_skills:
             if args.opt_all:
-                print("All levels and skills", end='')
+                print("All levels and skills:")
+                skills_levels_tree(
+                    [skill for skill in all_skills],
+                    expand_skills=True,
+                    show_human_names=not args.opt_short
+                    )
             elif args.opt_skills:
-                print("All skills", end='')
-            print(" (in short form):" if args.opt_short else ':', end="\n\n")
-            skills_levels_tree(None, all_skills, 
-                short=args.opt_short,
-                display_other_skills=True,
-                display_levels=args.opt_all or not args.opt_skills
-            )
+                print("All skills:")
+                skills_levels_tree(
+                    [skill for skill in all_skills],
+                    expand_skills=False,
+                    show_human_names=not args.opt_short
+                )
         else:
             if args.skill_name is not None:
                 try:
                     skill = all_skills[args.skill_name]
                     print('Levels in skill "{}" : \n'.format(skill.name))
-                    skills_levels_tree(next(iter(skill)), all_skills,
-                        short=args.opt_short,
-                        display_other_skills=False,
-                        display_levels=True
-                    )
+                    skills_levels_tree([skill], expand_skills=True, show_human_names=not args.opt_short)
                 except KeyError:
                     print('There is no skill "{}".'.format(args.skill_name))
                     print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
@@ -405,7 +403,7 @@ class GitGud:
                 current_level = self.file_operator.get_level()
                 current_skill = current_level.skill
                 print('Levels in the current skill "{}" : \n'.format(current_skill.name))
-                skills_levels_tree(current_level, all_skills)
+                skills_levels_tree([current_skill], expand_skills=True, show_human_names=not args.opt_short)
                 
         print("\nLoad a level with `git gud load`")
 
