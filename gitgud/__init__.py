@@ -5,16 +5,8 @@ import subprocess
 
 from git import Actor
 
-import types
-
 actor = Actor("Git Gud", "git-gud@example.com")
 actor_string = "Git Gud <git-gud@example.com>"
-
-global_file_operator = types.SimpleNamespace(
-    file_operator=None,
-    operator_kwargs=None,
-    operator_args=None
-)
 
 
 def create_alias():
