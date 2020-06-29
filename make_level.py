@@ -12,14 +12,14 @@ def register_skill_package(skill_name):
     if not "gitgud.skills.{}".format(skill_name) in filedata:
         # Package
         replace1 = "\n".join([
-            "        \'gitgud.skills.{}\',".format(skill_name),
+            "        'gitgud.skills.{}',".format(skill_name),
             "    ],",
             "    package_data"
         ])
 
         # Data files
         replace2 = "\n".join([
-            "        \'gitgud.skills.{}\': ['_*/*'],".format(skill_name),
+            "        'gitgud.skills.{}': ['_*/*'],".format(skill_name),
             "    },",
             "    python_requires"
         ])
@@ -62,15 +62,16 @@ def make_folders(skill_name, level_name):
     return skill_path, level_path
 
 
-def make_skill(skill_name, skill_path):
+def make_skill(skill_name, skill_long_name, skill_path):
     # Fill out template for skills/<skill>/__init__.py
     with open("level_file_templates/__init__.py", 'r') as fp:
-        level_file = fp.read()
+        skill_file = fp.read()
 
-    level_file = level_file.replace("{}", skill_name)
+    skill_file = skill_file.replace("{name}", skill_name)
+    skill_file = skill_file.replace("{long_name}", skill_long_name)
 
     with open(os.path.join(skill_path, "__init__.py"), 'w') as fp:
-        fp.write(level_file)
+        fp.write(skill_file)
 
     # Register skill to skills/__init__.py
     with open(os.path.join("gitgud", "skills", "__init__.py"), 'r') as fp:
@@ -96,7 +97,7 @@ def make_skill(skill_name, skill_path):
     print("Registered skill \"{}\" in {}".format(skill_name, filepath))
 
 
-def make_level(skill_name, skill_path, level_name):
+def make_level(skill_name, skill_path, level_name, level_long_name):
     # Add level to skills/<new_skill>/__init__.py
     filepath = os.path.join(skill_path, "__init__.py")
     with open(filepath, 'r') as fp:
@@ -106,7 +107,7 @@ def make_level(skill_name, skill_path, level_name):
     if basic_level_import_string not in filedata:
         filedata = basic_level_import_string + filedata
 
-    replace = ",\n        BasicLevel('{level_name}', __name__)\n    ]".format(level_name=level_name)  # noqa: E501
+    replace = ",\n        BasicLevel('{long_name}', '{name}', __name__)\n    ]".format(name=level_name, long_name=level_long_name)  # noqa: E501
     filedata = filedata.replace("\n    ]", replace)
     filedata = filedata.replace("[,", "[")
 
@@ -133,17 +134,19 @@ def create_level_file(level_path, filename):
 
 def get_new_level_name_from_args():
     num_args = len(sys.argv) - 1
-    if num_args == 2:
+    if num_args == 4:
         skill_name = sys.argv[1]
-        level_name = sys.argv[2]
-        return skill_name, level_name
+        skill_long_name = sys.argv[2]
+        level_name = sys.argv[3]
+        level_long_name = sys.argv[4]
+        return skill_name, skill_long_name, level_name, level_long_name
     else:
-        if num_args > 3:
+        if num_args > 4:
             error_message = "Too many arguments: "
         else:
             error_message = "Too few arguments: "
         print(error_message + "Takes 2 arguments, but {} was given.".format(num_args))  # noqa: E501
-        print("Usage: \"python make_level.py <skill_name> <level_name>\"")
+        print('Usage: "python make_level.py <skill_name> <skill_long_name> <level_name> <level_long_name>"')  # noqa: E501
         exit(1)
 
 
@@ -166,7 +169,7 @@ def confirm_name(skill_name, level_name):
 
 
 def main():
-    skill_name, level_name = get_new_level_name_from_args()
+    skill_name, skill_long_name, level_name, level_long_name = get_new_level_name_from_args()  # noqa: E501
 
     # Check if current dir isn't ../gitgud directory. (i.e. dir of setup files)
     if not os.path.isdir(os.path.join(os.getcwd(), 'gitgud')):
@@ -186,11 +189,11 @@ def main():
 
     if not os.path.exists(os.path.join(skill_path, "__init__.py")):
         print("Registering Skill:")
-        make_skill(skill_name, skill_path)
+        make_skill(skill_name, skill_long_name, skill_path)
         print()
 
     print("Registering Level:")
-    make_level(skill_name, skill_path, level_name)
+    make_level(skill_name, skill_path, level_name, level_long_name)
     print()
 
     print("Creating Test Case:")

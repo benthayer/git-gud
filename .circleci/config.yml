@@ -20,8 +20,8 @@ jobs:
       - run:
           name: Level synthesis test
           command: |
-            echo -e "y\n" | python3 ./make_level.py testskill testlevel1
-            echo -e "y\n" | python3 ./make_level.py testskill testlevel2
+            echo -e "y\n" | python3 ./make_level.py testskill "Test Skill" testlevel1 "Test Level 1"
+            echo -e "y\n" | python3 ./make_level.py testskill "Test Skill" testlevel2 "Test Level 2"
       - run:
           name: Running tests
           command: |
