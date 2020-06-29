@@ -374,6 +374,7 @@ class GitGud:
         if args.opt_all or args.opt_skills:
             if args.opt_all:
                 print("All levels and skills:")
+                print()
                 skills_levels_tree(
                     [skill for skill in all_skills],
                     expand_skills=True,
@@ -381,6 +382,7 @@ class GitGud:
                     )
             elif args.opt_skills:
                 print("All skills:")
+                print()
                 skills_levels_tree(
                     [skill for skill in all_skills],
                     expand_skills=False,
@@ -389,7 +391,8 @@ class GitGud:
         elif args.skill_name is not None:
             try:
                 skill = all_skills[args.skill_name]
-                print('Levels in skill "{}" : \n'.format(skill.name))
+                print('Levels in skill "{}" :'.format(skill.name))
+                print()
                 skills_levels_tree(
                     [skill],
                     expand_skills=True,
@@ -401,7 +404,8 @@ class GitGud:
         elif self.file_operator is not None:
             current_level = self.file_operator.get_level()
             current_skill = current_level.skill
-            print('Levels in the current skill "{}" : \n'.format(current_skill.name))  # noqa: E501
+            print('Levels in the current skill "{}" :'.format(current_skill.name))  # noqa: E501
+            print()
             skills_levels_tree(
                 [current_skill],
                 expand_skills=True,
@@ -411,7 +415,8 @@ class GitGud:
             self.subparsers.choices['levels'].print_help()
             return
 
-        print("\nLoad a level with `git gud load`")
+        print()
+        print("Load a level with `git gud load`")
 
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
