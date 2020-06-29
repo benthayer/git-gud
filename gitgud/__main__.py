@@ -386,31 +386,30 @@ class GitGud:
                     expand_skills=False,
                     show_human_names=not args.opt_short
                 )
-        else:
-            if args.skill_name is not None:
-                try:
-                    skill = all_skills[args.skill_name]
-                    print('Levels in skill "{}" : \n'.format(skill.name))
-                    skills_levels_tree(
-                        [skill],
-                        expand_skills=True,
-                        show_human_names=not args.opt_short
-                    )
-                except KeyError:
-                    print('There is no skill "{}".'.format(args.skill_name))
-                    print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
-            else:
-                if self.file_operator is None:
-                    self.subparsers.choices['levels'].print_help()
-                    return
-                current_level = self.file_operator.get_level()
-                current_skill = current_level.skill
-                print('Levels in the current skill "{}" : \n'.format(current_skill.name))  # noqa: E501
+        elif args.skill_name is not None:
+            try:
+                skill = all_skills[args.skill_name]
+                print('Levels in skill "{}" : \n'.format(skill.name))
                 skills_levels_tree(
-                    [current_skill],
+                    [skill],
                     expand_skills=True,
                     show_human_names=not args.opt_short
                 )
+            except KeyError:
+                print('There is no skill "{}".'.format(args.skill_name))
+                print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
+        elif self.file_operator is not None:
+            current_level = self.file_operator.get_level()
+            current_skill = current_level.skill
+            print('Levels in the current skill "{}" : \n'.format(current_skill.name))  # noqa: E501
+            skills_levels_tree(
+                [current_skill],
+                expand_skills=True,
+                show_human_names=not args.opt_short
+            )
+        else:
+            self.subparsers.choices['levels'].print_help()
+            return
 
         print("\nLoad a level with `git gud load`")
 
