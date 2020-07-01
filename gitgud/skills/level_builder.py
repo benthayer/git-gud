@@ -15,7 +15,6 @@ from .user_messages import default_fail
 from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
-from .user_messages import solution_print_header
 from .user_messages import no_solutions_available
 
 
