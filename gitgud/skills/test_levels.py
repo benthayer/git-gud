@@ -35,6 +35,8 @@ def test_goal():
 
 @pytest.mark.parametrize('level', all_levels)
 def test_setup_spec_has_no_duplicate_commits(level):
+    if not level.setup_spec_path.exists():
+        return
     commits = parse_spec(level.setup_spec_path)[0]
     names = [commit[0] for commit in commits]
     assert len(names) == len(set(names))
@@ -42,6 +44,8 @@ def test_setup_spec_has_no_duplicate_commits(level):
 
 @pytest.mark.parametrize('level', all_levels)
 def test_test_spec_has_no_duplicate_commits(level):
+    if not level.test_spec_path.exists():
+        return
     commits = parse_spec(level.test_spec_path)[0]
     names = [commit[0] for commit in commits]
     assert len(names) == len(set(names))
@@ -49,6 +53,8 @@ def test_test_spec_has_no_duplicate_commits(level):
 
 @pytest.mark.parametrize('level', all_levels)
 def test_rebases_have_originals(level):
+    if not (level.test_spec_path.exists() and level.test_spec_path.exists()):
+        return
     setup_commits = parse_spec(level.setup_spec_path)[0]
     test_commits = parse_spec(level.test_spec_path)[0]
     all_commits = setup_commits + test_commits

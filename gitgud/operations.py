@@ -9,25 +9,24 @@ from glob import glob
 from git import Repo
 
 from gitgud import actor
-from gitgud.skills import all_skills
 
 
-class Operator:
-    def __init__(self, path, initialize_repo=True):
+class Operator():
+    def __init__(self, path, initialize_repo=False):
         self.path = path
-        if initialize_repo:
-            self.repo = Repo(os.getcwd())
-        else:
-            self.repo = None
-
         self.git_path = os.path.join(self.path, '.git')
         self.hooks_path = os.path.join(self.git_path, 'hooks')
         self.gg_path = os.path.join(self.git_path, 'gud')
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
         self.commits_path = os.path.join(self.gg_path, 'commits.csv')
         self.level_path = os.path.join(self.gg_path, 'current_level.txt')
+        self.repo = None
+
+        if initialize_repo:
+            self.repo = Repo.init(self.path)
 
     def add_file_to_index(self, filename):
+        self.setup_repo()
         open('{}/{}'.format(self.path, filename), 'w+').close()
         self.repo.index.add([filename])
 
@@ -43,6 +42,7 @@ class Operator:
         return commit
 
     def clear_tree_and_index(self):
+        self.setup_repo()
         dirs = []
         for x in [('**', '.*'), ('**',)]:
             path_spec = os.path.join(self.path, *x)
@@ -52,7 +52,6 @@ class Operator:
                         os.unlink(path)
                     else:
                         dirs.append(path)
-
         self.repo.git.add(update=True)
         # Easiest way to clear the index is to commit an empty directory
         self.repo.index.commit("Clearing index", skip_hooks=True)
@@ -66,16 +65,36 @@ class Operator:
     def shutoff_pager(self):
         self.repo.config_writer().set_value("core", "pager", '').release()
 
+    def destroy_repo(self):
+        # Clear all in installation directory
+        if self.repo_exists():
+            self.clear_tree_and_index()
+        # Clear all in .git/ directory
+        for path in set(os.path.join(self.git_path, path) for path in os.listdir(self.git_path)):  # noqa: E501
+            if os.path.isdir(path) and path != self.gg_path:
+                shutil.rmtree(path)
+            elif not os.path.isdir(path):
+                os.unlink(path)
+        self.repo = None
+
+    def repo_exists(self):
+        head_exists = os.path.exists(os.path.join(self.git_path, 'HEAD'))
+        if head_exists and self.repo is None:
+            self.repo = Repo(self.git_path)
+        return head_exists
+
+    def setup_repo(self):
+        if not self.repo_exists():
+            self.repo = Repo.init(self.path)
+        return self.repo
+
     def create_tree(self, commits, head):
-        branches = self.repo.branches
-        try:
-            # Detached head, we can now delete everything
-            self.repo.git.checkout(self.repo.head.commit)
-        except ValueError:
-            pass
+        self.setup_repo()
 
         self.clear_tree_and_index()
+        self.repo.git.checkout(self.repo.head.commit)
 
+        branches = self.repo.branches
         for branch in branches:
             self.repo.delete_head(branch, force=True)
         self.repo.delete_tag(*self.repo.tags)
@@ -150,6 +169,7 @@ class Operator:
         return commit_msg
 
     def get_current_tree(self):
+        self.setup_repo()
         # Return a json object with the same structure as in level_json
 
         repo = self.repo
@@ -220,10 +240,6 @@ class Operator:
         with open(self.level_path) as level_file:
             return level_file.read()
 
-    def get_level(self):
-        skill_name, level_name = self.read_level_file().split()
-        return all_skills[skill_name][level_name]
-
     def write_level(self, level):
         with open(self.level_path, 'w+') as skill_file:
             skill_file.write(' '.join([level.skill.name, level.name]))
@@ -267,6 +283,7 @@ class Operator:
         return known_commits
 
     def get_diffs(self, known_commits):
+        self.setup_repo()
         diffs = {}
         for commit_hash, commit_name in known_commits.items():
             if commit_name == '1':
@@ -305,12 +322,18 @@ class Operator:
         return mapping
 
 
-def get_operator():
-    cwd = os.getcwd().split(os.path.sep)
+_operator = None
 
-    for i in reversed(range(len(cwd))):
-        path = os.path.sep.join(cwd[:i+1])
-        gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
-        if os.path.isdir(gg_path):
-            return Operator(path)
-    return None
+
+def get_operator(operator_path=None, initialize_repo=False):
+    global _operator
+    if operator_path:
+        _operator = Operator(operator_path, initialize_repo=initialize_repo)
+    elif not _operator:
+        cwd = os.getcwd().split(os.path.sep)
+        for i in reversed(range(len(cwd))):
+            path = os.path.sep.join(cwd[:i+1])
+            gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
+            if os.path.isdir(gg_path):
+                _operator = Operator(path, initialize_repo=initialize_repo)
+    return _operator
