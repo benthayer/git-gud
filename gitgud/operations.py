@@ -87,15 +87,11 @@ class Operator():
 
     def create_tree(self, commits, head):
         self.setup_repo()
-        branches = self.repo.branches
-        try:
-            # Detached head, we can now delete everything
-            self.repo.git.checkout(self.repo.head.commit)
-        except ValueError:
-            pass
 
         self.clear_tree_and_index()
+        self.repo.git.checkout(self.repo.head.commit)
 
+        branches = self.repo.branches
         for branch in branches:
             self.repo.delete_head(branch, force=True)
         self.repo.delete_tag(*self.repo.tags)
