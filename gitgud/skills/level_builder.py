@@ -96,6 +96,8 @@ class BasicLevel(Level):
             self.instructions_path = self.goal_path
 
         self.solution_path = self.level_dir.joinpath('solution.txt')
+        self.user_solution_path = self.level_dir.joinpath('solution.user.txt')
+
         self.solution_commands = self.solution_list()
 
     def display_message(self, message_path):
@@ -140,13 +142,15 @@ class BasicLevel(Level):
         return solution_commands
 
     def solution(self):
-        solution = self.solution_list()
-        if not solution:
-            no_solutions_available()
+        if self.user_solution_path.exists():
+            print(self.user_solution_path.read_text())
         else:
-            solution_print_header(self)
-            for command in solution:
-                print(' '*4 + command)
+            solution = self.solution_list()
+            if not solution:
+                no_solutions_available()
+            else:
+                for command in solution:
+                    print(command)
 
     def _test(self, file_operator):
         commits, head = parse_spec(self.test_spec_path)
