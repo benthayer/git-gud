@@ -30,7 +30,7 @@ or
 cd gitgud
 pytest .
 ```
-Pytest will search for files that start with `test_` and will run methods starting with `test_` as tests.The search ir run for all subdirectories, so all tests defined will automatically be found and don't need to be registered.
+Pytest will search for files that start with `test_` and will run methods starting with `test_` as tests. The search will run for all subdirectories, so all tests defined will automatically be found and don't need to be registered.
 
 #### CircleCI
 Once you push and make a pull request, CircleCI will run tests and will show the results directly on GitHub. 
@@ -91,7 +91,7 @@ It also implements some generic output.
 
 To make a custom level, you can extend `level_builder.BasicLevel` or you can extend `level_builder.Level`.
 There are examples in various skills already, in their `__init__.py` files.
-If you want to get more complicated and you're not sure what to do, add an issue or comment on a pull request or existin issue.
+If you want to get more complicated and you're not sure what to do, add an issue or comment on a pull request or existing issue.
 
 
 #### Creating a skill/level with `make_level.py`
@@ -102,7 +102,7 @@ The usage of the script is as follows: "python3 make_level.py <skill_name> <leve
 
 The script will register the new skill/level to `setup.py`, the `__init__.py` for the skill it is in.
 It creates `__init__.py` if it doesn't already exist. 
-Additionally, it will create tubehe skill/level directory and template files.
+Additionally, it will create the skill/level directory and template files.
 The logging of the script should be helpful.
 
 The template files are:
@@ -111,6 +111,7 @@ The template files are:
  - skills/<skill_name>/<level_name>/instructions.txt
  - skills/<skill_name>/<level_name>/setup.spec
  - skills/<skill_name>/<level_name>/test.spec
+ - skills/<skill_name>/<level_name>/solution.txt
  
 _The script overwrites existing files, so be careful_
 
