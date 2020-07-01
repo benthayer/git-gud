@@ -1,4 +1,28 @@
-Use this file to explain to the users how to use the git feature that this level focuses on.
+Let's say that you're well along in your workflow, and then you suddenly realize that you really don't want an old commit you've made several commits ago. 
 >>>
-Separate blocks using ">>>", and be sure to include tips and examples as explanation aids.
-
+Well, you're in luck! git has a solution for that: we can run an interactive rebase. But what does an interactive rebase do?
+>>>
+An interactive rebase allows you to modify commits that come after a certain commit. 
+git will ask you what you want to do with each commit, and then git will attempt to "replay" each commit based on what you told git to do!
+In this way, git is "rebasing" all of the commits on your chosen commit.
+>>>
+In this level, we're going to use an interactive rebase to remove commit 3.
+We'll first run "git rebase -i HASH", where HASH is the identifier for the commit just *before* commit 3.
+>>>
+Next, git will prompt you with a file in a similar way as it prompts you when it needs a commit message.
+At the top, you'll see several lines. Each line represents a commit, and it has this format:
+    <word> <HASH> <message>
+* <word> is the instruction that will tell git what to do with that commit
+* <HASH> is the hash that identifies the commit
+* <message> is the asssociated commit message.
+You can also reorder 
+>>> 
+There are plenty of options you could put for <word>, but for now, we'll just mention that:
+* "pick" tells git to leave the commit as-is
+* "drop" tells git to completely remove the commit. You could also delete the line to achieve the same effect.
+>>>
+For our purposes, you'll want to delete the line with commmit 3. After that, just save and exit!
+>>>
+Whew, that was a lot of instructions! Using what you now know, use 
+    git rebase -i 
+to delete commit 3!
