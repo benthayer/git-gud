@@ -15,7 +15,7 @@ At the top, you'll see several lines. Each line represents a commit, and it has 
 * <word> is the instruction that will tell git what to do with that commit
 * <HASH> is the hash that identifies the commit
 * <message> is the asssociated commit message.
-You can also reorder 
+You can also reorder lines and delete lines to reorder and delete commits, respectively.
 >>> 
 There are plenty of options you could put for <word>, but for now, we'll just mention that:
 * "pick" tells git to leave the commit as-is
