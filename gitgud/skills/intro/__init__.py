@@ -89,10 +89,11 @@ class Init(BasicLevel):
 
 
 skill = Skill(
+    'Introduction',
     'intro',
     [
-        Welcome('welcome', __name__),
-        Config('config', __name__),
-        Init('init', __name__),
+        Welcome('Welcome', 'welcome', __name__),
+        Config('Configuring', 'config', __name__),
+        Init('Initialization', 'init', __name__)
     ]
 )
