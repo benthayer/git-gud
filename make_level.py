@@ -171,9 +171,18 @@ def confirm_name(level_name, skill_name):
 def main():
     level_name, level_long_name, skill_name, skill_long_name = get_new_level_name_from_args()  # noqa: E501
 
+    skill_path = os.path.join("gitgud", "skills", "{}".format(skill_name))
+    skill_already_exists = os.path.exists(os.path.join(skill_path, "__init__.py"))  # noqa: E501
+
     # Check if current dir isn't ../gitgud directory. (i.e. dir of setup files)
     if not os.path.isdir(os.path.join(os.getcwd(), 'gitgud')):
         print("Error: Script must be run in the git-gud directory.")
+        exit(1)
+    elif not level_long_name:
+        print("Error: Level's long name must be specified in order to register a level.")  # noqa: E501
+        exit(1)
+    elif not skill_already_exists and not skill_long_name:  # noqa: E501
+        print("Error: Skill's long name must be specified if skill doesn't already exist.")  # noqa: E501
         exit(1)
 
     confirm_name(level_name, skill_name)
@@ -187,17 +196,11 @@ def main():
     level_path, skill_path = make_folders(level_name, skill_name)
     print()
 
-    if not os.path.exists(os.path.join(skill_path, "__init__.py")):
-        if not skill_long_name:
-            print("Error: Skill's long name must be specified if skill doesn't already exist.")  # noqa: E501
-            exit(1)
+    if not skill_already_exists:
         print("Registering Skill:")
         make_skill(skill_name, skill_long_name, skill_path)
         print()
 
-    if not level_long_name:
-        print("Error: Level's long name must be specified in order to register a level.")  # noqa: E501
-        exit(1)
     print("Registering Level:")
     make_level(level_name, level_long_name, skill_name, skill_path)
     print()
