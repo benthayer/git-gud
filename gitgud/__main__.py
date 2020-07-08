@@ -376,6 +376,7 @@ class GitGud:
         simulate_command("git gud levels --all")
 
     def handle_levels(self, args):
+        file_operator = operations.get_operator()
         if args.opt_all or args.opt_skills:
             if args.opt_all:
                 print("All levels and skills:")
@@ -406,8 +407,8 @@ class GitGud:
             except KeyError:
                 print('There is no skill "{}".'.format(args.skill_name))
                 print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
-        elif self.file_operator is not None:
-            current_level = self.file_operator.get_level()
+        elif file_operator is not None:
+            current_level = file_operator.get_level()
             current_skill = current_level.skill
             print('Levels in the current skill "{}" :'.format(current_skill.name))  # noqa: E501
             print()
