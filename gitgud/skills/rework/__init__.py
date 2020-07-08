@@ -6,5 +6,6 @@ skill = Skill(
     'rework',
     [
         BasicLevel('Cherrypicking', 'cherrypicking', __name__)
-    ],
+        BasicLevel('Interactive Rebase', 'irebase', __name__)
+    ]
 )

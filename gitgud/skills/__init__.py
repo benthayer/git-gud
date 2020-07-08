@@ -4,7 +4,6 @@ from gitgud.skills.rampup import skill as rampup_skill
 from gitgud.skills.rework import skill as rework_skill
 from gitgud.skills.extras import skill as extras_skill
 
-
 from gitgud.skills.util import AllSkills
 
 all_skills = AllSkills([

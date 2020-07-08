@@ -1,0 +1,8 @@
+Git is a version control system. This means that it stores and tracks the
+changes you make. Before we get to the business of making commits and branches
+and doing other fun things, we'll need a place to store all of it. That place
+is known as a "Git Repo".
+
+To see the goal for this level, type:
+    $ git gud goal
+

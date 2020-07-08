@@ -1,0 +1,5 @@
+Create a Git Repo!
+
+Type "git gud status" for more information
+Type "git gud test" when done
+
