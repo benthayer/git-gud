@@ -1,6 +1,7 @@
 import os
 import sys
 import webbrowser
+from pathlib import Path
 
 import argparse
 
@@ -256,7 +257,7 @@ class GitGud:
         file_operator = operations.get_operator()
         if not args.force:
             # We aren't forcing
-            if file_operator and "{}/".format(os.getcwd()).startswith("{}/".format(file_operator.path)):  # noqa: E501:
+            if file_operator and Path(file_operator.path) in Path(os.getcwd()).parents:  # noqa: E501:
                 print('Repo {} already initialized for git gud.'
                       .format(file_operator.path))
                 print('Use --force to initialize {}.'.format(os.getcwd()))
