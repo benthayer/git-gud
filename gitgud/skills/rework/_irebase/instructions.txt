@@ -1,13 +1,28 @@
-This practice level will familiarize with using interactive rebasing.
+This practice level will familiarize you with interactive rebasing.
 >>>
-This is an alternative way of using the "rebase" command with "-i" right after it. For example, "git rebase -i HEAD~4" allows you to change the last 4 commits with the text editor.
+Rebasing interactively makes it easier to change the effect of running "git rebase".
 >>>
-When you include this option, git will open a text editor to show which commits will be copied below the rebase target.
-In the text editor, you're given the ability to do three things: reorder commits, omit commits, and squash commits(combine commits).
+When you run "git rebase -i <commit-ish>", git will open a text editor to show you a list of commits.
 >>>
-In order to reorder commits, simply change the order of the commits in the text editor.
-In order to omit a commit, simply delete the "pick" before the commit.
-In order to squash commits, simply replace "pick" with "squash"
+For example, "git rebase -i HEAD~4" allows you to change the last 4 commits with the text editor.
+>>
+In the text editor, you're able to edit the list. You can reorder and drop certain commits among other things.
 >>>
-Now let's say there are 2 branches: overHere and master. overHere contains commit 1. master contains commit 2, commit 3, commit 4, and commit 5.
-In order to complete this level, reoder the commits using rebase -i so that commit 3, commit 5, and commit 4 are copied into master in that order.
+For example, you might start with this text file:
+----------------------
+pick 321cc87 One
+pick acf91d9 Two
+pick 2d7f421 Three
+----------------------
+>>>
+By changing it to this, the commits are now in reverse order.
+----------------------
+pick 2d7f421 Three
+pick acf91d9 Two
+pick 321cc87 One
+----------------------
+>>>
+To reorder a commit, change the order of the lines like you see above
+To omit a commit, replace "pick" with "drop" or delete the entire line
+>>>
+This should be enough to get started on the level. Good luck!
