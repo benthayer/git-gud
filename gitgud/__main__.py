@@ -408,7 +408,7 @@ class GitGud:
                 print('There is no skill "{}".'.format(args.skill_name))
                 print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
         elif file_operator is not None:
-            current_level = file_operator.get_level()
+            current_level = self.get_level()
             current_skill = current_level.skill
             print('Levels in the current skill "{}" :'.format(current_skill.name))  # noqa: E501
             print()
