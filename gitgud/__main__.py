@@ -379,7 +379,7 @@ class GitGud:
                     [skill for skill in all_skills],
                     expand_skills=True,
                     show_human_names=not args.opt_short
-                    )
+                )
             elif args.opt_skills:
                 print("All skills:")
                 print()
