@@ -15,6 +15,10 @@ from .user_messages import default_fail
 from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
+from .user_messages import solution_print_header
+from .user_messages import no_solutions_available
+
+from gitgud import operations
 
 
 class Level:
@@ -33,22 +37,12 @@ class Level:
     def full_name(self):
         return '{} {}'.format(self.skill.name, self.name)
 
-    def _setup(self, file_operator):
+    def _setup(self):
         pass
 
-    def setup(self, file_operator):
-        # Clear remotes
-        level_repo = file_operator.repo
-        for remote in level_repo.remotes:
-            level_repo.delete_remote(remote)
-
-        file_operator.clear_tracked_commits()
-
-        show_level_name(self)
-        self._setup(file_operator)
+    def setup(self):
+        self._setup()
         self.post_setup()
-
-        file_operator.write_level(self)
 
     def post_setup(self):
         show_level_name(self)
@@ -62,11 +56,14 @@ class Level:
     def status(self):
         show_level_name(self)
 
-    def _test(self, file_operator):
+    def has_ever_been_completed(self):
+        return self._test()
+
+    def _test(self):
         raise NotImplementedError
 
-    def test(self, file_operator):
-        if self._test(file_operator):
+    def test(self):
+        if self._test():
             self.test_passed()
         else:
             self.test_failed()
@@ -93,7 +90,6 @@ class BasicLevel(Level):
         self.test_spec_path = self.level_dir.joinpath('test.spec')
 
         self.instructions_path = self.level_dir.joinpath('instructions.txt')
-
         self.goal_path = self.level_dir.joinpath('goal.txt')
 
         self.passed_path = self.level_dir.joinpath('passed.txt')
@@ -101,11 +97,15 @@ class BasicLevel(Level):
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
 
+        self.solution_path = self.level_dir.joinpath('solution.txt')
+        self.solution_commands = self.solution_list()
+
     def display_message(self, message_path):
         path = self.level_dir.joinpath(message_path)
         print_user_file(path)
 
-    def _setup(self, file_operator):
+    def _setup(self):
+        file_operator = operations.get_operator(initialize_repo=True)
         commits, head = parse_spec(self.setup_spec_path)
         file_operator.create_tree(commits, head)
 
@@ -133,7 +133,26 @@ class BasicLevel(Level):
     def goal(self):
         self.display_message("goal.txt")
 
-    def _test(self, file_operator):
+    def solution_list(self):
+        solution_commands = []
+
+        for command in self.solution_path.read_text().split('\n'):
+            if command and command.strip()[0] != "#":
+                solution_commands.append(command)
+
+        return solution_commands
+
+    def solution(self):
+        solution = self.solution_list()
+        if not solution:
+            no_solutions_available()
+        else:
+            solution_print_header(self)
+            for command in solution:
+                print(' '*4 + command)
+
+    def _test(self):
+        file_operator = operations.get_operator()
         commits, head = parse_spec(self.test_spec_path)
 
         # Get commit trees
