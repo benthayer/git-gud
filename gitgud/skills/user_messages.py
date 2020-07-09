@@ -1,5 +1,6 @@
 import subprocess
 from .util import Skill
+from . import level_builder
 
 user_has_seen_messages = False
 
@@ -112,22 +113,21 @@ def default_fail_no_reset():
     print('Level not complete, keep trying.')
 
 
-def skills_levels_tree(items_to_show, show_human_names=True, show_code_names=True, expand_skills=False):  # noqa: E501
+def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_skills=False):  # noqa: E501
     middle_entry_bookend = '├── '
     last_entry_bookend = '└── '
 
-    format_string = "{}. "
-    if show_code_names and show_human_names:
-        format_string += "{name} ({code})"
-    elif show_human_names:
+    format_string = "{index}. "
+    if show_human_names and not show_code_names:
         format_string += "{name}"
-    elif show_code_names:
+    elif show_code_names and not show_human_names:
         format_string += "{code}"
     else:
-        raise Exception
+        format_string += "{name} ({code})"
 
-    def display_entry(index, human_name="", code_name="", indent=middle_entry_bookend):  # noqa: E501
-        print(indent + format_string.format(index, name=human_name, code=code_name))  # noqa: E501
+    def display_entry(index, human_name, code_name, indent):
+        print(indent + format_string.format(
+            index=index, name=human_name, code=code_name))
 
     def is_last_level(item):
         return int(item.skill.index(item.name)) == len(item.skill)
@@ -138,7 +138,17 @@ def skills_levels_tree(items_to_show, show_human_names=True, show_code_names=Tru
         else:
             return item.skill.index(item.name)
 
-    for item in items_to_show:
+    if expand_skills:
+        new_items = []
+        for skill in items:
+            assert isinstance(skill, Skill)
+            new_items.append(skill)
+            for level in skill:
+                new_items.append(level)
+
+        items = new_items
+
+    for item in items:
         if isinstance(item, Skill):
             display_entry(
                 index(item),
@@ -146,32 +156,16 @@ def skills_levels_tree(items_to_show, show_human_names=True, show_code_names=Tru
                 code_name=item.name,
                 indent=""
             )
-            if expand_skills:
-                for level in item:
-                    if is_last_level(level):
-                        display_entry(
-                            index(level),
-                            human_name=level.readable_name,
-                            code_name=level.name,
-                            indent=last_entry_bookend
-                        )
-                    else:
-                        display_entry(
-                            index(level),
-                            human_name=level.readable_name,
-                            code_name=level.name
-                        )
         else:
+            assert isinstance(item, level_builder.Level)
             if is_last_level(item):
-                display_entry(
-                    index(item),
-                    human_name=item.readable_name,
-                    code_name=item.name,
-                    indent=last_entry_bookend
-                )
+                indent = last_entry_bookend
             else:
-                display_entry(
-                    index(item),
-                    human_name=item.readable_name,
-                    code_name=item.name
-                )
+                indent = middle_entry_bookend
+
+            display_entry(
+                index(item),
+                human_name=item.readable_name,
+                code_name=item.name,
+                indent=last_entry_bookend
+            )
