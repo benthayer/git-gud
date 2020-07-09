@@ -167,5 +167,5 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
                 index(item),
                 human_name=item.readable_name,
                 code_name=item.name,
-                indent=last_entry_bookend
+                indent=indent
             )

@@ -17,7 +17,6 @@ from gitgud.skills.user_messages import handle_solution_confirmation
 from gitgud.skills.user_messages import mock_simulate
 from gitgud.skills.user_messages import print_info
 from gitgud.skills.user_messages import show_skill_tree
-from gitgud.skills.user_messages import simulate_command
 from gitgud.hooks import all_hooks
 
 
