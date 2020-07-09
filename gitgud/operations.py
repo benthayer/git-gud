@@ -1,25 +1,24 @@
 import csv
-import os
 import shutil
 import datetime as dt
 import email.utils
-
-from glob import glob
 
 from git import Repo
 
 from gitgud import actor
 
+from pathlib import Path
+
 
 class Operator():
     def __init__(self, path, initialize_repo=False):
-        self.path = path
-        self.git_path = os.path.join(self.path, '.git')
-        self.hooks_path = os.path.join(self.git_path, 'hooks')
-        self.gg_path = os.path.join(self.git_path, 'gud')
-        self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
-        self.commits_path = os.path.join(self.gg_path, 'commits.csv')
-        self.level_path = os.path.join(self.gg_path, 'current_level.txt')
+        self.path = Path(path)
+        self.git_path = self.path / '.git'
+        self.hooks_path = self.git_path / 'hooks'
+        self.gg_path = self.git_path / 'gud'
+        self.last_commit_path = self.gg_path / 'last_commit.txt'
+        self.commits_path = self.gg_path / 'commits.csv'
+        self.level_path = self.gg_path / 'current_level.txt'
         self.repo = None
 
         if initialize_repo:
@@ -27,7 +26,7 @@ class Operator():
 
     def add_file_to_index(self, filename):
         self.setup_repo()
-        open('{}/{}'.format(self.path, filename), 'w+').close()
+        open(self.path / filename, 'w+').close()
         self.repo.index.add([filename])
 
     def add_and_commit(self, name):
@@ -43,23 +42,19 @@ class Operator():
 
     def clear_tree_and_index(self):
         self.setup_repo()
-        dirs = []
-        for x in [('**', '.*'), ('**',)]:
-            path_spec = os.path.join(self.path, *x)
-            for path in glob(path_spec, recursive=True):
-                if not os.path.sep + '.git' + os.path.sep in path:
-                    if os.path.isfile(path):
-                        os.unlink(path)
-                    else:
-                        dirs.append(path)
+        for x in ["*", ".*"]:
+            for path in self.path.rglob(x):
+                if not any(p.name == '.git' for p in (path / 'fakedir').parents):  # noqa: E501
+                    if path.is_file():
+                        path.unlink()
+
         self.repo.git.add(update=True)
         # Easiest way to clear the index is to commit an empty directory
         self.repo.index.commit("Clearing index", skip_hooks=True)
-        # Remove all directories except current
-        dirs.remove(self.path + os.path.sep)
 
-        for path in os.listdir(self.path):
-            if path != '.git':
+        # Remove all directories except current
+        for path in self.path.iterdir():
+            if path != self.git_path:
                 shutil.rmtree(path)
 
     def shutoff_pager(self):
@@ -70,15 +65,15 @@ class Operator():
         if self.repo_exists():
             self.clear_tree_and_index()
         # Clear all in .git/ directory
-        for path in set(os.path.join(self.git_path, path) for path in os.listdir(self.git_path)):  # noqa: E501
-            if os.path.isdir(path) and path != self.gg_path:
+        for path in set(self.git_path / path for path in self.git_path.iterdir()):  # noqa: E501
+            if path.is_dir() and path != self.gg_path:
                 shutil.rmtree(path)
-            elif not os.path.isdir(path):
-                os.unlink(path)
+            elif not path.is_dir():
+                path.unlink()
         self.repo = None
 
     def repo_exists(self):
-        head_exists = os.path.exists(os.path.join(self.git_path, 'HEAD'))
+        head_exists = (self.git_path / 'HEAD').exists()
         if head_exists and self.repo is None:
             self.repo = Repo(self.git_path)
         return head_exists
@@ -321,10 +316,8 @@ def get_operator(operator_path=None, initialize_repo=False):
     if operator_path:
         _operator = Operator(operator_path, initialize_repo=initialize_repo)
     elif not _operator:
-        cwd = os.getcwd().split(os.path.sep)
-        for i in reversed(range(len(cwd))):
-            path = os.path.sep.join(cwd[:i+1])
-            gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
-            if os.path.isdir(gg_path):
+        for path in (Path.cwd() / "fakedir").parents:
+            gg_path = path / '.git' / 'gud'
+            if gg_path.is_dir():
                 _operator = Operator(path, initialize_repo=initialize_repo)
     return _operator
