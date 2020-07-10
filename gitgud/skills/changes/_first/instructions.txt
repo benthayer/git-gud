@@ -1,0 +1,35 @@
+Now that you have a repo, you're going to want to start using it.
+>>>
+As stated before, repos are used to keep track of your changes.
+Your changes a stored in what's known as a commit.
+>>>
+Commits are called "commits" because you use them to "commit" your changes.
+>>>
+You can think of committing your changes as another way to save your files, just a little more advanced.
+Among other things, you need to manually add your files to commits, and each commit comes with a message.
+>>>
+Commits are also ordered, so there is naturally a first commit. Most people call this their "Initial commit".
+>>>
+Making your first commit will look something like this:
+
+Create a file, it can be named anything, and it can have anything in it.
+Type "git add myfile.txt" to add your file (in this case, the name of the file is "myfile.txt")
+Type "git commit -m "Initial commit""
+>>>
+
+Make your first commit, and then we can get started
+
+
+
+
+
+Normally, you'll use commits to save your changes, 
+
+The first thing you need to know about repos is that they contain commits. In this level, you'll make a commit
+>>>
+So what do commits do?
+Commits store your changes. Every time you make changes and "commit" them, you're saving your changes.
+>>>
+
+
+

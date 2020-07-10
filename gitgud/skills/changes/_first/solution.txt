@@ -1,0 +1,3 @@
+touch file
+git add file
+git commit -m "Added a file"
