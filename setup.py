@@ -8,7 +8,7 @@ setup(
     name='git-gud',
     version=open('gitgud/version.txt').read().strip(),
     url='https://github.com/benthayer/git-gud/',
-    description='A tool to learn git',
+    description='A command line game to learn git',
     author='Ben Thayer',
     author_email='ben@benthayer.com',
     license='MIT',

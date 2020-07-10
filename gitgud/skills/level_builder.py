@@ -15,11 +15,16 @@ from .user_messages import default_fail
 from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
+from .user_messages import solution_print_header
+from .user_messages import no_solutions_available
+
+from gitgud import operations
 
 
 class Level:
-    def __init__(self, name):
+    def __init__(self, readable_name, name):
         self.name = name
+        self.readable_name = readable_name
         self.skill = None
         self.next_level = None
         self.prev_level = None
@@ -33,11 +38,11 @@ class Level:
     def full_name(self):
         return '{} {}'.format(self.skill.name, self.name)
 
-    def _setup(self, file_operator):
+    def _setup(self):
         pass
 
-    def setup(self, file_operator):
-        self._setup(file_operator)
+    def setup(self):
+        self._setup()
         self.post_setup()
 
     def post_setup(self):
@@ -52,11 +57,14 @@ class Level:
     def status(self):
         show_level_name(self)
 
-    def _test(self, file_operator):
+    def has_ever_been_completed(self):
+        return self._test()
+
+    def _test(self):
         raise NotImplementedError
 
-    def test(self, file_operator):
-        if self._test(file_operator):
+    def test(self):
+        if self._test():
             self.test_passed()
         else:
             self.test_failed()
@@ -74,8 +82,8 @@ class Level:
 
 
 class BasicLevel(Level):
-    def __init__(self, name, skill_package):
-        super().__init__(name)
+    def __init__(self, readable_name, name, skill_package):
+        super().__init__(readable_name, name)
 
         self.level_dir = files(skill_package).joinpath('_{}/'.format(name))
 
@@ -83,7 +91,6 @@ class BasicLevel(Level):
         self.test_spec_path = self.level_dir.joinpath('test.spec')
 
         self.instructions_path = self.level_dir.joinpath('instructions.txt')
-
         self.goal_path = self.level_dir.joinpath('goal.txt')
 
         self.passed_path = self.level_dir.joinpath('passed.txt')
@@ -91,11 +98,14 @@ class BasicLevel(Level):
         if not self.instructions_path.exists():
             self.instructions_path = self.goal_path
 
+        self.solution_path = self.level_dir.joinpath('solution.txt')
+
     def display_message(self, message_path):
         path = self.level_dir.joinpath(message_path)
         print_user_file(path)
 
-    def _setup(self, file_operator):
+    def _setup(self):
+        file_operator = operations.get_operator(initialize_repo=True)
         commits, head = parse_spec(self.setup_spec_path)
         file_operator.create_tree(commits, head)
 
@@ -123,7 +133,26 @@ class BasicLevel(Level):
     def goal(self):
         self.display_message("goal.txt")
 
-    def _test(self, file_operator):
+    def solution_list(self):
+        solution_commands = []
+
+        for command in self.solution_path.read_text().split('\n'):
+            if command and command.strip()[0] != "#":
+                solution_commands.append(command)
+
+        return solution_commands
+
+    def solution(self):
+        solution = self.solution_list()
+        if not solution:
+            no_solutions_available()
+        else:
+            solution_print_header(self)
+            for command in solution:
+                print(' '*4 + command)
+
+    def _test(self):
+        file_operator = operations.get_operator()
         commits, head = parse_spec(self.test_spec_path)
 
         # Get commit trees
@@ -138,7 +167,10 @@ class BasicLevel(Level):
         name_from_map(level_tree, known_commits)
 
         # Name rebases and cherrypicks
-        diff_map = file_operator.get_copy_mapping(non_merges, known_commits)
+        known_non_merges = {commit_hash: name
+                            for commit_hash, name in known_commits.items()
+                            if name[:1] != 'M'}
+        diff_map = file_operator.get_copy_mapping(non_merges, known_non_merges)
         name_from_map(level_tree, diff_map)
 
         # Name merges

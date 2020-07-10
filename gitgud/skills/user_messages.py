@@ -1,4 +1,6 @@
 import subprocess
+from .util import Skill
+from . import level_builder
 
 user_has_seen_messages = False
 
@@ -93,6 +95,68 @@ def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')  # noqa: E501
 
 
+def handle_solution_confirmation(level):
+    print('Are you sure you want to view the solution for "{}": "{}"?'.format(level.name, level.skill.name))  # noqa: E501
+    print('If so, run `git gud solution --confirm`')
+
+
+def no_solutions_available():
+    print("No solutions available for this level.")
+
+
+def solution_print_header(level):
+    print('Solution for the current level "{}" in the skill "{}":'.format(level.name, level.skill.name))  # noqa: E501
+
+
 @separated
 def default_fail_no_reset():
     print('Level not complete, keep trying.')
+
+
+def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_skills=False):  # noqa: E501
+    middle_entry_bookend = '├── '
+    last_entry_bookend = '└── '
+
+    format_string = "{index}. "
+    if show_human_names and not show_code_names:
+        format_string += "{name}"
+    elif show_code_names and not show_human_names:
+        format_string += "{code}"
+    else:
+        format_string += "{name} ({code})"
+
+    def display_entry(index, human_name, code_name, indent):
+        print(indent + format_string.format(
+            index=index, name=human_name, code=code_name))
+
+    if expand_skills:
+        new_items = []
+        for skill in items:
+            assert isinstance(skill, Skill)
+            new_items.append(skill)
+            for level in skill:
+                new_items.append(level)
+
+        items = new_items
+
+    for i, item in enumerate(items):
+        if isinstance(item, Skill):
+            display_entry(
+                item.all_skills.index(item.name),
+                human_name=item.readable_name,
+                code_name=item.name,
+                indent=""
+            )
+        else:
+            assert isinstance(item, level_builder.Level)
+            if i + 1 == len(items) or isinstance(items[i+1], Skill):
+                indent = last_entry_bookend
+            else:
+                indent = middle_entry_bookend
+
+            display_entry(
+                item.skill.index(item.name),
+                human_name=item.readable_name,
+                code_name=item.name,
+                indent=indent
+            )

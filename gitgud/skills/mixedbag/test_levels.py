@@ -6,12 +6,7 @@ from . import skill
 
 
 level_tests = [
-    (
-        skill['onecommit'], [
-            'git checkout master',
-            'git cherry-pick bugFix'
-        ]
-    )
+    (level, level.solution_list()) for level in skill
 ]
 
 

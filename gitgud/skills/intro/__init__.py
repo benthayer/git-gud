@@ -6,6 +6,8 @@ from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.user_messages import simulate_command
 from gitgud.skills.user_messages import default_fail_no_reset
 
+from gitgud import operations
+
 
 class Welcome(BasicLevel):
     def post_setup(self):
@@ -21,7 +23,7 @@ class Welcome(BasicLevel):
     def test_passed(self):
         self.display_message("passed.txt")
 
-    def _test(self, file_operator):
+    def _test(self):
         return True
 
 
@@ -48,7 +50,7 @@ class Config(BasicLevel):
 
         self.display_message("status-2.txt")
 
-    def _test(self, file_operator):
+    def _test(self):
         name, email = get_name_and_email()
         return name and email
 
@@ -59,10 +61,39 @@ class Config(BasicLevel):
         self.display_message("passed.txt")
 
 
+class Init(BasicLevel):
+    def _setup(self):
+        # Make sure we are not in a git repo
+        file_operator = operations.get_operator()
+        file_operator.destroy_repo()
+
+    def post_setup(self):
+        self.display_message("post-setup.txt")
+
+    def status(self):
+        if self._test():
+            self.display_message("status-repo.txt")
+        else:
+            self.display_message("status-norepo.txt")
+
+    def _test(self):
+        # Check if we are in a git repo
+        file_operator = operations.get_operator()
+        return file_operator.repo_exists()
+
+    def test_failed(self):
+        default_fail_no_reset()
+
+    def test_passed(self):
+        self.display_message("passed.txt")
+
+
 skill = Skill(
+    'Introduction',
     'intro',
     [
-        Welcome('welcome', __name__),
-        Config('config', __name__)
+        Welcome('Welcome', 'welcome', __name__),
+        Config('Configuring', 'config', __name__),
+        Init('Initialization', 'init', __name__)
     ]
 )
