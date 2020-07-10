@@ -99,7 +99,6 @@ class BasicLevel(Level):
             self.instructions_path = self.goal_path
 
         self.solution_path = self.level_dir.joinpath('solution.txt')
-        self.solution_commands = self.solution_list()
 
     def display_message(self, message_path):
         path = self.level_dir.joinpath(message_path)
