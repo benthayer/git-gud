@@ -129,15 +129,6 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
         print(indent + format_string.format(
             index=index, name=human_name, code=code_name))
 
-    def is_last_level(item):
-        return int(item.skill.index(item.name)) == len(item.skill)
-
-    def index(item):
-        if isinstance(item, Skill):
-            return item.all_skills.index(item.name)
-        else:
-            return item.skill.index(item.name)
-
     if expand_skills:
         new_items = []
         for skill in items:
@@ -148,23 +139,23 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
 
         items = new_items
 
-    for item in items:
+    for i, item in enumerate(items):
         if isinstance(item, Skill):
             display_entry(
-                index(item),
+                item.all_skills.index(item.name),
                 human_name=item.readable_name,
                 code_name=item.name,
                 indent=""
             )
         else:
             assert isinstance(item, level_builder.Level)
-            if is_last_level(item):
+            if i + 1 == len(items) or isinstance(items[i+1], Skill):
                 indent = last_entry_bookend
             else:
                 indent = middle_entry_bookend
 
             display_entry(
-                index(item),
+                item.skill.index(item.name),
                 human_name=item.readable_name,
                 code_name=item.name,
                 indent=indent
