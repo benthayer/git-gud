@@ -22,7 +22,7 @@ Ideally, the game will teach you everything you need to know to beat it, but you
 
 The beginning levels of the game start by getting you accustomed to the Git Gud interface, but later on, the training wheels come off, and you'll have to remember to type in the commands.
 If you ever forget which commands there are, or if you want to start on a later level, you can always run "git gud help"
-The most important commands are `git gud goal`, `git gud status`, `git gud instructions` `git gud test`, and `git gud load next`.
+The most important commands are `git gud goal`, `git gud status`, `git gud explain` `git gud test`, and `git gud load next`.
 Other commands are also useful, but the output of those commands should be enough to guide you through the level.
 
 To get started, you need to initialize Git Gud in an empty directory.

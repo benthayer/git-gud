@@ -60,7 +60,7 @@ def show_tree():
 
 @separated
 def help():
-    print("Type \"git gud instructions\" to view full instructions")
+    print("Type \"git gud explain\" for an explaination of the level")
     print("Type \"git gud test\" to test for level completion")
     print("Type \"git gud help\" for more help")
 

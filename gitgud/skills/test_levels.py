@@ -22,10 +22,10 @@ def test_types():
             assert isinstance(level, Level)
 
 
-def test_instructions():
+def test_explain():
     for skill in all_skills:
         for level in skill:
-            os.path.isfile(level.instructions_path)
+            os.path.isfile(level.explanation_path)
 
 
 def test_goal():

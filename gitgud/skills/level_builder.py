@@ -48,7 +48,7 @@ class Level:
     def post_setup(self):
         show_level_name(self)
 
-    def instructions(self):
+    def explain(self):
         pass
 
     def goal(self):
@@ -90,13 +90,13 @@ class BasicLevel(Level):
         self.setup_spec_path = self.level_dir.joinpath('setup.spec')
         self.test_spec_path = self.level_dir.joinpath('test.spec')
 
-        self.instructions_path = self.level_dir.joinpath('instructions.txt')
+        self.explanation_path = self.level_dir.joinpath('explanation.txt')
         self.goal_path = self.level_dir.joinpath('goal.txt')
 
         self.passed_path = self.level_dir.joinpath('passed.txt')
 
-        if not self.instructions_path.exists():
-            self.instructions_path = self.goal_path
+        if not self.explanation_path.exists():
+            self.explanation_path = self.goal_path
 
         self.solution_path = self.level_dir.joinpath('solution.txt')
 
@@ -123,8 +123,8 @@ class BasicLevel(Level):
         self.display_message('goal.txt')
         show_tree()
 
-    def instructions(self):
-        for line in self.instructions_path.read_text().strip().split('\n'):
+    def explain(self):
+        for line in self.explanation_path.read_text().strip().split('\n'):
             if line[:3] == '>>>':
                 input('>>>')
             else:
