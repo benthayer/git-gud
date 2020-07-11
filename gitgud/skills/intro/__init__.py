@@ -71,10 +71,7 @@ class Init(BasicLevel):
         self.display_message("post-setup.txt")
 
     def status(self):
-        if self._test():
-            self.display_message("status-repo.txt")
-        else:
-            self.display_message("status-norepo.txt")
+        simulate_command("git status")
 
     def _test(self):
         # Check if we are in a git repo
