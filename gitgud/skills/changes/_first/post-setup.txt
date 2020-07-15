@@ -1,0 +1,14 @@
+Now that we've initialized a repo, we're going to take the git gud training wheels off and let you focus on git.
+
+You'll be expected to run these commands from memory, but remember to run "git gud" or "git gud help" if you ever forget which commands to run, or to seee some new commands
+
+Here are the most important commands, remember them:
+    git gud goal
+    git gud status
+    git gud explain
+    git gud test
+    git gud load
+
+Remember them, and they'll guide you through the levels.
+If you ever get stuck, run "git gud help"
+Good luck!
