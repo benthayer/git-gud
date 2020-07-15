@@ -7,7 +7,7 @@ class FirstCommit(BasicLevel):
         get_operator().repo.git.checkout('--orphan', 'master')
 
     def post_setup(self):
-        self.display_message('post-setup.txt')
+        self.cat_file('post-setup.txt')
 
     def _test(self):
         # As long as there's one commit, it doesn't matter what's in it
