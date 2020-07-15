@@ -1,7 +1,7 @@
 import pytest
 
 from gitgud.skills import all_skills, all_levels
-from gitgud.skills.level_builder import Level
+from gitgud.skills.level_builder import Level, BasicLevel
 from gitgud.skills.util import Skill
 from gitgud.skills.parsing import parse_spec
 
@@ -23,12 +23,14 @@ def test_types():
 def test_explain():
     for skill in all_skills:
         for level in skill:
-            level.file('explanation.txt').is_file()
+            if level.explain.__code__ == BasicLevel.explain.__code__:
+                assert level.file('explanation.txt').is_file()
 
 
 def test_goal():
     for level in all_levels:
-        level.file('goal.txt').is_file()
+        if level.goal.__code__ == BasicLevel.goal.__code__:
+            assert level.file('goal.txt').is_file()
 
 
 @pytest.mark.parametrize('level', all_levels)
