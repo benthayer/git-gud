@@ -1,2 +1,2 @@
-Add a file and commit it
+Add a file and commit it to master
 

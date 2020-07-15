@@ -6,6 +6,23 @@ class FirstCommit(BasicLevel):
     def post_setup(self):
         self.cat_file('post-setup.txt')
 
+
+    def is_one_commit(self):
+        pass
+
+    def status(self):
+
+        op = get_operator()
+        from path import Path
+        has_file = len(Path(op.path).listdir()) >= 2  # git directory == 1
+        try:
+            op.repo.head.commit
+            has_commit = True
+        except ValueError:
+            has_commit = False
+        print('Created file?     {}'.format(has_file))
+        print('Created commit?   {}'.format(has_commit))
+
     def _test(self):
         # As long as there's one commit, it doesn't matter what's in it
         # Use the existing setup so that any commit matches the first one
