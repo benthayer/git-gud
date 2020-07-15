@@ -1,4 +1,3 @@
-import os
 import sys
 import webbrowser
 from pathlib import Path
@@ -317,21 +316,21 @@ class GitGud:
                 passargs = ''
 
             with open(path, 'w+') as hook_file:
-                hook_file.write('#!/bin/bash' + os.linesep)
+                hook_file.write('#!/bin/bash' + '\n')
                 hook_file.write(
                         forward_stdin +
                         python_exec + ' -m gitgud.hooks.' + module_hook_name +
-                        passargs + os.linesep)
+                        passargs + '\n')
                 hook_file.write(
-                    "if [[ $? -ne 0 ]]" + os.linesep + ""
-                    "then" + os.linesep + ""
-                    "\t exit 1" + os.linesep + ""
-                    "fi" + os.linesep)
+                    "if [[ $? -ne 0 ]]" + '\n' + ""
+                    "then" + '\n' + ""
+                    "\t exit 1" + '\n' + ""
+                    "fi" + '\n')
 
             # Make the files executable
-            mode = os.stat(path).st_mode
+            mode = path.stat().st_mode
             mode |= (mode & 0o444) >> 2
-            os.chmod(path, mode)
+            path.chmod(mode)
 
         self.load_level(all_skills["0"]["1"])
 
