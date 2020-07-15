@@ -14,7 +14,6 @@ from .user_messages import default_fail
 from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
-from .user_messages import solution_print_header
 from .user_messages import no_solutions_available
 
 from gitgud import operations
@@ -136,9 +135,8 @@ class BasicLevel(Level):
         if not solution:
             no_solutions_available()
         else:
-            solution_print_header(self)
             for command in solution:
-                print(' '*4 + command)
+                print(command)
 
     def _test(self):
         file_operator = operations.get_operator()
