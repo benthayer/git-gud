@@ -151,14 +151,16 @@ class Operator():
                 self.repo.create_tag(tag, self.repo.head.commit)
             counter = counter - 1
 
-        head_is_commit = True
+        if head in commit_objects:
+            self.repo.git.checkout(commit_objects[head])
+            return
+
         for branch in self.repo.branches:
             if branch.name == head:
                 branch.checkout()
-                head_is_commit = False
+                return
 
-        if head_is_commit:
-            self.repo.git.checkout(commit_objects[head])
+        self.repo.git.checkout('--orphan', head)
 
     # Parses commit msg for keywords (e.g. Revert)
     @staticmethod

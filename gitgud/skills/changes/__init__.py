@@ -3,9 +3,6 @@ from gitgud.skills.util import Skill
 from gitgud.operations import get_operator
 
 class FirstCommit(BasicLevel):
-    def _setup(self):
-        get_operator().repo.git.checkout('--orphan', 'master')
-
     def post_setup(self):
         self.cat_file('post-setup.txt')
 
