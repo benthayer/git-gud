@@ -25,7 +25,7 @@ def separated(func):
 
 
 @separated
-def print_user_file(path):
+def cat_file(path):
     print(path.read_text().strip())
 
 

@@ -11,17 +11,17 @@ from gitgud import operations
 
 class Welcome(BasicLevel):
     def post_setup(self):
-        self.display_message("post-setup.txt")
+        self.cat_file("post-setup.txt")
 
     def status(self):
-        self.display_message("status-1.txt")
+        self.cat_file("status-1.txt")
         simulate_command("git log")
 
     def test_failed(self):
         default_fail_no_reset()
 
     def test_passed(self):
-        self.display_message("passed.txt")
+        self.cat_file("passed.txt")
 
     def _test(self):
         return True
@@ -37,10 +37,10 @@ def get_name_and_email():
 
 class Config(BasicLevel):
     def post_setup(self):
-        self.display_message("post-setup.txt")
+        self.cat_file("post-setup.txt")
 
     def status(self):
-        self.display_message("status-1.txt")
+        self.cat_file("status-1.txt")
 
         name, email = get_name_and_email()
 
@@ -48,7 +48,7 @@ class Config(BasicLevel):
         print('user.name: "{}"'.format(name))
         print('user.email: "{}"'.format(email))
 
-        self.display_message("status-2.txt")
+        self.cat_file("status-2.txt")
 
     def _test(self):
         name, email = get_name_and_email()
@@ -58,7 +58,7 @@ class Config(BasicLevel):
         default_fail_no_reset()
 
     def test_passed(self):
-        self.display_message("passed.txt")
+        self.cat_file("passed.txt")
 
 
 class Init(BasicLevel):
@@ -68,7 +68,7 @@ class Init(BasicLevel):
         file_operator.destroy_repo()
 
     def post_setup(self):
-        self.display_message("post-setup.txt")
+        self.cat_file("post-setup.txt")
 
     def status(self):
         simulate_command("git status")
@@ -82,7 +82,7 @@ class Init(BasicLevel):
         default_fail_no_reset()
 
     def test_passed(self):
-        self.display_message("passed.txt")
+        self.cat_file("passed.txt")
 
 
 skill = Skill(
