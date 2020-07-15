@@ -262,29 +262,29 @@ class GitGud:
         file_operator = operations.get_operator()
         if not args.force:
             # We aren't forcing
-            if file_operator and Path(file_operator.path) in Path(os.getcwd()).parents:  # noqa: E501:
+            if file_operator and file_operator.path in (Path.cwd() / 'fakedir').parents:  # noqa: E501:
                 print('Repo {} already initialized for git gud.'
                       .format(file_operator.path))
-                print('Use --force to initialize {}.'.format(os.getcwd()))
+                print('Use --force to initialize {}.'.format(Path.cwd()))
                 return
 
-            file_operator = operations.get_operator(os.getcwd())
+            file_operator = operations.get_operator(Path.cwd())
 
-            if os.path.exists(file_operator.gg_path):
+            if file_operator.gg_path.exists():
                 # Current directory is a git repo
                 print('Git gud has already initialized. Use --force to force initialize again.')  # noqa: E501
                 return
-            if os.path.exists(os.path.join(file_operator.git_path, 'HEAD')):
+            if (file_operator.git_path / 'HEAD').exists():
                 # Current directory is a git repo
                 print('Currently in a git repo. Use --force to force initialize here.')  # noqa: E501
                 return
-            elif len(os.listdir(file_operator.path)) != 0:
+            elif len(list(file_operator.path.iterdir())) != 0:
                 print('Current directory is nonempty. Use --force to force initialize here.')  # noqa: E501
                 return
         else:
             print('Force initializing Git Gud.')
             if not file_operator:
-                file_operator = operations.get_operator(os.getcwd())
+                file_operator = operations.get_operator(Path.cwd())
 
         assert file_operator is not None
         # After here, we initialize everything
@@ -296,14 +296,14 @@ class GitGud:
         # Disable pager so "git gud status" can use the output easily
         file_operator.shutoff_pager()
 
-        if not os.path.exists(file_operator.gg_path):
-            os.mkdir(file_operator.gg_path)
+        if not file_operator.gg_path.exists():
+            file_operator.gg_path.mkdir()
 
         # Git uses unix-like path separators
         python_exec = sys.executable.replace('\\', '/')
 
         for git_hook_name, module_hook_name, accepts_args in all_hooks:
-            path = os.path.join(file_operator.hooks_path, git_hook_name)
+            path = file_operator.hooks_path / git_hook_name
             if accepts_args:
                 forward_stdin = 'cat - |'
                 passargs = ' "$@"'
