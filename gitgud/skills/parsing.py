@@ -218,8 +218,9 @@ def name_merges(skill, test):
     for commit_name, commit_info in test['commits'].items():
         if len(commit_info['parents']) >= 2:
             parents = tuple(commit_info['parents'])
-            merge_name = merges[parents]
-            mapping[merge_name] = commit_name
+            if parents in merges:
+                merge_name = merges[parents]
+                mapping[merge_name] = commit_name
 
     name_from_map(skill, mapping)
 

@@ -1,8 +1,8 @@
-This is a practice level to get you started with the format of "git gud".
-Hit enter to advance.
+"git gud explain" will help give you more context to the currrent level
+Hit enter to read more.
 >>>
-You are currently reading the instructions. As long as you see the ">>>", you are reading the instructions.
- You won't be able to enter any commands until you're done reading the instructions.
+As long as you see the ">>>", you are reading the explanation.
+More text appears each time you hit enter, can once explanation finishes, you can type commands again.
 >>>
 As you progress, "git gud" will guide you through the relevant commands in both "git" and "git gud".
 >>>

@@ -1,8 +1,8 @@
 This level is designed to help you learn how to merge.
-It will show the steps one at a time, and after the instructions, you can go and try it for yourself.
+It will show the steps one at a time, and after the explanation, you can go and try it for yourself.
 >>>
 Make a new branch called bugFix by typing the command "git branch bugFix"
->>> 
+>>>
 Checkout the bugFix branch with "git checkout bugFix"
 >>>
 Commit once ("git gud commit")

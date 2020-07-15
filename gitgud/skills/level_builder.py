@@ -7,8 +7,7 @@ from .parsing import name_from_map
 from .parsing import get_non_merges
 from .parsing import name_merges
 
-from .user_messages import print_user_file
-from .user_messages import print_user_message
+from .user_messages import cat_file
 from .user_messages import show_level_name
 from .user_messages import show_tree
 from .user_messages import default_fail
@@ -48,7 +47,7 @@ class Level:
     def post_setup(self):
         show_level_name(self)
 
-    def instructions(self):
+    def explain(self):
         pass
 
     def goal(self):
@@ -87,27 +86,15 @@ class BasicLevel(Level):
 
         self.level_dir = files(skill_package).joinpath('_{}/'.format(name))
 
-        self.setup_spec_path = self.level_dir.joinpath('setup.spec')
-        self.test_spec_path = self.level_dir.joinpath('test.spec')
+    def file(self, path):
+        return self.level_dir.joinpath(path)
 
-        self.instructions_path = self.level_dir.joinpath('instructions.txt')
-        self.goal_path = self.level_dir.joinpath('goal.txt')
-
-        self.passed_path = self.level_dir.joinpath('passed.txt')
-
-        if not self.instructions_path.exists():
-            self.instructions_path = self.goal_path
-
-        self.solution_path = self.level_dir.joinpath('solution.txt')
-        self.solution_commands = self.solution_list()
-
-    def display_message(self, message_path):
-        path = self.level_dir.joinpath(message_path)
-        print_user_file(path)
+    def cat_file(self, path):
+        cat_file(self.file(path))
 
     def _setup(self):
         file_operator = operations.get_operator(initialize_repo=True)
-        commits, head = parse_spec(self.setup_spec_path)
+        commits, head = parse_spec(self.file('setup.spec'))
         file_operator.create_tree(commits, head)
 
         latest_commit = '0'
@@ -121,23 +108,24 @@ class BasicLevel(Level):
         file_operator.write_last_commit(latest_commit)
 
     def post_setup(self):
-        self.display_message('goal.txt')
+        self.cat_file('goal.txt')
         show_tree()
 
-    def instructions(self):
-        for line in self.instructions_path.read_text().strip().split('\n'):
+    def explain(self):
+        for line in self.file('explanation.txt') \
+                .read_text().strip().split('\n'):
             if line[:3] == '>>>':
                 input('>>>')
             else:
                 print(line.strip())
 
     def goal(self):
-        self.display_message("goal.txt")
+        self.cat_file("goal.txt")
 
     def solution_list(self):
         solution_commands = []
 
-        for command in self.solution_path.read_text().split('\n'):
+        for command in self.file('solution.txt').read_text().split('\n'):
             if command and command.strip()[0] != "#":
                 solution_commands.append(command)
 
@@ -154,7 +142,7 @@ class BasicLevel(Level):
 
     def _test(self):
         file_operator = operations.get_operator()
-        commits, head = parse_spec(self.test_spec_path)
+        commits, head = parse_spec(self.file('test.spec'))
 
         # Get commit trees
         test_tree = level_json(commits, head)
@@ -181,7 +169,7 @@ class BasicLevel(Level):
         return test_ancestry(level_tree, test_tree)
 
     def test_passed(self):
-        if self.passed_path.exists():
-            print_user_message(self.passed_path.read_text())
+        if self.file('passed.txt').exists():
+            self.cat_file('passed.txt')
         else:
             super().test_passed()

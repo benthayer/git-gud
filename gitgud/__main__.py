@@ -16,8 +16,7 @@ from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import handle_solution_confirmation
 from gitgud.skills.user_messages import mock_simulate
 from gitgud.skills.user_messages import print_info
-from gitgud.skills.user_messages import skills_levels_tree
-from gitgud.skills.user_messages import simulate_command
+from gitgud.skills.user_messages import show_skill_tree
 from gitgud.hooks import all_hooks
 
 
@@ -90,9 +89,9 @@ class GitGud:
                 help='Print out the name of the current level',
                 description='Print out the name of the current level')
         self.subparsers.add_parser(
-                'instructions',
-                help='Show the instructions for the current level',
-                description='Show the instructions for the current level')
+                'explain',
+                help='Show the explain for the current level',
+                description='Show the explain for the current level')
         self.subparsers.add_parser(
                 'goal',
                 help='Concisely show what needs to be done to complete the level.',  # noqa: E501
@@ -110,9 +109,9 @@ class GitGud:
                 help="Test to see if you've successfully completed the current level",  # noqa: E501
                 description="Test to see if you've successfully completed the current level")  # noqa: E501
         self.subparsers.add_parser(
-                'skills',
-                help='List skills',
-                description='List skills')
+                'level',
+                help='Display current level',
+                description='Display the currently loaded level')
         self.subparsers.add_parser(
                 'goal',
                 help='Show a description of the current goal',
@@ -166,13 +165,18 @@ class GitGud:
                 nargs='?',
                 help='Level to load')
 
+        skills_parser = self.subparsers.add_parser(
+                'skills',
+                help='List skills',
+                description='List skills')
+        skills_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills usable with `git gud load`.")  # noqa: E501
+
         levels_parser = self.subparsers.add_parser(
                 'levels',
                 help='List levels in a skill',
                 description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud levels --all`.')  # noqa: E501
         levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
-        levels_parser.add_argument('--skills', dest='opt_skills', action='store_true', help="Prints all available skills.")  # noqa: E501
-        levels_parser.add_argument('--all', dest='opt_all', action='store_true', help="Prints all available skills with levels. Overrides --skills.")  # noqa: E501
+        levels_parser.add_argument('--all', dest='opt_all', action='store_true', help="Prints all available skills with levels.")  # noqa: E501
         levels_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
 
         commit_parser = self.subparsers.add_parser(
@@ -195,11 +199,12 @@ class GitGud:
             'help': self.handle_help,
             'init': self.handle_init,
             'status': self.handle_status,
-            'instructions': self.handle_instructions,
+            'explain': self.handle_explain,
             'goal': self.handle_goal,
             'reset': self.handle_reset,
             'reload': self.handle_reset,
             'test': self.handle_test,
+            'level': self.handle_level,
             'skills': self.handle_skills,
             'levels': self.handle_levels,
             'load': self.handle_load,
@@ -343,9 +348,9 @@ class GitGud:
             print("Git Gud not initialized.")
             print('Initialize using "git gud init"')
 
-    def handle_instructions(self, args):
+    def handle_explain(self, args):
         self.assert_initialized()
-        self.get_level().instructions()
+        self.get_level().explain()
 
     def handle_goal(self, args):
         self.assert_initialized()
@@ -371,56 +376,50 @@ class GitGud:
         else:
             current_level.solution()
 
+    def handle_level(self, args):
+        level = self.get_level()
+        skill = level.skill
+        show_skill_tree(
+                [skill, level],
+                expand_skills=False)
+
     def handle_skills(self, args):
-        print_info('The functionality of "git gud skills" will be replaced by "git gud levels --all".')  # noqa: E501
-        simulate_command("git gud levels --all")
+        print("All skills:")
+        print()
+        show_skill_tree(
+            [skill for skill in all_skills],
+            expand_skills=False,
+            show_human_names=not args.opt_short
+        )
 
     def handle_levels(self, args):
-        file_operator = operations.get_operator()
-        if args.opt_all or args.opt_skills:
-            if args.opt_all:
-                print("All levels and skills:")
-                print()
-                skills_levels_tree(
-                    [skill for skill in all_skills],
-                    expand_skills=True,
-                    show_human_names=not args.opt_short
-                )
-            elif args.opt_skills:
-                print("All skills:")
-                print()
-                skills_levels_tree(
-                    [skill for skill in all_skills],
-                    expand_skills=False,
-                    show_human_names=not args.opt_short
-                )
-        elif args.skill_name is not None:
-            try:
-                skill = all_skills[args.skill_name]
-                print('Levels in skill "{}" :'.format(skill.name))
-                print()
-                skills_levels_tree(
-                    [skill],
-                    expand_skills=True,
-                    show_human_names=not args.opt_short
-                )
-            except KeyError:
-                print('There is no skill "{}".'.format(args.skill_name))
-                print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
-        elif file_operator is not None:
-            current_level = self.get_level()
-            current_skill = current_level.skill
-            print('Levels in the current skill "{}" :'.format(current_skill.name))  # noqa: E501
-            print()
-            skills_levels_tree(
-                [current_skill],
-                expand_skills=True,
-                show_human_names=not args.opt_short
-            )
+        if args.opt_all:
+            skills_to_show = [skill for skill in all_skills]
+            print("All levels and skills:")
         else:
-            self.subparsers.choices['levels'].print_help()
-            return
+            # Only show levels in one skill
+            if args.skill_name:
+                try:
+                    skills_to_show = [all_skills[args.skill_name]]
+                    print('Levels in skill "{}" :'.format(args.skill_name))
+                except KeyError:
+                    print('There is no skill "{}".'.format(args.skill_name))
+                    print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
+                    return
+            elif self.is_initialized():
+                current_skill = self.get_level().skill
+                skills_to_show = [current_skill]
+                print('Levels in the current skill "{}" :'.format(current_skill.name))  # noqa: E501
+            else:
+                self.subparsers.choices['levels'].print_help()
+                return
 
+        print()
+        show_skill_tree(
+            skills_to_show,
+            expand_skills=True,
+            show_human_names=not args.opt_short
+        )
         print()
         print("Load a level with `git gud load`")
 

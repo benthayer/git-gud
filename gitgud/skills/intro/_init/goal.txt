@@ -1,5 +1,4 @@
-Create a Git Repo!
+Create a Git repo!
 
-Type "git gud status" for more information
+Type "git gud explain" to learn what a Git repo is and how to make one
 Type "git gud test" when done
-
