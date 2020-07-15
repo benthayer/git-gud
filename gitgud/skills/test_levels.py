@@ -1,7 +1,5 @@
 import pytest
 
-import os
-
 from gitgud.skills import all_skills, all_levels
 from gitgud.skills.level_builder import Level
 from gitgud.skills.util import Skill
@@ -25,12 +23,12 @@ def test_types():
 def test_explain():
     for skill in all_skills:
         for level in skill:
-            os.path.isfile(level.file('explanation.txt'))
+            level.file('explanation.txt').is_file()
 
 
 def test_goal():
     for level in all_levels:
-        os.path.isfile(level.file('goal.txt'))
+        level.file('goal.txt').is_file()
 
 
 @pytest.mark.parametrize('level', all_levels)
