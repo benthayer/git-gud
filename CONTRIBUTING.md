@@ -108,7 +108,7 @@ The logging of the script should be helpful.
 The template files are:
  - skills/test_levels.py
  - skills/<skill_name>/<level_name>/goal.txt
- - skills/<skill_name>/<level_name>/instructions.txt
+ - skills/<skill_name>/<level_name>/explanation.txt
  - skills/<skill_name>/<level_name>/setup.spec
  - skills/<skill_name>/<level_name>/test.spec
  - skills/<skill_name>/<level_name>/solution.txt

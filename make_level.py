@@ -211,7 +211,7 @@ def main():
     print()
 
     print("Creating Files:")
-    create_level_file(level_path, "instructions.txt")
+    create_level_file(level_path, "explanation.txt")
     create_level_file(level_path, "goal.txt")
     create_level_file(level_path, "setup.spec")
     create_level_file(level_path, "test.spec")

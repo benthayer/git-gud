@@ -25,7 +25,7 @@ def separated(func):
 
 
 @separated
-def print_user_file(path):
+def cat_file(path):
     print(path.read_text().strip())
 
 
@@ -60,7 +60,7 @@ def show_tree():
 
 @separated
 def help():
-    print("Type \"git gud instructions\" to view full instructions")
+    print("Type \"git gud explain\" for an explaination of the level")
     print("Type \"git gud test\" to test for level completion")
     print("Type \"git gud help\" for more help")
 

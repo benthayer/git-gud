@@ -89,9 +89,9 @@ class GitGud:
                 help='Print out the name of the current level',
                 description='Print out the name of the current level')
         self.subparsers.add_parser(
-                'instructions',
-                help='Show the instructions for the current level',
-                description='Show the instructions for the current level')
+                'explain',
+                help='Show the explain for the current level',
+                description='Show the explain for the current level')
         self.subparsers.add_parser(
                 'goal',
                 help='Concisely show what needs to be done to complete the level.',  # noqa: E501
@@ -199,7 +199,7 @@ class GitGud:
             'help': self.handle_help,
             'init': self.handle_init,
             'status': self.handle_status,
-            'instructions': self.handle_instructions,
+            'explain': self.handle_explain,
             'goal': self.handle_goal,
             'reset': self.handle_reset,
             'reload': self.handle_reset,
@@ -348,9 +348,9 @@ class GitGud:
             print("Git Gud not initialized.")
             print('Initialize using "git gud init"')
 
-    def handle_instructions(self, args):
+    def handle_explain(self, args):
         self.assert_initialized()
-        self.get_level().instructions()
+        self.get_level().explain()
 
     def handle_goal(self, args):
         self.assert_initialized()

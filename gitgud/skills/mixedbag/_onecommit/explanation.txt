@@ -1,0 +1,9 @@
+Now that you know how to use both cherry-pick and the interactive rebase, this practice level is designed to put to use your previously learned skills.
+>>>
+Let's say you were working on a bug fix and you added a few debbugging commands and print statments in their own commits.
+Once you've fixed the bug, you don't want to commit the debugging and print statements with your bug fix.
+>>>
+To visualize this lets say that there are 4 commits, commit 1 "master" , commit 2 "debug", commit 3 "printf", and commit 4 "bugFix".
+>>>
+To complete this level, copy only the bugFix into the master branch using "rebase -i" or "cherry-pick".
+hint: Since you've just commited the bug fix, remember that your HEAD is at bugFix and not master.
