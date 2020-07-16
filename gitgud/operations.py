@@ -16,7 +16,7 @@ from gitgud.hooks import all_hooks
 
 
 class Operator():
-    def __init__(self, path, initialize_repo=False):
+    def __init__(self, path):
         self.path = Path(path)
         self.git_path = self.path / '.git'
         self.hooks_path = self.git_path / 'hooks'
@@ -24,13 +24,13 @@ class Operator():
         self.last_commit_path = self.gg_path / 'last_commit.txt'
         self.commits_path = self.gg_path / 'commits.csv'
         self.level_path = self.gg_path / 'current_level.txt'
-        self.repo = None
 
-        if initialize_repo:
-            self.repo = Repo.init(self.path)
+        try:
+            self.repo = Repo(path)
+        except InvalidGitRepositoryError:
+            self.repo = None
 
     def add_file_to_index(self, filename):
-        self.setup_repo()
         with open(self.path / filename, 'w+') as f:
             f.write("Hello, I'm an auto-generated file!")
         self.repo.index.add([filename])
@@ -56,7 +56,6 @@ class Operator():
         return commit
 
     def clear_tree_and_index(self):
-        self.setup_repo()
         for path in self.path.glob('*'):
             if path.is_file():
                 path.unlink()
@@ -120,7 +119,7 @@ class Operator():
 
     def destroy_repo(self):
         # Clear all in installation directory
-        if self.repo_exists():
+        if self.repo is not None:
             self.clear_tree_and_index()
         # Clear all in .git/ directory except .git/gud
         for path in self.git_path.iterdir():
@@ -130,16 +129,9 @@ class Operator():
                 shutil.rmtree(path)
         self.repo = None
 
-    def repo_exists(self):
-        head_exists = (self.git_path / 'HEAD').exists()
-        if head_exists and self.repo is None:
-            self.repo = Repo(self.git_path)
-        return head_exists
-
-    def setup_repo(self):
-        if not self.repo_exists():
+    def use_repo(self):
+        if self.repo is None:
             self.repo = Repo.init(self.path)
-        return self.repo
 
     def commit(self, commit_message, parents, time_offset):
         committime = dt.datetime.now(dt.timezone.utc).astimezone() \
@@ -162,8 +154,6 @@ class Operator():
         if not details:
             details = {}
 
-        self.setup_repo()
-
         self.clear_tree_and_index()
 
         # Commit so we know we're not on an orphan branch
@@ -180,6 +170,8 @@ class Operator():
         for branch in branches:
             self.repo.delete_head(branch, force=True)
         self.repo.delete_tag(*self.repo.tags)
+        for remote in self.repo.remotes:
+            self.repo.delete_remote(remote)
 
         commit_objects = {}
         counter = len(commits)
@@ -268,7 +260,6 @@ class Operator():
             self.repo.git.checkout(commit_objects[head])
 
     def get_current_tree(self):
-        self.setup_repo()
         # Return a json object with the same structure as in level_json
 
         repo = self.repo
@@ -380,7 +371,6 @@ class Operator():
         return known_commits
 
     def get_diffs(self, known_commits):
-        self.setup_repo()
         diffs = {}
         for commit_hash, commit_name in known_commits.items():
             if commit_name == '1':
@@ -410,11 +400,11 @@ class Operator():
         return mapping
 
 
-def get_operator(operator_path=None, initialize_repo=False):
+def get_operator(operator_path=None):
     if operator_path:
-        return Operator(operator_path, initialize_repo=initialize_repo)
+        return Operator(operator_path)
     else:
         for path in (Path.cwd() / "_").parents:
             gg_path = path / '.git' / 'gud'
             if gg_path.is_dir():
-                return Operator(path, initialize_repo=initialize_repo)
+                return Operator(path)

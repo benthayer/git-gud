@@ -94,7 +94,8 @@ class BasicLevel(Level):
         cat_file(self.file(path))
 
     def _setup(self):
-        file_operator = operations.get_operator(initialize_repo=True)
+        file_operator = operations.get_operator()
+        file_operator.use_repo()
         commits, head = parse_spec(self.file('setup.spec'))
 
         details_path = self.file('details.yaml')
