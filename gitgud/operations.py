@@ -7,12 +7,13 @@ import email.utils
 from glob import glob
 
 from git import Repo
+from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
 
 
 class Operator():
-    def __init__(self, path, initialize_repo=False):
+    def __init__(self, path):
         self.path = path
         self.git_path = os.path.join(self.path, '.git')
         self.hooks_path = os.path.join(self.git_path, 'hooks')
@@ -20,13 +21,13 @@ class Operator():
         self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
         self.commits_path = os.path.join(self.gg_path, 'commits.csv')
         self.level_path = os.path.join(self.gg_path, 'current_level.txt')
-        self.repo = None
 
-        if initialize_repo:
-            self.repo = Repo.init(self.path)
+        try:
+            self.repo = Repo(path)
+        except InvalidGitRepositoryError:
+            self.repo = None
 
     def add_file_to_index(self, filename):
-        self.setup_repo()
         open('{}/{}'.format(self.path, filename), 'w+').close()
         self.repo.index.add([filename])
 
@@ -42,7 +43,6 @@ class Operator():
         return commit
 
     def clear_tree_and_index(self):
-        self.setup_repo()
         dirs = []
         for x in [('**', '.*'), ('**',)]:
             path_spec = os.path.join(self.path, *x)
@@ -67,7 +67,7 @@ class Operator():
 
     def destroy_repo(self):
         # Clear all in installation directory
-        if self.repo_exists():
+        if self.repo is not None:
             self.clear_tree_and_index()
         # Clear all in .git/ directory
         for path in set(os.path.join(self.git_path, path) for path in os.listdir(self.git_path)):  # noqa: E501
@@ -77,19 +77,11 @@ class Operator():
                 os.unlink(path)
         self.repo = None
 
-    def repo_exists(self):
-        head_exists = os.path.exists(os.path.join(self.git_path, 'HEAD'))
-        if head_exists and self.repo is None:
-            self.repo = Repo(self.git_path)
-        return head_exists
-
-    def setup_repo(self):
-        if not self.repo_exists():
+    def use_repo(self):
+        if self.repo is None:
             self.repo = Repo.init(self.path)
-        return self.repo
 
     def create_tree(self, commits, head):
-        self.setup_repo()
 
         self.clear_tree_and_index()
         self.repo.git.checkout(self.repo.head.commit)
@@ -98,6 +90,8 @@ class Operator():
         for branch in branches:
             self.repo.delete_head(branch, force=True)
         self.repo.delete_tag(*self.repo.tags)
+        for remote in self.repo.remotes:
+            self.repo.delete_remote(remote)
 
         commit_objects = {}
         counter = len(commits)
@@ -171,7 +165,6 @@ class Operator():
         return commit_msg
 
     def get_current_tree(self):
-        self.setup_repo()
         # Return a json object with the same structure as in level_json
 
         repo = self.repo
@@ -285,7 +278,6 @@ class Operator():
         return known_commits
 
     def get_diffs(self, known_commits):
-        self.setup_repo()
         diffs = {}
         for commit_hash, commit_name in known_commits.items():
             if commit_name == '1':
@@ -318,15 +310,15 @@ class Operator():
 _operator = None
 
 
-def get_operator(operator_path=None, initialize_repo=False):
+def get_operator(operator_path=None):
     global _operator
     if operator_path:
-        _operator = Operator(operator_path, initialize_repo=initialize_repo)
+        _operator = Operator(operator_path)
     elif not _operator:
         cwd = os.getcwd().split(os.path.sep)
         for i in reversed(range(len(cwd))):
             path = os.path.sep.join(cwd[:i+1])
             gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
             if os.path.isdir(gg_path):
-                _operator = Operator(path, initialize_repo=initialize_repo)
+                _operator = Operator(path)
     return _operator

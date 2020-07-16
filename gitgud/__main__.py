@@ -233,15 +233,8 @@ class GitGud:
                         .format(level_name))
 
     def load_level(self, level):
-        # Clear remotes
         self.assert_initialized(skip_level_check=True)
         file_operator = operations.get_operator()
-        level_repo = file_operator.setup_repo()
-        if level_repo:
-            for remote in level_repo.remotes:
-                level_repo.delete_remote(remote)
-        else:
-            file_operator.setup_repo()
         file_operator.clear_tracked_commits()
         level.setup()
         file_operator.write_level(level)
