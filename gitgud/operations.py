@@ -44,7 +44,7 @@ class Operator():
         self.setup_repo()
         for x in ["*", ".*"]:
             for path in self.path.rglob(x):
-                if not any(p.name == '.git' for p in (path / 'fakedir').parents):  # noqa: E501
+                if not any(p.name == '.git' for p in (path / '_').parents):
                     if path.is_file():
                         path.unlink()
 
@@ -316,7 +316,7 @@ def get_operator(operator_path=None, initialize_repo=False):
     if operator_path:
         _operator = Operator(operator_path, initialize_repo=initialize_repo)
     elif not _operator:
-        for path in (Path.cwd() / "fakedir").parents:
+        for path in (Path.cwd() / "_").parents:
             gg_path = path / '.git' / 'gud'
             if gg_path.is_dir():
                 _operator = Operator(path, initialize_repo=initialize_repo)
