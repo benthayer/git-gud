@@ -62,12 +62,12 @@ class Operator():
         # Clear all in installation directory
         if self.repo_exists():
             self.clear_tree_and_index()
-        # Clear all in .git/ directory
-        for path in set(self.git_path / path for path in self.git_path.iterdir()):  # noqa: E501
-            if path.is_dir() and path != self.gg_path:
-                shutil.rmtree(path)
-            elif not path.is_dir():
+        # Clear all in .git/ directory except .git/gud
+        for path in self.git_path.iterdir():
+            if path.is_file():
                 path.unlink()
+            elif path != self.gg_path:
+                shutil.rmtree(path)
         self.repo = None
 
     def repo_exists(self):
