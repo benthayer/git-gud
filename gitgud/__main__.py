@@ -266,7 +266,7 @@ class GitGud:
         file_operator = operations.get_operator()
         if not args.force:
             # We aren't forcing
-            if file_operator and file_operator.path in (Path.cwd() / '_').parents:  # noqa: E501
+            if file_operator:
                 print('Repo {} already initialized for git gud.'
                       .format(file_operator.path))
                 print('Use --force to initialize {}.'.format(Path.cwd()))
