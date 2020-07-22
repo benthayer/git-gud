@@ -309,23 +309,24 @@ class GitGud:
         for git_hook_name, module_hook_name, accepts_args in all_hooks:
             path = file_operator.hooks_path / git_hook_name
             if accepts_args:
-                forward_stdin = 'cat - |'
+                forward_stdin = 'cat - | '
                 passargs = ' "$@"'
             else:
                 forward_stdin = ''
                 passargs = ''
 
             with open(path, 'w+') as hook_file:
-                hook_file.write('#!/bin/bash' + '\n')
                 hook_file.write(
-                        forward_stdin +
-                        python_exec + ' -m gitgud.hooks.' + module_hook_name +
-                        passargs + '\n')
-                hook_file.write(
-                    "if [[ $? -ne 0 ]]" + '\n' + ""
-                    "then" + '\n' + ""
-                    "\t exit 1" + '\n' + ""
-                    "fi" + '\n')
+                    "#!/bin/bash\n"
+                    "{pipe}{python} -m gitgud.hooks.{hook_module}{args}\n"
+                    "if [[ $? -ne 0 ]]\n"
+                    "then\n"
+                    "\t exit 1\n"
+                    "fi\n".format(
+                        pipe=forward_stdin,
+                        python=python_exec,
+                        hook_module=module_hook_name,
+                        args=passargs))
 
             # Make the files executable
             mode = path.stat().st_mode
