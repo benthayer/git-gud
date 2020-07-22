@@ -83,10 +83,10 @@ class BasicLevel(Level):
     def __init__(self, readable_name, name, skill_package):
         super().__init__(readable_name, name)
 
-        self.level_dir = files(skill_package).joinpath('_{}/'.format(name))
+        self.level_dir = files(skill_package) / '_{}/'.format(name)
 
     def file(self, path):
-        return self.level_dir.joinpath(path)
+        return self.level_dir / path
 
     def cat_file(self, path):
         cat_file(self.file(path))
