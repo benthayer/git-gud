@@ -13,24 +13,26 @@ def test_skill_access():
     all_skills['basics']['committing']
 
 
-def test_types():
-    for skill in all_skills:
-        assert isinstance(skill, Skill)
-        for level in skill:
-            assert isinstance(level, Level)
+@pytest.mark.parametrize('skill', all_skills)
+def test_skill_types(skill):
+    assert isinstance(skill, Skill)
 
 
-def test_explain():
-    for skill in all_skills:
-        for level in skill:
-            if level.explain.__code__ == BasicLevel.explain.__code__:
-                assert level.file('explanation.txt').is_file()
+@pytest.mark.parametrize('level', all_levels)
+def test_level_types(level):
+    assert isinstance(level, Level)
 
 
-def test_goal():
-    for level in all_levels:
-        if level.goal.__code__ == BasicLevel.goal.__code__:
-            assert level.file('goal.txt').is_file()
+@pytest.mark.parametrize('level', all_levels)
+def test_explain(level):
+    if level.explain.__func__ == BasicLevel.explain:
+        assert level.file('explanation.txt').is_file()
+
+
+@pytest.mark.parametrize('level', all_levels)
+def test_goal(level):
+    if level.goal.__func__ == BasicLevel.goal:
+        assert level.file('goal.txt').is_file()
 
 
 @pytest.mark.parametrize('level', all_levels)
