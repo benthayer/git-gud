@@ -42,20 +42,18 @@ class Operator():
 
     def clear_tree_and_index(self):
         self.setup_repo()
-        for x in ["*", ".*"]:
-            for path in self.path.rglob(x):
-                if not any(p.name == '.git' for p in (path / '_').parents):
-                    if path.is_file():
-                        path.unlink()
+        for path in self.path.glob('*'):
+            if path.is_file():
+                path.unlink()
 
-        self.repo.git.add(update=True)
-        # Easiest way to clear the index is to commit an empty directory
-        self.repo.index.commit("Clearing index", skip_hooks=True)
-
-        # Remove all directories except current
+        # Remove all directories except .git
         for path in self.path.iterdir():
             if path != self.git_path:
                 shutil.rmtree(path)
+
+        # Easiest way to clear the index is to commit an empty directory
+        self.repo.git.add(update=True)
+        self.repo.index.commit("Clearing index", skip_hooks=True)
 
     def shutoff_pager(self):
         self.repo.config_writer().set_value("core", "pager", '').release()
