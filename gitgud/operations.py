@@ -308,16 +308,11 @@ class Operator():
         return mapping
 
 
-_operator = None
-
-
 def get_operator(operator_path=None, initialize_repo=False):
-    global _operator
     if operator_path:
-        _operator = Operator(operator_path, initialize_repo=initialize_repo)
-    elif not _operator:
+        return Operator(operator_path, initialize_repo=initialize_repo)
+    else:
         for path in (Path.cwd() / "_").parents:
             gg_path = path / '.git' / 'gud'
             if gg_path.is_dir():
-                _operator = Operator(path, initialize_repo=initialize_repo)
-    return _operator
+                return Operator(path, initialize_repo=initialize_repo)
