@@ -333,6 +333,8 @@ class GitGud:
             mode |= (mode & 0o444) >> 2
             path.chmod(mode)
 
+        file_operator.initialize_progress_file(all_skills)
+
         self.load_level(all_skills["0"]["1"])
 
     def handle_status(self, args):

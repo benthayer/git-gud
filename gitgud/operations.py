@@ -2,6 +2,7 @@ import csv
 import shutil
 import datetime as dt
 import email.utils
+import json
 
 from git import Repo
 
@@ -19,6 +20,7 @@ class Operator():
         self.last_commit_path = self.gg_path / 'last_commit.txt'
         self.commits_path = self.gg_path / 'commits.csv'
         self.level_path = self.gg_path / 'current_level.txt'
+        self.progress_path = self.gg_path / 'progress.json'
         self.repo = None
 
         if initialize_repo:
@@ -228,6 +230,25 @@ class Operator():
             'id': 'HEAD'
         }
         return tree
+
+    def initialize_progress_file(self, all_skills):
+        with open(self.progress_path, 'w') as progress_file:
+            progress_data = {}
+            for skill in all_skills:
+                progress_data.update(
+                    {skill.name: {level.name: 'unvisited' for level in skill}}
+                )
+            json.dump(progress_data, progress_file)
+
+    def read_progress_file(self):
+        with open(self.progress_path) as progress_file:
+            return json.load(progress_file)
+
+    def update_progress_file(self, data):
+        with open(self.progress_path, 'w') as progress_file:
+            progress_data = self.read_progress_file()
+            progress_data.update(data)
+            json.dump(progress_data, progress_file)
 
     def read_level_file(self):
         with open(self.level_path) as level_file:
