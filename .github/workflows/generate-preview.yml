@@ -1,0 +1,58 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Generate asciinema preview gif
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+
+env:
+  DEMO_MAGIC_PATH: $HOME/demo-magic/demo-magic.sh
+  GITGUD_REPO: $HOME/git-gud
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  gif:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        path: git-gud
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+
+    - name: Set up prerequisites for gif build
+      run: |
+        python -m pip install --upgrade pip
+        pip install --user asciinema
+        pip install --user $HOME/git-gud/
+        npm install --global asciicast2gif
+        sudo apt-get install pv
+
+    - name: Download demo-script.sh from repository
+      run: git clone --depth 1 https://github.com/paxtonhare/demo-magic.git demo-magic
+
+    - name: Test functionality of preview commands
+      run: |
+        chmod +x $HOME/git-gud/previewgif.sh
+        $HOME/git-gud/previewgif.sh
+    
+    - name: Record to asciinema JSON
+      run: |
+        mkdir build
+        asciinema rec -c "$HOME/git-gud/previewgif.sh" ./build/asciicast.out
+    
+    - name: Generate gif preview
+      run: asciicast2gif ./build/asciicast.out ./build/preview.gif

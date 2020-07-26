@@ -1,5 +1,6 @@
-# Required Environments
-# DEMOMAGICPATH="$(realpath demomagic.sh)"
+# Required Environments Variables:
+#	DEMO_MAGIC_PATH: Path to demo-magic.sh
+#	GITGUD_REPO: Path to the git gud repo
 
 # ===== Configure demo-magic.sh
 . $DEMO_MAGIC_PATH
@@ -19,13 +20,14 @@ clear
 
 # ===== Begin presentation 
 p "pip3 install git-gud"
-pip3 install ${GITGUD_REPO}
+pip install ${GITGUD_REPO}
 
 p "We'll first make an empty directory for git gud."
 pe "mkdir my-git-gud"
 pe "cd my-git-gud"
 pe "git gud init"
 wait
+
 pe "git gud load 0 3"
 pe "git gud status"
 pe "git init"
@@ -50,4 +52,4 @@ p ""
 
 # ===== Cleanup
 rm -rf /tmp/my-git-gud
-cd $OLD_HOME
+cd $OLD_HOME 
