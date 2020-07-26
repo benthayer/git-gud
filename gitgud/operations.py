@@ -245,10 +245,28 @@ class Operator():
             return json.load(progress_file)
 
     def update_progress_file(self, data):
+        progress_data = self.read_progress_file()
         with open(self.progress_path, 'w') as progress_file:
-            progress_data = self.read_progress_file()
             progress_data.update(data)
             json.dump(progress_data, progress_file)
+
+    def get_level_progress(self, level):
+        progress_data = self.read_progress_file()
+        return progress_data[level.skill.name][level.name]
+
+    def mark_level_complete(self, level):
+        progress_data = self.read_progress_file()
+        progress_data[level.skill.name].update(
+            {level.name: "complete"}
+        )
+        self.update_progress_file(progress_data)
+
+    def mark_level_incomplete(self, level):
+        progress_data = self.read_progress_file()
+        progress_data[level.skill.name].update(
+            {level.name: "incomplete"}
+        )
+        self.update_progress_file(progress_data)
 
     def read_level_file(self):
         with open(self.level_path) as level_file:
