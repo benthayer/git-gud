@@ -84,6 +84,10 @@ class GitGud:
         )
 
         self.subparsers.add_parser(
+                'debug',
+                description='Debug git-gud with necessary imports set up.'
+        )
+        self.subparsers.add_parser(
                 'status',
                 help='Print out the name of the current level',
                 description='Print out the name of the current level')
@@ -212,7 +216,8 @@ class GitGud:
             'show': self.handle_show,
             'contributors': self.handle_contrib,
             'issues': self.handle_issues,
-            'solution': self.handle_solution
+            'solution': self.handle_solution,
+            'debug': self.handle_debug
         }
 
     def is_initialized(self):
@@ -521,6 +526,19 @@ class GitGud:
     def handle_issues(self, args):
         issues_website = "https://github.com/benthayer/git-gud/issues"
         webbrowser.open_new(issues_website)
+
+    def handle_debug(self, args):
+        import readline  # noqa: F401
+        import code
+        variables = globals()
+        shell = code.InteractiveConsole(variables)
+        shell.interact(
+            banner="\n".join([
+                "You are now in the Python interpreter invoked by `git gud debug`.",  # noqa: E501
+                "Your current path is " + str(Path.cwd()),
+                "To exit, type exit()"
+            ])
+        )
 
     def parse(self):
         args, _ = self.parser.parse_known_args()
