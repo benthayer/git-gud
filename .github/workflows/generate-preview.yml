@@ -9,7 +9,6 @@ on:
 
 env:
   DEMO_MAGIC_PATH: $HOME/demo-magic/demo-magic.sh
-  GITGUD_REPO: $GITHUB_WORKSPACE/git-gud
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -37,7 +36,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install --user asciinema
-        pip install --user $GITGUD_REPO
+        pip install --user $GITHUB_WORKSPACE/sahansk2/git-gud
         npm install --global asciicast2gif
         sudo apt-get install pv
 
@@ -46,13 +45,13 @@ jobs:
 
     - name: Test functionality of preview commands
       run: |
-        chmod +x $GITGUD_REPO/previewgif.sh
-        $GITGUD_REPO/previewgif.sh
+        chmod +x $GITHUB_WORKSPACE/sahansk2/git-gud/previewgif.sh
+        $GITHUB_WORKSPACE/sahansk2/git-gud/previewgif.sh
     
     - name: Record to asciinema JSON
       run: |
         mkdir build
-        asciinema rec -c $GITGUD_REPO/previewgif.sh" ./build/asciicast.out
+        asciinema rec -c $GITHUB_WORKSPACE/sahansk2/git-gud/previewgif.sh" ./build/asciicast.out
     
     - name: Generate gif preview
       run: asciicast2gif ./build/asciicast.out ./build/preview.gif
