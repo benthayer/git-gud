@@ -36,7 +36,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install --user asciinema
-        pip install --user $GITHUB_WORKSPACE/sahansk2/git-gud
+        pip install --user $GITHUB_WORKSPACE/git-gud
         npm install --global asciicast2gif
         sudo apt-get install pv
 
@@ -45,13 +45,13 @@ jobs:
 
     - name: Test functionality of preview commands
       run: |
-        chmod +x $GITHUB_WORKSPACE/sahansk2/git-gud/previewgif.sh
-        $GITHUB_WORKSPACE/sahansk2/git-gud/previewgif.sh
+        chmod +x $GITHUB_WORKSPACE/git-gud/previewgif.sh
+        $GITHUB_WORKSPACE/git-gud/previewgif.sh
     
     - name: Record to asciinema JSON
       run: |
         mkdir build
-        asciinema rec -c $GITHUB_WORKSPACE/sahansk2/git-gud/previewgif.sh" ./build/asciicast.out
+        asciinema rec -c $GITHUB_WORKSPACE/git-gud/previewgif.sh" ./build/asciicast.out
     
     - name: Generate gif preview
       run: asciicast2gif ./build/asciicast.out ./build/preview.gif
