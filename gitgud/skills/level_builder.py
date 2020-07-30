@@ -167,6 +167,7 @@ class BasicLevel(Level):
         return test_ancestry(level_tree, test_tree)
 
     def test_passed(self):
+        operations.get_operator().mark_level_complete(self)
         if self.file('passed.txt').exists():
             self.cat_file('passed.txt')
         else:
