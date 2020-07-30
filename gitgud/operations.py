@@ -153,14 +153,6 @@ class Operator():
         if head_is_commit:
             self.repo.git.checkout(commit_objects[head])
 
-    # Parses commit msg for keywords (e.g. Revert)
-    @staticmethod
-    def parse_name(commit_msg):
-        if "Revert" in commit_msg:
-            commit_msg = commit_msg[8:-64]
-            commit_msg += '-'
-        return commit_msg
-
     def get_current_tree(self):
         self.setup_repo()
         # Return a json object with the same structure as in level_json
@@ -183,16 +175,16 @@ class Operator():
 
         for branch in repo.branches:
             commits.add(branch.commit)
-            commit_name = branch.commit.hexsha
+            commit_hash = branch.commit.hexsha
             tree['branches'][branch.name] = {
-                "target": commit_name,
+                "target": commit_hash,
                 "id": branch.name
             }
 
         for tag in repo.tags:
-            commit_name = tag.commit.hexsha
+            commit_hash = tag.commit.hexsha
             tree['tags'][tag.name] = {
-                'target': commit_name,
+                'target': commit_hash,
                 'id': tag.name
             }
 
@@ -205,17 +197,15 @@ class Operator():
 
         while len(visited) > 0:
             cur_commit = visited.pop()
-            commit_name = cur_commit.hexsha
-            # If revert detected, modifies commit_name; o/w nothing happens
-            commit_name = self.parse_name(commit_name)
+            commit_hash = cur_commit.hexsha
 
             parents = []
             for parent in cur_commit.parents:
-                parents.append(self.parse_name(parent.hexsha))
+                parents.append(parent.hexsha)
 
-            tree['commits'][commit_name] = {
+            tree['commits'][commit_hash] = {
                 'parents': parents,
-                'id': commit_name
+                'id': commit_hash
             }
 
         if repo.head.is_detached:
