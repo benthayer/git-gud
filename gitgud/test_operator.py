@@ -19,7 +19,9 @@ def progress_data(file_operator, gg):
 
 def test_get_level_progress(file_operator, progress_data):
     level = all_skills["1"]["1"]
-    assert file_operator.get_level_progress(level) in {"complete", "incomplete", "unvisited"}  # noqa: E501
+    assert file_operator.get_level_progress(level) in {
+        "complete", "incomplete", "unvisited"
+    }
 
 
 def test_update_progress_file(file_operator, progress_data):

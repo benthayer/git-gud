@@ -256,10 +256,11 @@ class Operator():
 
     def mark_level_complete(self, level):
         progress_data = self.read_progress_file()
-        progress_data[level.skill.name].update(
-            {level.name: "complete"}
-        )
-        self.update_progress_file(progress_data)
+        if (progress_data[level.skill.name][level.name] != "complete"):
+            progress_data[level.skill.name].update(
+                {level.name: "complete"}
+            )
+            self.update_progress_file(progress_data)
 
     def mark_level_incomplete(self, level):
         progress_data = self.read_progress_file()
