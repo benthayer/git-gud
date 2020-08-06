@@ -1,14 +1,15 @@
-import csv
 import shutil
+from pathlib import Path
 import datetime as dt
 import email.utils
+import csv
 import json
 
 from git import Repo
 
 from gitgud import actor
 
-from pathlib import Path
+from gitgud.skills.user_messages import mock_simulate, print_info
 
 
 class Operator():
@@ -31,14 +32,22 @@ class Operator():
         open(self.path / filename, 'w+').close()
         self.repo.index.add([filename])
 
-    def add_and_commit(self, name):
+    def add_and_commit(self, name, silent=True):
+        commit_msg = "Commit " + name
+
         self.add_file_to_index(name)
         commit = self.repo.index.commit(
-            name,
+            commit_msg,
             author=actor,
             committer=actor,
             skip_hooks=True
         )
+
+        if not silent:
+            print_info('Created file "{}"'.format(commit_msg))
+            mock_simulate('git add {}'.format(commit_msg))
+            mock_simulate('git commit -m "{}"'.format(commit_msg))
+            print_info("New Commit: {}".format(commit.hexsha[:7]))
 
         return commit
 
@@ -112,7 +121,7 @@ class Operator():
                 # Not a merge
                 self.add_file_to_index(name)
                 commit_obj = self.repo.index.commit(
-                        name,
+                        "Commit " + name,
                         author=actor,
                         committer=actor,
                         author_date=committime_rfc,
@@ -155,14 +164,6 @@ class Operator():
         if head_is_commit:
             self.repo.git.checkout(commit_objects[head])
 
-    # Parses commit msg for keywords (e.g. Revert)
-    @staticmethod
-    def parse_name(commit_msg):
-        if "Revert" in commit_msg:
-            commit_msg = commit_msg[8:-64]
-            commit_msg += '-'
-        return commit_msg
-
     def get_current_tree(self):
         self.setup_repo()
         # Return a json object with the same structure as in level_json
@@ -185,16 +186,16 @@ class Operator():
 
         for branch in repo.branches:
             commits.add(branch.commit)
-            commit_name = branch.commit.hexsha
+            commit_hash = branch.commit.hexsha
             tree['branches'][branch.name] = {
-                "target": commit_name,
+                "target": commit_hash,
                 "id": branch.name
             }
 
         for tag in repo.tags:
-            commit_name = tag.commit.hexsha
+            commit_hash = tag.commit.hexsha
             tree['tags'][tag.name] = {
-                'target': commit_name,
+                'target': commit_hash,
                 'id': tag.name
             }
 
@@ -207,17 +208,15 @@ class Operator():
 
         while len(visited) > 0:
             cur_commit = visited.pop()
-            commit_name = cur_commit.hexsha
-            # If revert detected, modifies commit_name; o/w nothing happens
-            commit_name = self.parse_name(commit_name)
+            commit_hash = cur_commit.hexsha
 
             parents = []
             for parent in cur_commit.parents:
-                parents.append(self.parse_name(parent.hexsha))
+                parents.append(parent.hexsha)
 
-            tree['commits'][commit_name] = {
+            tree['commits'][commit_hash] = {
                 'parents': parents,
-                'id': commit_name
+                'id': commit_hash
             }
 
         if repo.head.is_detached:
