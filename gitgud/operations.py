@@ -42,8 +42,8 @@ class Operator():
         )
 
         if not silent:
-            print_info('Created file "{}"'.format(commit_msg))
-            mock_simulate('git add {}'.format(commit_msg))
+            print_info('Created file "{}"'.format(name))
+            mock_simulate('git add {}'.format(name))
             mock_simulate('git commit -m "{}"'.format(commit_msg))
             print_info("New Commit: {}".format(commit.hexsha[:7]))
 
@@ -62,7 +62,6 @@ class Operator():
 
         # Easiest way to clear the index is to commit an empty directory
         self.repo.git.add(update=True)
-        self.repo.index.commit("Clearing index", skip_hooks=True)
 
     def shutoff_pager(self):
         self.repo.config_writer().set_value("core", "pager", '').release()
@@ -90,10 +89,31 @@ class Operator():
             self.repo = Repo.init(self.path)
         return self.repo
 
-    def create_tree(self, commits, head):
+    def commit(self, commit_message, parents, time_offset):
+        committime = dt.datetime.now(dt.timezone.utc).astimezone() \
+                .replace(microsecond=0)
+        committime_offset = dt.timedelta(seconds=time_offset) + \
+            committime.utcoffset()
+        committime_rfc = email.utils.format_datetime(
+                committime - committime_offset)
+        commit_obj = self.repo.index.commit(
+                commit_message,
+                author=actor,
+                committer=actor,
+                author_date=committime_rfc,
+                commit_date=committime_rfc,
+                parent_commits=parents,
+                skip_hooks=True)
+        return commit_obj
+
+    def create_tree(self, commits, head, details, level_dir):
         self.setup_repo()
 
         self.clear_tree_and_index()
+
+        # Commit so we know we're not on an orphan branch
+        self.repo.index.commit("Placeholder commit", skip_hooks=True)
+        # Detach HEAD so we can delete branches
         self.repo.git.checkout(self.repo.head.commit)
 
         branches = self.repo.branches
@@ -104,12 +124,6 @@ class Operator():
         commit_objects = {}
         counter = len(commits)
         for name, parents, branches, tags in commits:
-            committime = dt.datetime.now(dt.timezone.utc).astimezone() \
-                    .replace(microsecond=0)
-            committime_offset = dt.timedelta(seconds=counter) + \
-                committime.utcoffset()
-            committime_rfc = email.utils.format_datetime(
-                    committime - committime_offset)
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
@@ -117,15 +131,21 @@ class Operator():
                 self.repo.git.checkout(parents[0])
             if len(parents) < 2:
                 # Not a merge
-                self.add_file_to_index(name)
-                commit_obj = self.repo.index.commit(
-                        "Commit " + name,
-                        author=actor,
-                        committer=actor,
-                        author_date=committime_rfc,
-                        commit_date=committime_rfc,
-                        parent_commits=parents,
-                        skip_hooks=True)
+                if name in details:
+                    message = details[name]["message"]
+                    if type(message) is list:
+                        message = message[0] + '\n\n' + '\n'.join(message[1:])
+                    self.clear_tree_and_index()
+                    for path, content in details[name]["files"].items():
+                        if type(content) is str:
+                            shutil.copyfile(level_dir / content, path)
+                        else:
+                            with open(path, 'w') as f:
+                                f.write('\n'.join(content))
+                else:
+                    message = "Commit " + name
+                    self.add_file_to_index(name)
+                commit_obj = self.commit(message, parents, counter)
             else:
                 assert name[0] == 'M'
                 int(name[1:])  # Fails if not a number
@@ -134,14 +154,9 @@ class Operator():
                 for parent in parents[1:]:
                     merge_base = self.repo.merge_base(parents[0], parent)
                     self.repo.index.merge_tree(parent, base=merge_base)
-                commit_obj = self.repo.index.commit(
-                        name,
-                        author=actor,
-                        committer=actor,
-                        author_date=committime_rfc,
-                        commit_date=committime_rfc,
-                        parent_commits=parents,
-                        skip_hooks=True)
+
+                message = "Merge " + name[1:]
+                commit_obj = self.commit(message, parents, counter)
 
             commit_objects[name] = commit_obj
             self.track_commit(name, commit_obj.hexsha)

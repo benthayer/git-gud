@@ -1,8 +1,11 @@
 from importlib_resources import files
 
+import yaml
+
 from .parsing import test_ancestry
 from .parsing import level_json
 from .parsing import parse_spec
+from .parsing import get_default_details
 from .parsing import name_from_map
 from .parsing import get_non_merges
 from .parsing import name_merges
@@ -94,7 +97,14 @@ class BasicLevel(Level):
     def _setup(self):
         file_operator = operations.get_operator(initialize_repo=True)
         commits, head = parse_spec(self.file('setup.spec'))
-        file_operator.create_tree(commits, head)
+
+        details_path = self.file('details.yaml')
+        if details_path.is_file():
+            details = yaml.safe_load(details_path.open())
+        else:
+            details = get_default_details(commits)
+
+        file_operator.create_tree(commits, head, details, self.level_dir)
 
         latest_commit = '0'
         for commit_name, _, _, _ in commits:
