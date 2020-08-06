@@ -20,9 +20,6 @@ class Welcome(BasicLevel):
     def test_failed(self):
         default_fail_no_reset()
 
-    def test_passed(self):
-        self.cat_file("passed.txt")
-
     def _test(self):
         return True
 
@@ -57,9 +54,6 @@ class Config(BasicLevel):
     def test_failed(self):
         default_fail_no_reset()
 
-    def test_passed(self):
-        self.cat_file("passed.txt")
-
 
 class Init(BasicLevel):
     def _setup(self):
@@ -80,9 +74,6 @@ class Init(BasicLevel):
 
     def test_failed(self):
         default_fail_no_reset()
-
-    def test_passed(self):
-        self.cat_file("passed.txt")
 
 
 skill = Skill(

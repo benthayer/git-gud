@@ -89,11 +89,14 @@ class Level:
         if level_progress == "unvisited":
             file_operator.mark_level_incomplete(self)
 
+    def get_progress(self):
+        file_operator = operations.get_operator()
+        return file_operator.get_level_progress(self)
+
 
 class BasicLevel(Level):
     def __init__(self, readable_name, name, skill_package):
         super().__init__(readable_name, name)
-
         self.level_dir = files(skill_package) / '_{}/'.format(name)
 
     def file(self, path):
