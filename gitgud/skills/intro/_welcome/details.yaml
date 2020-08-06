@@ -2,5 +2,5 @@
   message:
     - "Initial Commit"
     - "Welcome to Git Gud!"
-  files:
+  add-files:
     Welcome.txt: "welcome.txt"

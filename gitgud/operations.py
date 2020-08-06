@@ -112,7 +112,11 @@ class Operator():
         self.clear_tree_and_index()
 
         # Commit so we know we're not on an orphan branch
-        self.repo.index.commit("Placeholder commit", skip_hooks=True)
+        self.repo.index.commit(
+                "Placeholder commit\n\n"
+                "This commit is used when initializing levels. Something must have gone wrong",
+                parent_commits=[],
+                skip_hooks=True)
         # Detach HEAD so we can delete branches
         self.repo.git.checkout(self.repo.head.commit)
 
@@ -127,14 +131,24 @@ class Operator():
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
-                # TODO GitPython detach head
                 self.repo.git.checkout(parents[0])
-            if len(parents) < 2:
-                # Not a merge
-                if name in details:
+
+            if len(parents) >= 2:
+                assert name[0] == 'M'
+                int(name[1:])  # Fails if not a number
+
+            if name in details:
+                if "message" in details[name]:
                     message = details[name]["message"]
                     if type(message) is list:
                         message = message[0] + '\n\n' + '\n'.join(message[1:])
+                else:
+                    if len(parents) < 2:
+                        message = "Commit " + name
+                    else:
+                        message = "Merge " + name[1:]
+
+                if "files" in details[name]:
                     self.clear_tree_and_index()
                     for path, content in details[name]["files"].items():
                         if type(content) is str:
@@ -142,21 +156,38 @@ class Operator():
                         else:
                             with open(path, 'w') as f:
                                 f.write('\n'.join(content))
+                elif len(parents) >= 2:
+                    # Merge branches one by one
+                    for parent in parents[1:]:
+                        merge_base = self.repo.merge_base(parents[0], parent)
+                        self.repo.index.merge_tree(parent, base=merge_base)
+                elif 'add-files' in details[name] or \
+                        'remove-files' in details[name]:
+                    level_files = set()
+                    if 'add-files' in details[name]:
+                        for path in details[name]['add-files']:
+                            assert path not in level_files
+                            level_files.add(path)
+                    if 'remove-files' in details[name]:
+                        for path in details[name]['remove-files']:
+                            assert path not in level_files
+                            assert Path(path).exists()
+                            level_files.add(path)
+
+                    if 'add-files' in details[name]:
+                        for path, content in details[name]['add-files'].items():
+                           if type(content) is str:
+                               shutil.copyfile(level_dir / content, path)
+                           else:
+                               with open(path, 'w') as f:
+                                   f.write('\n'.join(content))
+                    if 'remove-files' in details[name]:
+                        for path in details[name]['remove-files'].items():
+                            Path(path).unlink()
                 else:
-                    message = "Commit " + name
                     self.add_file_to_index(name)
-                commit_obj = self.commit(message, parents, counter)
-            else:
-                assert name[0] == 'M'
-                int(name[1:])  # Fails if not a number
 
-                # For octopus merges, merge branches one by one
-                for parent in parents[1:]:
-                    merge_base = self.repo.merge_base(parents[0], parent)
-                    self.repo.index.merge_tree(parent, base=merge_base)
-
-                message = "Merge " + name[1:]
-                commit_obj = self.commit(message, parents, counter)
+            commit_obj = self.commit(message, parents, counter)
 
             commit_objects[name] = commit_obj
             self.track_commit(name, commit_obj.hexsha)
