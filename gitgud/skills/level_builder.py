@@ -41,6 +41,7 @@ class Level:
 
     def setup(self):
         self._setup()
+        self.mark_visited()
         self.post_setup()
 
     def post_setup(self):
@@ -77,6 +78,16 @@ class Level:
 
     def test_failed(self):
         default_fail()
+
+    def mark_complete(self):
+        file_operator = operations.get_operator()
+        file_operator.mark_level_complete(self)
+
+    def mark_visited(self):
+        file_operator = operations.get_operator()
+        level_progress = file_operator.get_level_progress(self)
+        if level_progress == "unvisited":
+            file_operator.mark_level_incomplete(self)
 
 
 class BasicLevel(Level):
@@ -167,7 +178,7 @@ class BasicLevel(Level):
         return test_ancestry(level_tree, test_tree)
 
     def test_passed(self):
-        operations.get_operator().mark_level_complete(self)
+        self.mark_complete()
         if self.file('passed.txt').exists():
             self.cat_file('passed.txt')
         else:
