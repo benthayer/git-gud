@@ -32,7 +32,7 @@ class Operator():
     def add_and_commit(self, name):
         self.add_file_to_index(name)
         commit = self.repo.index.commit(
-            name,
+            "Commit " +  name,
             author=actor,
             committer=actor,
             skip_hooks=True
@@ -110,7 +110,7 @@ class Operator():
                 # Not a merge
                 self.add_file_to_index(name)
                 commit_obj = self.repo.index.commit(
-                        name,
+                        "Commit " + name,
                         author=actor,
                         committer=actor,
                         author_date=committime_rfc,
