@@ -2,12 +2,13 @@ import csv
 import shutil
 import datetime as dt
 import email.utils
+from pathlib import Path
 
 from git import Repo
 
 from gitgud import actor
 
-from pathlib import Path
+from gitgud.skills.user_messages import mock_simulate, print_info
 
 
 class Operator():
@@ -29,14 +30,22 @@ class Operator():
         open(self.path / filename, 'w+').close()
         self.repo.index.add([filename])
 
-    def add_and_commit(self, name):
+    def add_and_commit(self, name, silent=True):
+        commit_msg = "Commit " + name
+
         self.add_file_to_index(name)
         commit = self.repo.index.commit(
-            "Commit " +  name,
+            commit_msg,
             author=actor,
             committer=actor,
             skip_hooks=True
         )
+
+        if not silent:
+            print_info('Created file "{}"'.format(commit_msg))
+            mock_simulate('git add {}'.format(commit_msg))
+            mock_simulate('git commit -m "{}"'.format(commit_msg))
+            print_info("New Commit: {}".format(commit.hexsha[:7]))
 
         return commit
 

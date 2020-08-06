@@ -13,8 +13,6 @@ from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import handle_solution_confirmation
-from gitgud.skills.user_messages import mock_simulate
-from gitgud.skills.user_messages import print_info
 from gitgud.skills.user_messages import show_skill_tree
 from gitgud.hooks import all_hooks
 
@@ -492,12 +490,7 @@ class GitGud:
             except ValueError:
                 pass
 
-        print_info('Created file "{}"'.format(commit_name))
-        mock_simulate('git add {}'.format(commit_name))
-        mock_simulate('git commit -m "{}"'.format(commit_name))
-
-        commit = file_operator.add_and_commit(commit_name)
-        print_info("New Commit: {}".format(commit.hexsha[:7]))
+        commit = file_operator.add_and_commit(commit_name, silent=False)
         file_operator.track_commit(commit_name, commit.hexsha)
 
         # Next "git gud commit" name
