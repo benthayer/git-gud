@@ -1,0 +1,22 @@
+Before learning about Git repos, hit enter
+>>>
+Explanations are broken up into multiple chunks to make it easier to read.
+>>>
+Hitting enter will get you to the next part of the explanation
+>>>
+Anyways...
+>>>
+A Git repository (repo for short) is where Git stores all of it's information.
+Running "git init" will make a folder in your current directory called ".git".
+>>>
+The ".git" folder contains a lot of information that git can use to help you
+manage different versions of your code.
+Managing different versions of your code is why Git is called a "Version Control System"
+>>>
+For now, it's fine to know that you don't need to ever look in the ".git" dirctory.
+What's more important is that you know what git does.
+Among other things, these are some of the things you'll work with throughout the game:
+Commits, branches, remotes, tags, heads, merges and rebases.
+>>>
+For now, type "git init" to make a git repo for this folder
+The output of "git status" will change once you're in a git repo

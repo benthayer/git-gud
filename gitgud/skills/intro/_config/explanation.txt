@@ -1,0 +1,2 @@
+Before we can dive into git, we first have to tell git who we are.
+Run "git gud status" for more information.

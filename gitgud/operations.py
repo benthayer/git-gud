@@ -1,78 +1,105 @@
 import csv
-import os
 import shutil
 import datetime as dt
 import email.utils
+from pathlib import Path
 
-from glob import glob
-
-from git import Repo
+from git import Repo, Git
 
 from gitgud import actor
-from gitgud.skills import all_skills
+
+from gitgud.skills.user_messages import mock_simulate, print_info
 
 
-class Operator:
-    def __init__(self, path, initialize_repo=True):
-        self.path = path
+class Operator():
+    def __init__(self, path, initialize_repo=False):
+        self.path = Path(path)
+        self.git_path = self.path / '.git'
+        self.hooks_path = self.git_path / 'hooks'
+        self.gg_path = self.git_path / 'gud'
+        self.last_commit_path = self.gg_path / 'last_commit.txt'
+        self.commits_path = self.gg_path / 'commits.csv'
+        self.level_path = self.gg_path / 'current_level.txt'
+        self.repo = None
+
         if initialize_repo:
-            self.repo = Repo(os.getcwd())
-        else:
-            self.repo = None
-
-        self.git_path = os.path.join(self.path, '.git')
-        self.hooks_path = os.path.join(self.git_path, 'hooks')
-        self.gg_path = os.path.join(self.git_path, 'gud')
-        self.last_commit_path = os.path.join(self.gg_path, 'last_commit.txt')
-        self.commits_path = os.path.join(self.gg_path, 'commits.csv')
-        self.level_path = os.path.join(self.gg_path, 'current_level.txt')
+            self.repo = Repo.init(self.path)
 
     def add_file_to_index(self, filename):
-        open('{}/{}'.format(self.path, filename), 'w+').close()
+        self.setup_repo()
+        open(self.path / filename, 'w+').close()
         self.repo.index.add([filename])
 
-    def add_and_commit(self, name):
+    def add_and_commit(self, name, silent=True):
+        commit_msg = "Commit " + name
+
         self.add_file_to_index(name)
         commit = self.repo.index.commit(
-            name,
+            commit_msg,
             author=actor,
             committer=actor,
             skip_hooks=True
         )
 
+        if not silent:
+            print_info('Created file "{}"'.format(commit_msg))
+            mock_simulate('git add {}'.format(commit_msg))
+            mock_simulate('git commit -m "{}"'.format(commit_msg))
+            print_info("New Commit: {}".format(commit.hexsha[:7]))
+
         return commit
 
     def clear_tree_and_index(self):
-        dirs = []
-        for x in [('**', '.*'), ('**',)]:
-            path_spec = os.path.join(self.path, *x)
-            for path in glob(path_spec, recursive=True):
-                if not os.path.sep + '.git' + os.path.sep in path:
-                    if os.path.isfile(path):
-                        os.unlink(path)
-                    else:
-                        dirs.append(path)
+        self.setup_repo()
+        for path in self.path.glob('*'):
+            if path.is_file():
+                path.unlink()
 
-        self.repo.git.add(update=True)
-        # Easiest way to clear the index is to commit an empty directory
-        self.repo.index.commit("Clearing index", skip_hooks=True)
-        # Remove all directories except current
-        dirs.remove(self.path + os.path.sep)
-
-        for path in os.listdir(self.path):
-            if path != '.git':
+        # Remove all directories except .git
+        for path in self.path.iterdir():
+            if path != self.git_path:
                 shutil.rmtree(path)
 
+        # Easiest way to clear the index is to commit an empty directory
+        self.repo.git.add(update=True)
+        self.repo.index.commit("Clearing index", skip_hooks=True)
+
+    def shutoff_pager(self):
+        self.repo.config_writer().set_value("core", "pager", '').release()
+
+    def git_version(self):
+        return Git(self.git_path).version_info
+
+    def destroy_repo(self):
+        # Clear all in installation directory
+        if self.repo_exists():
+            self.clear_tree_and_index()
+        # Clear all in .git/ directory except .git/gud
+        for path in self.git_path.iterdir():
+            if path.is_file():
+                path.unlink()
+            elif path != self.gg_path:
+                shutil.rmtree(path)
+        self.repo = None
+
+    def repo_exists(self):
+        head_exists = (self.git_path / 'HEAD').exists()
+        if head_exists and self.repo is None:
+            self.repo = Repo(self.git_path)
+        return head_exists
+
+    def setup_repo(self):
+        if not self.repo_exists():
+            self.repo = Repo.init(self.path)
+        return self.repo
+
     def create_tree(self, commits, head):
-        branches = self.repo.branches
-        try:
-            # Detached head, we can now delete everything
-            self.repo.git.checkout(self.repo.head.commit)
-        except ValueError:
-            pass
+        self.setup_repo()
 
         self.clear_tree_and_index()
+        self.repo.git.checkout(self.repo.head.commit)
 
+        branches = self.repo.branches
         for branch in branches:
             self.repo.delete_head(branch, force=True)
         self.repo.delete_tag(*self.repo.tags)
@@ -95,7 +122,7 @@ class Operator:
                 # Not a merge
                 self.add_file_to_index(name)
                 commit_obj = self.repo.index.commit(
-                        name,
+                        "Commit " + name,
                         author=actor,
                         committer=actor,
                         author_date=committime_rfc,
@@ -138,15 +165,8 @@ class Operator:
         if head_is_commit:
             self.repo.git.checkout(commit_objects[head])
 
-    # Parses commit msg for keywords (e.g. Revert)
-    @staticmethod
-    def parse_name(commit_msg):
-        if "Revert" in commit_msg:
-            commit_msg = commit_msg[8:-64]
-            commit_msg += '-'
-        return commit_msg
-
     def get_current_tree(self):
+        self.setup_repo()
         # Return a json object with the same structure as in level_json
 
         repo = self.repo
@@ -167,16 +187,16 @@ class Operator:
 
         for branch in repo.branches:
             commits.add(branch.commit)
-            commit_name = branch.commit.hexsha
+            commit_hash = branch.commit.hexsha
             tree['branches'][branch.name] = {
-                "target": commit_name,
+                "target": commit_hash,
                 "id": branch.name
             }
 
         for tag in repo.tags:
-            commit_name = tag.commit.hexsha
+            commit_hash = tag.commit.hexsha
             tree['tags'][tag.name] = {
-                'target': commit_name,
+                'target': commit_hash,
                 'id': tag.name
             }
 
@@ -189,17 +209,15 @@ class Operator:
 
         while len(visited) > 0:
             cur_commit = visited.pop()
-            commit_name = cur_commit.hexsha
-            # If revert detected, modifies commit_name; o/w nothing happens
-            commit_name = self.parse_name(commit_name)
+            commit_hash = cur_commit.hexsha
 
             parents = []
             for parent in cur_commit.parents:
-                parents.append(self.parse_name(parent.hexsha))
+                parents.append(parent.hexsha)
 
-            tree['commits'][commit_name] = {
+            tree['commits'][commit_hash] = {
                 'parents': parents,
-                'id': commit_name
+                'id': commit_hash
             }
 
         if repo.head.is_detached:
@@ -217,12 +235,8 @@ class Operator:
         with open(self.level_path) as level_file:
             return level_file.read()
 
-    def get_level(self):
-        skill_name, level_name = self.read_level_file().split()
-        return all_skills[skill_name][level_name]
-
     def write_level(self, level):
-        with open(self.level_path, 'w+') as skill_file:
+        with open(self.level_path, 'w') as skill_file:
             skill_file.write(' '.join([level.skill.name, level.name]))
 
     def get_last_commit(self):
@@ -264,6 +278,7 @@ class Operator:
         return known_commits
 
     def get_diffs(self, known_commits):
+        self.setup_repo()
         diffs = {}
         for commit_hash, commit_name in known_commits.items():
             if commit_name == '1':
@@ -278,23 +293,14 @@ class Operator:
                 anti_diff = self.repo.git.diff(commit_hash, commit_hash + '~')
             diffs[diff] = commit_name + "'"
             diffs[anti_diff] = commit_name + '-'
-
         return diffs
 
     def get_copy_mapping(self, non_merges, known_commits):
-        existing_commits = {}
-        unlabeled_commits = []
-
+        diffs = self.get_diffs(known_commits)
+        mapping = {}
         for commit_hash in non_merges:
             if commit_hash in known_commits:
-                existing_commits[commit_hash] = known_commits[commit_hash]
-            else:
-                unlabeled_commits.append(commit_hash)
-
-        diffs = self.get_diffs(existing_commits)
-
-        mapping = {}
-        for commit_hash in unlabeled_commits:
+                continue
             diff = self.repo.git.diff(commit_hash + '~', commit_hash)
             if diff in diffs:
                 mapping[commit_hash] = diffs[diff]
@@ -302,12 +308,11 @@ class Operator:
         return mapping
 
 
-def get_operator():
-    cwd = os.getcwd().split(os.path.sep)
-
-    for i in reversed(range(len(cwd))):
-        path = os.path.sep.join(cwd[:i+1])
-        gg_path = os.path.sep.join(cwd[:i+1] + ['.git', 'gud'])
-        if os.path.isdir(gg_path):
-            return Operator(path)
-    return None
+def get_operator(operator_path=None, initialize_repo=False):
+    if operator_path:
+        return Operator(operator_path, initialize_repo=initialize_repo)
+    else:
+        for path in (Path.cwd() / "_").parents:
+            gg_path = path / '.git' / 'gud'
+            if gg_path.is_dir():
+                return Operator(path, initialize_repo=initialize_repo)

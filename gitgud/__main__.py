@@ -1,7 +1,6 @@
-import os
 import sys
-import subprocess
 import webbrowser
+from pathlib import Path
 
 import argparse
 
@@ -9,13 +8,12 @@ from git import Repo
 from git.exc import InvalidGitRepositoryError
 
 import gitgud
-from gitgud.operations import get_operator
-from gitgud.operations import Operator
+from gitgud import operations
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
-from gitgud.skills.user_messages import mock_simulate
-from gitgud.skills.user_messages import print_info
+from gitgud.skills.user_messages import handle_solution_confirmation
+from gitgud.skills.user_messages import show_skill_tree
 from gitgud.hooks import all_hooks
 
 
@@ -26,8 +24,6 @@ class InitializationError(Exception):
 class GitGud:
     def __init__(self):
         # Only gets operator if Git Gud has been initialized
-        self.file_operator = get_operator()
-
         self.parser = argparse.ArgumentParser(prog='git gud')
         self.parser.add_argument(
                 '--version',
@@ -45,7 +41,7 @@ class GitGud:
             "   git gud load <skill>-<level>",
             "\n",
             "<skill> and <level> could either be the name of the skill/level or the number of the skill/level.",  # noqa: E501
-            "Running `git gud skills` will help you find the number and name associated with each skill/level.",  # noqa: E501
+            "Running `git gud levels --all --short` will help you find the number and name associated with each skill/level.",  # noqa: E501
             "\n",
             "Here are example uses which load the same level:",
             "\n",
@@ -71,14 +67,12 @@ class GitGud:
             "\n",
         ])
 
-        show_description = "".join([
+        show_description = "\n".join([
             "Helper command to show certain information.",
-            "\n\n",
+            "\n",
             "Subcommands:",
-            "\n",
             "  <command>",
-            "\n",
-            "    tree", "\t", "Show the current state of the branching tree"
+            "    tree\tShow the current state of the branching tree"
         ])
 
         self.subparsers = self.parser.add_subparsers(
@@ -92,9 +86,9 @@ class GitGud:
                 help='Print out the name of the current level',
                 description='Print out the name of the current level')
         self.subparsers.add_parser(
-                'instructions',
-                help='Show the instructions for the current level',
-                description='Show the instructions for the current level')
+                'explain',
+                help='Show the explain for the current level',
+                description='Show the explain for the current level')
         self.subparsers.add_parser(
                 'goal',
                 help='Concisely show what needs to be done to complete the level.',  # noqa: E501
@@ -112,9 +106,9 @@ class GitGud:
                 help="Test to see if you've successfully completed the current level",  # noqa: E501
                 description="Test to see if you've successfully completed the current level")  # noqa: E501
         self.subparsers.add_parser(
-                'skills',
-                help='List skills',
-                description='List skills')
+                'level',
+                help='Display current level',
+                description='Display the currently loaded level')
         self.subparsers.add_parser(
                 'goal',
                 help='Show a description of the current goal',
@@ -139,6 +133,13 @@ class GitGud:
                 help="Command to get help on", nargs='?'
         )
 
+        solution_parser = self.subparsers.add_parser(
+                'solution',
+                help='Show solution for the given level',
+                description='Show the solution for the given level'
+        )
+        solution_parser.add_argument('--confirm', action='store_true')
+
         init_parser = self.subparsers.add_parser(
                 'init',
                 help='Init Git Gud and load first level',
@@ -161,11 +162,19 @@ class GitGud:
                 nargs='?',
                 help='Level to load')
 
+        skills_parser = self.subparsers.add_parser(
+                'skills',
+                help='List skills',
+                description='List skills')
+        skills_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills usable with `git gud load`.")  # noqa: E501
+
         levels_parser = self.subparsers.add_parser(
                 'levels',
                 help='List levels in a skill',
-                description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud skills`.')  # noqa: E501
+                description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud levels --all`.')  # noqa: E501
         levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
+        levels_parser.add_argument('--all', dest='opt_all', action='store_true', help="Prints all available skills with levels.")  # noqa: E501
+        levels_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
 
         commit_parser = self.subparsers.add_parser(
                 'commit',
@@ -187,11 +196,12 @@ class GitGud:
             'help': self.handle_help,
             'init': self.handle_init,
             'status': self.handle_status,
-            'instructions': self.handle_instructions,
+            'explain': self.handle_explain,
             'goal': self.handle_goal,
             'reset': self.handle_reset,
             'reload': self.handle_reset,
             'test': self.handle_test,
+            'level': self.handle_level,
             'skills': self.handle_skills,
             'levels': self.handle_levels,
             'load': self.handle_load,
@@ -199,11 +209,12 @@ class GitGud:
             'show-tree': self.handle_show_tree,
             'show': self.handle_show,
             'contributors': self.handle_contrib,
-            'issues': self.handle_issues
+            'issues': self.handle_issues,
+            'solution': self.handle_solution
         }
 
     def is_initialized(self):
-        return self.file_operator is not None
+        return operations.get_operator() is not None
 
     def assert_initialized(self, skip_level_check=False):
         if not self.is_initialized():
@@ -211,9 +222,9 @@ class GitGud:
 
         if not skip_level_check:
             try:
-                self.file_operator.get_level()
+                self.get_level()
             except KeyError:
-                level_name = self.file_operator.read_level_file()
+                level_name = operations.get_operator().read_level_file()
                 raise InitializationError(
                         'Currently loaded level does not exist: "{}"'
                         .format(level_name))
@@ -221,12 +232,20 @@ class GitGud:
     def load_level(self, level):
         # Clear remotes
         self.assert_initialized(skip_level_check=True)
-        level_repo = self.file_operator.repo
-        for remote in level_repo.remotes:
-            level_repo.delete_remote(remote)
-        self.file_operator.clear_tracked_commits()
-        level.setup(self.file_operator)
-        self.file_operator.write_level(level)
+        file_operator = operations.get_operator()
+        level_repo = file_operator.setup_repo()
+        if level_repo:
+            for remote in level_repo.remotes:
+                level_repo.delete_remote(remote)
+        else:
+            file_operator.setup_repo()
+        file_operator.clear_tracked_commits()
+        level.setup()
+        file_operator.write_level(level)
+
+    def get_level(self):
+        skill_name, level_name = operations.get_operator().read_level_file().split()  # noqa: E501
+        return all_skills[skill_name][level_name]
 
     def handle_help(self, args):
         if args.command_name is None:
@@ -242,171 +261,165 @@ class GitGud:
 
     def handle_init(self, args):
         # Make sure it's safe to initialize
+        file_operator = operations.get_operator()
         if not args.force:
             # We aren't forcing
-            if self.file_operator:
+            if file_operator:
                 print('Repo {} already initialized for git gud.'
-                      .format(self.file_operator.path))
-                print('Use --force to initialize {}.'.format(os.getcwd()))
+                      .format(file_operator.path))
+                print('Use --force to initialize {}.'.format(Path.cwd()))
                 return
 
-            self.file_operator = Operator(os.getcwd(), initialize_repo=False)
+            file_operator = operations.get_operator(Path.cwd())
 
-            if os.path.exists(self.file_operator.git_path):
-                # Current directory is a git repo
-                print('Currently in a git repo. Use --force to force initialize here.')  # noqa: E501
-                return
-            if os.path.exists(self.file_operator.gg_path):
+            if file_operator.gg_path.exists():
                 # Current directory is a git repo
                 print('Git gud has already initialized. Use --force to force initialize again.')  # noqa: E501
                 return
-            if len(os.listdir(self.file_operator.path)) != 0:
+            if (file_operator.git_path / 'HEAD').exists():
+                # Current directory is a git repo
+                print('Currently in a git repo. Use --force to force initialize here.')  # noqa: E501
+                return
+            elif len(list(file_operator.path.iterdir())) != 0:
                 print('Current directory is nonempty. Use --force to force initialize here.')  # noqa: E501
                 return
         else:
             print('Force initializing Git Gud.')
-            if not self.file_operator:
-                self.file_operator = Operator(
-                        os.getcwd(),
-                        initialize_repo=False)
+            if not file_operator:
+                file_operator = operations.get_operator(Path.cwd())
 
+        assert file_operator is not None
         # After here, we initialize everything
         try:
-            self.file_operator.repo = Repo(self.file_operator.path)
+            file_operator.repo = Repo(file_operator.path)
         except InvalidGitRepositoryError:
-            self.file_operator.repo = Repo.init(self.file_operator.path)
+            file_operator.repo = Repo.init(file_operator.path)
 
         # Disable pager so "git gud status" can use the output easily
-        subprocess.call("git config core.pager ''", shell=True)
+        file_operator.shutoff_pager()
 
-        if not os.path.exists(self.file_operator.gg_path):
-            os.mkdir(self.file_operator.gg_path)
+        if not file_operator.gg_path.exists():
+            file_operator.gg_path.mkdir()
 
         # Git uses unix-like path separators
         python_exec = sys.executable.replace('\\', '/')
 
         for git_hook_name, module_hook_name, accepts_args in all_hooks:
-            path = os.path.join(self.file_operator.hooks_path, git_hook_name)
+            path = file_operator.hooks_path / git_hook_name
             if accepts_args:
-                forward_stdin = 'cat - |'
+                forward_stdin = 'cat - | '
                 passargs = ' "$@"'
             else:
                 forward_stdin = ''
                 passargs = ''
 
             with open(path, 'w+') as hook_file:
-                hook_file.write('#!/bin/bash' + os.linesep)
                 hook_file.write(
-                        forward_stdin +
-                        python_exec + ' -m gitgud.hooks.' + module_hook_name +
-                        passargs + os.linesep)
-                hook_file.write(
-                    "if [[ $? -ne 0 ]]" + os.linesep + ""
-                    "then" + os.linesep + ""
-                    "\t exit 1" + os.linesep + ""
-                    "fi" + os.linesep)
+                    "#!/bin/bash\n"
+                    "{pipe}{python} -m gitgud.hooks.{hook_module}{args}\n"
+                    "if [[ $? -ne 0 ]]\n"
+                    "then\n"
+                    "\t exit 1\n"
+                    "fi\n".format(
+                        pipe=forward_stdin,
+                        python=python_exec,
+                        hook_module=module_hook_name,
+                        args=passargs))
 
             # Make the files executable
-            mode = os.stat(path).st_mode
+            mode = path.stat().st_mode
             mode |= (mode & 0o444) >> 2
-            os.chmod(path, mode)
+            path.chmod(mode)
 
         self.load_level(all_skills["0"]["1"])
 
     def handle_status(self, args):
         if self.is_initialized():
             try:
-                level = self.file_operator.get_level()
+                level = self.get_level()
                 level.status()
             except KeyError:
-                level_name = self.file_operator.read_level_file()
+                level_name = operations.get_operator().read_level_file()
                 print('Currently on unregistered level: "{}"'
                       .format(level_name))
         else:
             print("Git Gud not initialized.")
             print('Initialize using "git gud init"')
 
-    def handle_instructions(self, args):
+    def handle_explain(self, args):
         self.assert_initialized()
-        self.file_operator.get_level().instructions()
+        self.get_level().explain()
 
     def handle_goal(self, args):
         self.assert_initialized()
-        self.file_operator.get_level().goal()
+        self.get_level().goal()
 
     def handle_reset(self, args):
         self.assert_initialized()
 
-        level = self.file_operator.get_level()
+        level = self.get_level()
         self.load_level(level)
 
     def handle_test(self, args):
         self.assert_initialized()
-        level = self.file_operator.get_level()
-        level.test(self.file_operator)
+        level = self.get_level()
+        level.test()
+
+    def handle_solution(self, args):
+        self.assert_initialized()
+        current_level = self.get_level()
+        if not args.confirm and \
+                not current_level.has_ever_been_completed():
+            handle_solution_confirmation(current_level)
+        else:
+            current_level.solution()
+
+    def handle_level(self, args):
+        level = self.get_level()
+        skill = level.skill
+        show_skill_tree(
+                [skill, level],
+                expand_skills=False)
 
     def handle_skills(self, args):
-        if self.is_initialized():
-            try:
-                cur_skill = self.file_operator.get_level().skill
-                print('Currently on skill: "{}"'.format(cur_skill.name))
-                print()
-            except KeyError:
-                pass
-
-        # Add two for quotes
-        skill_formatted_len = max(len(skill.name) for skill in all_skills) + 2
-
-        skill_format_template = 'Skill ' \
-            '{skill_number} - {formatted_skill_name} : ' \
-            '{num_levels:>2} level{plural}'
-        level_format_template = "    Level {:>2} : {:<3}"
-
-        for skill_number, skill in enumerate(all_skills):
-            # TODO Add description
-            print(skill_format_template.format(
-                skill_number=skill_number,
-                formatted_skill_name='"{}"'
-                .format(skill.name).ljust(skill_formatted_len),
-                num_levels=len(skill),
-                plural="s" if len(skill) > 1 else ""
-            ))
-
-            for index, level in enumerate(skill):
-                print(level_format_template.format(index + 1, level.name))
-
-        print("\nLoad a level with `git gud load`")
+        print("All skills:")
+        print()
+        show_skill_tree(
+            [skill for skill in all_skills],
+            expand_skills=False,
+            show_human_names=not args.opt_short
+        )
 
     def handle_levels(self, args):
-        key_error_flag = False
-        if args.skill_name is None:
-            if self.file_operator is None:
+        if args.opt_all:
+            skills_to_show = [skill for skill in all_skills]
+            print("All levels and skills:")
+        else:
+            # Only show levels in one skill
+            if args.skill_name:
+                try:
+                    skills_to_show = [all_skills[args.skill_name]]
+                    print('Levels in skill "{}" :'.format(args.skill_name))
+                except KeyError:
+                    print('There is no skill "{}".'.format(args.skill_name))
+                    print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
+                    return
+            elif self.is_initialized():
+                current_skill = self.get_level().skill
+                skills_to_show = [current_skill]
+                print('Levels in the current skill "{}" :'.format(current_skill.name))  # noqa: E501
+            else:
                 self.subparsers.choices['levels'].print_help()
                 return
-            try:
-                skill = self.file_operator.get_level().skill
-            except KeyError:
-                skill_name = self.file_operator.read_level_file().split()[0]
-                print('Cannot find any levels in skill: "{}"'.format(skill_name))  # noqa: E501
-                return
-        else:
-            try:
-                skill = all_skills[args.skill_name]
-            except KeyError:
-                print('There is no skill "{}".'.format(args.skill_name))
-                print('You may run "git gud skills" to print all the skills. \n')  # noqa: E501
-                skill = self.file_operator.get_level().skill
-                key_error_flag = True
 
-        if key_error_flag or args.skill_name is None:
-            print('Levels in the current skill "{}" : \n'.format(skill.name))
-        else:
-            print('Levels for skill "{}" : \n'.format(skill.name))
-
-        for index, level in enumerate(skill):
-            print(str(index + 1) + ": " + level.name)
-
-        print('\nTo see levels in all skills, run "git gud skills".')
+        print()
+        show_skill_tree(
+            skills_to_show,
+            expand_skills=True,
+            show_human_names=not args.opt_short
+        )
+        print()
+        print("Load a level with `git gud load`")
 
     def handle_load(self, args):
         self.assert_initialized(skip_level_check=True)
@@ -417,18 +430,18 @@ class GitGud:
         if args.level_name:
             if args.skill_name == "-":
                 # Replace the dash with the current skill's name.
-                args.skill_name = self.file_operator.get_level().skill.name
+                args.skill_name = self.get_level().skill.name
         else:
             if len(argskillset) == 2:
                 args.skill_name, args.level_name = tuple(argskillset)
             else:
                 args.skill_name, args.level_name = argskillset[0], None
 
-        skill_to_load = self.file_operator.get_level().skill.name
+        skill_to_load = self.get_level().skill.name
         if args.skill_name:
             if args.skill_name.lower() in {"next", "prev", "previous"}:
                 query = args.skill_name.lower()
-                level = self.file_operator.get_level()
+                level = self.get_level()
 
                 if query == "next":
                     level_to_load = level.next_level
@@ -443,7 +456,7 @@ class GitGud:
                         all_levels_complete()
                     else:
                         print('Already on the first level. To reload the level, use "git gud reload".')  # noqa: E501
-                    print('\nTo view levels/skills, use "git gud levels" or "git gud skills"')  # noqa: E501
+                    print('\nTo view levels/skills, use "git gud levels --all"')  # noqa: E501
                 return
             else:
                 skill_to_load = args.skill_name
@@ -459,15 +472,15 @@ class GitGud:
                 self.load_level(level)
             else:
                 print('Level "{}" does not exist'.format(args.level_name))
-                print('To view levels/skills, use "git gud levels" or "git gud skills"\n')  # noqa: E501
+                print('\nTo view levels/skills, use "git gud levels --all"')  # noqa: E501
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
-            print('To view levels/skills, use "git gud levels" or "git gud skills"\n')  # noqa: E501
+            print('\nTo view levels/skills, use "git gud levels --all"')  # noqa: E501
 
     def handle_commit(self, args):
         self.assert_initialized()
-
-        last_commit = self.file_operator.get_last_commit()
+        file_operator = operations.get_operator()
+        last_commit = file_operator.get_last_commit()
         commit_name = str(int(last_commit) + 1)
 
         if args.file is not None:
@@ -477,17 +490,12 @@ class GitGud:
             except ValueError:
                 pass
 
-        print_info('Created file "{}"'.format(commit_name))
-        mock_simulate('git add {}'.format(commit_name))
-        mock_simulate('git commit -m "{}"'.format(commit_name))
-
-        commit = self.file_operator.add_and_commit(commit_name)
-        print_info("New Commit: {}".format(commit.hexsha[:7]))
-        self.file_operator.track_commit(commit_name, commit.hexsha)
+        commit = file_operator.add_and_commit(commit_name, silent=False)
+        file_operator.track_commit(commit_name, commit.hexsha)
 
         # Next "git gud commit" name
         if int(commit_name) > int(last_commit):
-            self.file_operator.write_last_commit(commit_name)
+            file_operator.write_last_commit(commit_name)
 
     def handle_show(self, args):
         if args.cmd == "tree":
@@ -510,7 +518,7 @@ class GitGud:
     def parse(self):
         args, _ = self.parser.parse_known_args()
         if args.command is None:
-            if not self.is_initialized():
+            if operations.get_operator() is None:
                 print('Currently in an uninitialized directory.')
                 print('Get started by running "git gud init" in an empty directory!')  # noqa: E501
             else:

@@ -1,0 +1,28 @@
+This practice level will familiarize you with interactive rebasing.
+>>>
+Rebasing interactively makes it easier to change the effect of running "git rebase".
+>>>
+When you run "git rebase -i <commit-ish>", git will open a text editor to show you a list of commits.
+>>>
+For example, "git rebase -i HEAD~4" allows you to change the last 4 commits with the text editor.
+>>
+In the text editor, you're able to edit the list. You can reorder and drop certain commits among other things.
+>>>
+For example, you might start with this text file:
+----------------------
+pick 321cc87 One
+pick acf91d9 Two
+pick 2d7f421 Three
+----------------------
+>>>
+By changing it to this, the commits are now in reverse order.
+----------------------
+pick 2d7f421 Three
+pick acf91d9 Two
+pick 321cc87 One
+----------------------
+>>>
+To reorder a commit, change the order of the lines like you see above
+To omit a commit, replace "pick" with "drop" or delete the entire line
+>>>
+This should be enough to get started on the level. Good luck!

@@ -6,15 +6,7 @@ from . import skill
 
 
 level_tests = [
-    (
-        skill['jugglecommits1'], [  # Examples, change to solution for your level"
-            'git gud commit',
-            'git gud commit',
-            'git checkout HEAD^',
-            'git checkout -b changes-to-be-made-by-player',
-            'git checkout checked-out-branch'
-        ]
-    )
+    (level, level.solution_list()) for level in skill
 ]
 
 

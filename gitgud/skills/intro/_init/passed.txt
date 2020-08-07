@@ -1,0 +1,4 @@
+Congratulations, you made a Git Repo! You've passed the level!
+
+To continue, type
+    git gud load next
