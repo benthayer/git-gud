@@ -1,5 +1,5 @@
 1 (tag:tag-name)
-2 : 1 (branch-name)
+2 (branch-name)
 3
 4 : 1 (child-of-1)
 5 (tag:child-of-4)
