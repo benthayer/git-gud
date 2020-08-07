@@ -1,3 +1,4 @@
+import sys
 import csv
 import shutil
 import datetime as dt
@@ -5,10 +6,13 @@ import email.utils
 from pathlib import Path
 
 from git import Repo, Git
+from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
 
 from gitgud.skills.user_messages import mock_simulate, print_info
+
+from gitgud.hooks import all_hooks
 
 
 class Operator():
@@ -69,6 +73,49 @@ class Operator():
 
     def git_version(self):
         return Git(self.git_path).version_info
+
+    def init_gg(self):
+        # Init git if needed
+        try:
+            self.repo = Repo(self.path)
+        except InvalidGitRepositoryError:
+            self.repo = Repo.init(self.path)
+
+        # Disable pager so "git gud status" can use the output easily
+        self.shutoff_pager()
+
+        if not self.gg_path.exists():
+            self.gg_path.mkdir()
+
+        # Git uses unix-like path separators
+        python_exec = sys.executable.replace('\\', '/')
+
+        for git_hook_name, module_hook_name, accepts_args in all_hooks:
+            path = self.hooks_path / git_hook_name
+            if accepts_args:
+                forward_stdin = 'cat - | '
+                passargs = ' "$@"'
+            else:
+                forward_stdin = ''
+                passargs = ''
+
+            with open(path, 'w+') as hook_file:
+                hook_file.write(
+                    "#!/bin/bash\n"
+                    "{pipe}{python} -m gitgud.hooks.{hook_module}{args}\n"
+                    "if [[ $? -ne 0 ]]\n"
+                    "then\n"
+                    "\t exit 1\n"
+                    "fi\n".format(
+                        pipe=forward_stdin,
+                        python=python_exec,
+                        hook_module=module_hook_name,
+                        args=passargs))
+
+            # Make the files executable
+            mode = path.stat().st_mode
+            mode |= (mode & 0o444) >> 2
+            path.chmod(mode)
 
     def destroy_repo(self):
         # Clear all in installation directory
