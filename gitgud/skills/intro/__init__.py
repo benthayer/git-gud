@@ -28,11 +28,12 @@ class Welcome(BasicLevel):
 
 
 def get_name_and_email():
-    name = subprocess.run('git config user.name', shell=True,
-            check=False, stdout=subprocess.PIPE).stdout.decode().strip()
-    email = subprocess.run('git config user.email', shell=True,
-            check=False, stdout=subprocess.PIPE).stdout.decode().strip()
-
+    name = subprocess.run(
+        'git config user.name', shell=True,
+        check=False, stdout=subprocess.PIPE).stdout.decode().strip()
+    email = subprocess.run(
+        'git config user.email', shell=True,
+        check=False, stdout=subprocess.PIPE).stdout.decode().strip()
     return name, email
 
 
