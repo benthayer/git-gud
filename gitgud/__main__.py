@@ -1,11 +1,7 @@
-import sys
 import webbrowser
 from pathlib import Path
 
 import argparse
-
-from git import Repo
-from git.exc import InvalidGitRepositoryError
 
 import gitgud
 from gitgud import operations
@@ -14,7 +10,6 @@ from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import handle_solution_confirmation
 from gitgud.skills.user_messages import show_skill_tree
-from gitgud.hooks import all_hooks
 
 
 class InitializationError(Exception):
@@ -146,6 +141,7 @@ class GitGud:
                 description='Initialize the direcotry with a git repository and load the first level of Git Gud.'  # noqa: E501
         )
         init_parser.add_argument('--force', action='store_true')
+        init_parser.add_argument('--prettyplease', action='store_true')
 
         load_parser = self.subparsers.add_parser(
                 'load',
@@ -261,36 +257,34 @@ class GitGud:
 
     def handle_init(self, args):
         # Make sure it's safe to initialize
+
         file_operator = operations.get_operator()
-        if not args.force:
-            # We aren't forcing
-            if file_operator:
-                print('Repo {} already initialized for git gud.'
+        if file_operator:
+            if not args.force:
+                print('Repo {} already initialized for Git Gud.'
                       .format(file_operator.path))
                 print('Use --force to initialize {}.'.format(Path.cwd()))
+                if file_operator.path != Path.cwd():
+                    print('{} will be left as is.'.format(file_operator.gg_path))  # noqa: E501
                 return
+            else:
+                print('Force initializing Git Gud.')
+        elif len(list(Path.cwd().iterdir())) != 0:
+            if not (args.force and args.prettyplease):
+                print('Current directory is nonempty. Initializing will delete all files.')  # noqa: E501
+                print('Use --force --prettyplease to force initialize here.')
+                return
+            else:
+                print('Deleting all files.')
+                print('Initializing Git Gud.')
 
-            file_operator = operations.get_operator(Path.cwd())
-
-            if file_operator.gg_path.exists():
-                # Current directory is a git repo
-                print('Git gud has already initialized. Use --force to force initialize again.')  # noqa: E501
-                return
-            if (file_operator.git_path / 'HEAD').exists():
-                # Current directory is a git repo
-                print('Currently in a git repo. Use --force to force initialize here.')  # noqa: E501
-                return
-            elif len(list(file_operator.path.iterdir())) != 0:
-                print('Current directory is nonempty. Use --force to force initialize here.')  # noqa: E501
-                return
-        else:
-            print('Force initializing Git Gud.')
-            if not file_operator:
-                file_operator = operations.get_operator(Path.cwd())
+        file_operator = operations.get_operator(Path.cwd())
 
         assert file_operator is not None
 
         file_operator.init_gg()
+
+        print()
 
         self.load_level(all_skills["0"]["1"])
 

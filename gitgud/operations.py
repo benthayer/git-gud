@@ -1,3 +1,4 @@
+import sys
 import csv
 import shutil
 import datetime as dt
@@ -5,10 +6,13 @@ import email.utils
 from pathlib import Path
 
 from git import Repo
+from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
 
 from gitgud.skills.user_messages import mock_simulate, print_info
+
+from gitgud.hooks import all_hooks
 
 
 class Operator():
