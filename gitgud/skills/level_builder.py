@@ -5,7 +5,6 @@ import yaml
 from .parsing import test_ancestry
 from .parsing import level_json
 from .parsing import parse_spec
-from .parsing import get_default_details
 from .parsing import name_from_map
 from .parsing import get_non_merges
 from .parsing import name_merges
@@ -102,7 +101,7 @@ class BasicLevel(Level):
         if details_path.is_file():
             details = yaml.safe_load(details_path.open())
         else:
-            details = get_default_details(commits)
+            details = None
 
         file_operator.create_tree(commits, head, details, self.level_dir)
 

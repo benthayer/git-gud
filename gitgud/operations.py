@@ -107,6 +107,9 @@ class Operator():
         return commit_obj
 
     def create_tree(self, commits, head, details, level_dir):
+        if not details:
+            details = {}
+
         self.setup_repo()
 
         self.clear_tree_and_index()

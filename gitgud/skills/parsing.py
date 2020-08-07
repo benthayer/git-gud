@@ -71,10 +71,6 @@ def parse_spec(spec_path):
     return commits, head
 
 
-def get_default_details(commits):
-    return {}
-
-
 def level_json(commits, head):
     # Used with test spec files
     # return json object representing the current commits
