@@ -20,24 +20,24 @@ def progress_data(file_operator, gg):
 def test_get_level_progress(file_operator, progress_data):
     level = all_skills["1"]["1"]
     assert file_operator.get_level_progress(level) in {
-        "complete", "incomplete", "unvisited"
+        "unvisited", "visited", "partial", "complete"
     }
 
 
 def test_update_progress_file(file_operator, progress_data):
     file_operator.read_progress_file()
     level = all_skills["1"]["1"]
-    progress_data[level.skill.name].update({level.name: "incomplete"})
+    progress_data[level.skill.name].update({level.name: "value"})
     file_operator.update_progress_file(progress_data)
-    assert file_operator.get_level_progress(level) == "incomplete"
+    assert file_operator.get_level_progress(level) == "value"
     assert file_operator.get_level_progress(level.next_level) == "unvisited"
 
 
-def test_mark_level_incomplete(file_operator):
+def test_mark_level_visited(file_operator):
     level = all_skills["1"]["1"]
     assert file_operator.get_level_progress(level) == "unvisited"
-    file_operator.mark_level_incomplete(level)
-    assert file_operator.get_level_progress(level) == "incomplete"
+    file_operator.mark_level_visited(level)
+    assert file_operator.get_level_progress(level) == "visited"
 
 
 def test_mark_level_complete(file_operator):
@@ -45,3 +45,10 @@ def test_mark_level_complete(file_operator):
     assert file_operator.get_level_progress(level) == "unvisited"
     file_operator.mark_level_complete(level)
     assert file_operator.get_level_progress(level) == "complete"
+
+
+def test_mark_level_partial(file_operator):
+    level = all_skills["1"]["1"]
+    assert file_operator.get_level_progress(level) == "unvisited"
+    file_operator.mark_level_partial(level)
+    assert file_operator.get_level_progress(level) == "partial"

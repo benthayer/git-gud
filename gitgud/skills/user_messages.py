@@ -1,6 +1,7 @@
 import subprocess
 from .util import Skill
 from . import level_builder
+import gitgud.operations
 
 user_has_seen_messages = False
 
@@ -110,15 +111,16 @@ def default_fail_no_reset():
 
 
 def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_skills=False):  # noqa: E501
-    from gitgud.operations import get_operator
-
     middle_entry_bookend = '├──'
     last_entry_bookend = '└──'
 
+    initialized_gitgud = gitgud.operations.get_operator() is not None
+
     completion = {
-        "complete": '\N{CIRCLED WHITE STAR}',
-        "incomplete": '\N{BULLSEYE}',
-        "unvisited": '\N{DOTTED CIRCLE}'
+        "unvisited": '\N{DOTTED CIRCLE}',
+        "visited": '\N{BULLSEYE}',
+        "partial": '',
+        "complete": '\N{CIRCLED WHITE STAR}'
     }
 
     format_string = "{index}. "
@@ -158,8 +160,7 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
             else:
                 indent = middle_entry_bookend
 
-            file_operator = get_operator()
-            if file_operator is not None:
+            if initialized_gitgud:
                 indent += completion[item.get_progress()]
             indent += " "
 

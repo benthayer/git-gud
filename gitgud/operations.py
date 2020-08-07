@@ -261,10 +261,17 @@ class Operator():
             )
             self.update_progress_file(progress_data)
 
-    def mark_level_incomplete(self, level):
+    def mark_level_visited(self, level):
         progress_data = self.read_progress_file()
         progress_data[level.skill.name].update(
-            {level.name: "incomplete"}
+            {level.name: "visited"}
+        )
+        self.update_progress_file(progress_data)
+
+    def mark_level_partial(self, level):
+        progress_data = self.read_progress_file()
+        progress_data[level.skill.name].update(
+            {level.name: "partial"}
         )
         self.update_progress_file(progress_data)
 

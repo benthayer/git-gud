@@ -87,7 +87,7 @@ class Level:
         file_operator = operations.get_operator()
         level_progress = file_operator.get_level_progress(self)
         if level_progress == "unvisited":
-            file_operator.mark_level_incomplete(self)
+            file_operator.mark_level_visited(self)
 
     def get_progress(self):
         file_operator = operations.get_operator()
