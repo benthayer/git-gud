@@ -4,7 +4,7 @@ import datetime as dt
 import email.utils
 from pathlib import Path
 
-from git import Repo
+from git import Repo, Git
 
 from gitgud import actor
 
@@ -66,6 +66,9 @@ class Operator():
 
     def shutoff_pager(self):
         self.repo.config_writer().set_value("core", "pager", '').release()
+
+    def git_version(self):
+        return Git(self.git_path).version_info
 
     def destroy_repo(self):
         # Clear all in installation directory
