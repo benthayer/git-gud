@@ -289,47 +289,8 @@ class GitGud:
                 file_operator = operations.get_operator(Path.cwd())
 
         assert file_operator is not None
-        # After here, we initialize everything
-        try:
-            file_operator.repo = Repo(file_operator.path)
-        except InvalidGitRepositoryError:
-            file_operator.repo = Repo.init(file_operator.path)
 
-        # Disable pager so "git gud status" can use the output easily
-        file_operator.shutoff_pager()
-
-        if not file_operator.gg_path.exists():
-            file_operator.gg_path.mkdir()
-
-        # Git uses unix-like path separators
-        python_exec = sys.executable.replace('\\', '/')
-
-        for git_hook_name, module_hook_name, accepts_args in all_hooks:
-            path = file_operator.hooks_path / git_hook_name
-            if accepts_args:
-                forward_stdin = 'cat - | '
-                passargs = ' "$@"'
-            else:
-                forward_stdin = ''
-                passargs = ''
-
-            with open(path, 'w+') as hook_file:
-                hook_file.write(
-                    "#!/bin/bash\n"
-                    "{pipe}{python} -m gitgud.hooks.{hook_module}{args}\n"
-                    "if [[ $? -ne 0 ]]\n"
-                    "then\n"
-                    "\t exit 1\n"
-                    "fi\n".format(
-                        pipe=forward_stdin,
-                        python=python_exec,
-                        hook_module=module_hook_name,
-                        args=passargs))
-
-            # Make the files executable
-            mode = path.stat().st_mode
-            mode |= (mode & 0o444) >> 2
-            path.chmod(mode)
+        file_operator.init_gg()
 
         self.load_level(all_skills["0"]["1"])
 
