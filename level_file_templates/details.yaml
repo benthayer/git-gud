@@ -16,8 +16,8 @@
     another.txt:
       - "'add-files' and 'remove-files' are meant to be used together"
   remove-files:
-    - 1
-    - 2
+    - '1'
+    - '2'
 '4':
   message:
     - By default, commits without files, add-files, or remove-files add a file with the same name as the commit
