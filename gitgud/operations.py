@@ -194,7 +194,7 @@ class Operator():
                         Path(path).unlink()
                         self.repo.index.remove([path])
             else:
-                self.add_file_to_index(name)
+                self.add_file_to_index(name + '.txt')
 
             commit_obj = self.commit(message, parents, counter)
 

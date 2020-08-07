@@ -2,7 +2,7 @@
   message:
     - "Initial commit"
     - By default, commits create a blank file with the same name as the commit
-    - This commit creates a blank file called '1'
+    - This commit creates a blank file called '1.txt'
 '2':
   message:
     - Start solving an issue on a branch
