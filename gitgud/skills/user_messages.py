@@ -1,7 +1,6 @@
 import subprocess
 from .util import Skill
 from . import level_builder
-from gitgud.operations import get_operator
 
 user_has_seen_messages = False
 
@@ -111,6 +110,8 @@ def default_fail_no_reset():
 
 
 def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_skills=False):  # noqa: E501
+    from gitgud.operations import get_operator
+
     middle_entry_bookend = '├──'
     last_entry_bookend = '└──'
 
