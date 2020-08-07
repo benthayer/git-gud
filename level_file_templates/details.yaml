@@ -11,7 +11,7 @@
     - The add-files block below has the equivalent effect of the default behavior for commits without an add-files block
   add-files:
     2.txt:
-      -
+      - ''
 '3':
   message:
     - This portion of the message will be two lines below the first line
