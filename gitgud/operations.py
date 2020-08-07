@@ -114,7 +114,8 @@ class Operator():
         # Commit so we know we're not on an orphan branch
         self.repo.index.commit(
                 "Placeholder commit\n\n"
-                "This commit is used when initializing levels. Something must have gone wrong",
+                "This commit is used when initializing levels."
+                "Something must have gone wrong",
                 parent_commits=[],
                 skip_hooks=True)
         # Detach HEAD so we can delete branches
@@ -137,55 +138,58 @@ class Operator():
                 assert name[0] == 'M'
                 int(name[1:])  # Fails if not a number
 
-            if name in details:
-                if "message" in details[name]:
-                    message = details[name]["message"]
-                    if type(message) is list:
-                        message = message[0] + '\n\n' + '\n'.join(message[1:])
+            if name in details and "message" in details[name]:
+                message = details[name]["message"]
+                if type(message) is list:
+                    message = message[0] + '\n\n' + '\n'.join(message[1:])
+            else:
+                if len(parents) < 2:
+                    message = "Commit " + name
                 else:
-                    if len(parents) < 2:
-                        message = "Commit " + name
-                    else:
-                        message = "Merge " + name[1:]
+                    message = "Merge " + name[1:]
 
-                if "files" in details[name]:
-                    self.clear_tree_and_index()
-                    for path, content in details[name]["files"].items():
+            if name in details and "files" in details[name]:
+                self.clear_tree_and_index()
+                for path, content in details[name]["files"].items():
+                    if type(content) is str:
+                        shutil.copyfile(level_dir / content, path)
+                    else:
+                        with open(path, 'w') as f:
+                            f.write('\n'.join(content))
+                    self.repo.index.add([path])
+            elif len(parents) >= 2:
+                # Merge branches one by one
+                for parent in parents[1:]:
+                    merge_base = self.repo.merge_base(parents[0], parent)
+                    self.repo.index.merge_tree(parent, base=merge_base)
+            elif name in details and (
+                    'add-files' in details[name] or
+                    'remove-files' in details[name]):
+                level_files = set()
+                if 'add-files' in details[name]:
+                    for path in details[name]['add-files']:
+                        assert path not in level_files
+                        level_files.add(path)
+                if 'remove-files' in details[name]:
+                    for path in details[name]['remove-files']:
+                        assert path not in level_files
+                        assert Path(path).exists()
+                        level_files.add(path)
+
+                if 'add-files' in details[name]:
+                    for path, content in details[name]['add-files'].items():
                         if type(content) is str:
                             shutil.copyfile(level_dir / content, path)
                         else:
                             with open(path, 'w') as f:
                                 f.write('\n'.join(content))
-                elif len(parents) >= 2:
-                    # Merge branches one by one
-                    for parent in parents[1:]:
-                        merge_base = self.repo.merge_base(parents[0], parent)
-                        self.repo.index.merge_tree(parent, base=merge_base)
-                elif 'add-files' in details[name] or \
-                        'remove-files' in details[name]:
-                    level_files = set()
-                    if 'add-files' in details[name]:
-                        for path in details[name]['add-files']:
-                            assert path not in level_files
-                            level_files.add(path)
-                    if 'remove-files' in details[name]:
-                        for path in details[name]['remove-files']:
-                            assert path not in level_files
-                            assert Path(path).exists()
-                            level_files.add(path)
-
-                    if 'add-files' in details[name]:
-                        for path, content in details[name]['add-files'].items():
-                           if type(content) is str:
-                               shutil.copyfile(level_dir / content, path)
-                           else:
-                               with open(path, 'w') as f:
-                                   f.write('\n'.join(content))
-                    if 'remove-files' in details[name]:
-                        for path in details[name]['remove-files'].items():
-                            Path(path).unlink()
-                else:
-                    self.add_file_to_index(name)
+                        self.repo.index.add([path])
+                if 'remove-files' in details[name]:
+                    for path in details[name]['remove-files']:
+                        Path(path).unlink()
+                        self.repo.index.remove([path])
+            else:
+                self.add_file_to_index(name)
 
             commit_obj = self.commit(message, parents, counter)
 
