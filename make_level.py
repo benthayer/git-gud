@@ -216,6 +216,7 @@ def main():
     create_level_file(level_path, "setup.spec")
     create_level_file(level_path, "test.spec")
     create_level_file(level_path, "details.yaml")
+    create_level_file(level_path, "filename.txt")
     create_level_file(level_path, "solution.txt")
     print()
 
