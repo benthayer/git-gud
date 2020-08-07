@@ -27,13 +27,15 @@ class Operator():
 
     def add_file_to_index(self, filename):
         self.setup_repo()
-        open(self.path / filename, 'w+').close()
+        with open(self.path / filename, 'w+') as f:
+            f.write("Hello, I'm an auto-generated file!")
         self.repo.index.add([filename])
 
     def add_and_commit(self, name, silent=True):
         commit_msg = "Commit " + name
 
-        self.add_file_to_index(name)
+        filename = name + '.txt'
+        self.add_file_to_index(filename)
         commit = self.repo.index.commit(
             commit_msg,
             author=actor,
@@ -42,8 +44,8 @@ class Operator():
         )
 
         if not silent:
-            print_info('Created file "{}"'.format(name))
-            mock_simulate('git add {}'.format(name))
+            print_info('Created file "{}"'.format(filename))
+            mock_simulate('git add {}'.format(filename))
             mock_simulate('git commit -m "{}"'.format(commit_msg))
             print_info("New Commit: {}".format(commit.hexsha[:7]))
 
