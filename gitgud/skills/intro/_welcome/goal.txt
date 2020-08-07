@@ -1,1 +1,1 @@
-Don't worry about a goal for this level!
+Run "git gud status" and get used to the interface!
