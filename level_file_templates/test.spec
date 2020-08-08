@@ -10,4 +10,3 @@ M1 : 3 6 (merge-3-and-6)
 9 (changes-to-be-made-by-player)
 10 (checked-out-branch)
 checked-out-branch
-
