@@ -1,0 +1,7 @@
+git checkout master~4
+git cherry-pick master~1
+git cherry-pick master~2
+git cherry-pick master~3
+git cherry-pick master
+git branch -D master
+git checkout -b master
