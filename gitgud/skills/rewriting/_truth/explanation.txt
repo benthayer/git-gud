@@ -1,0 +1,12 @@
+You've already seen some of the stuff "git rebase -i" can do.
+"git rebase -i" can also be used to reoder commits.
+>>>
+When the editor opens, simply re-order the commits to be in the order you want them to be in.
+On a technical level, Git is changing the parent of each of the commits. The order of the commits is determined by looking at the parents of each commit.
+>>>
+For this level, each commit has a single word message that are meant to come together to form the sentence "This is an easy level" when viewing them in chronological order. You are meant to put the commits in order and form that sentence.
+>>>
+You can see the commits in chronological order by running "git log --reversed".
+Git normally tries to show you the most recent commit first since that's normally more useful. That's why you need the "--reversed" flag
+>>>
+Run "git rebase -i <commit>" for more details. It contains useful information

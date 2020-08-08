@@ -17,5 +17,6 @@ skill = Skill(
     'Rewriting History',
     'rewriting',
     [
+        SentenceLevel('The Truth', 'truth', __name__)
     ]
 )
