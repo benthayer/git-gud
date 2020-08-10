@@ -1,1 +1,0 @@
-Enter a detached head state by checking out commit 4
