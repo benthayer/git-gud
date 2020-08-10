@@ -1,4 +1,5 @@
 # Examples, change to solution for your level
+git revert HEAD
 git gud commit
 git gud commit
 git checkout HEAD^

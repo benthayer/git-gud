@@ -20,9 +20,6 @@ class Welcome(BasicLevel):
     def test_failed(self):
         default_fail_no_reset()
 
-    def test_passed(self):
-        self.cat_file("passed.txt")
-
     def _test(self):
         return True
 
@@ -59,9 +56,6 @@ class Config(BasicLevel):
     def test_failed(self):
         default_fail_no_reset()
 
-    def test_passed(self):
-        self.cat_file("passed.txt")
-
 
 class Init(BasicLevel):
     def _setup(self):
@@ -78,13 +72,10 @@ class Init(BasicLevel):
     def _test(self):
         # Check if we are in a git repo
         file_operator = operations.get_operator()
-        return file_operator.repo_exists()
+        return file_operator.repo is not None
 
     def test_failed(self):
         default_fail_no_reset()
-
-    def test_passed(self):
-        self.cat_file("passed.txt")
 
 
 skill = Skill(

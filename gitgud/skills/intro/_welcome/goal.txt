@@ -1,0 +1,1 @@
+Run "git gud status" and get used to the interface!

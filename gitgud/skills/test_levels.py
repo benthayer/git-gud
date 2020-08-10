@@ -1,9 +1,7 @@
 import pytest
 
-import os
-
 from gitgud.skills import all_skills, all_levels
-from gitgud.skills.level_builder import Level
+from gitgud.skills.level_builder import Level, BasicLevel
 from gitgud.skills.util import Skill
 from gitgud.skills.parsing import parse_spec
 
@@ -15,22 +13,26 @@ def test_skill_access():
     all_skills['basics']['committing']
 
 
-def test_types():
-    for skill in all_skills:
-        assert isinstance(skill, Skill)
-        for level in skill:
-            assert isinstance(level, Level)
+@pytest.mark.parametrize('skill', all_skills)
+def test_skill_types(skill):
+    assert isinstance(skill, Skill)
 
 
-def test_explain():
-    for skill in all_skills:
-        for level in skill:
-            os.path.isfile(level.file('explanation.txt'))
+@pytest.mark.parametrize('level', all_levels)
+def test_level_types(level):
+    assert isinstance(level, Level)
 
 
-def test_goal():
-    for level in all_levels:
-        os.path.isfile(level.file('goal.txt'))
+@pytest.mark.parametrize('level', all_levels)
+def test_explain(level):
+    if level.explain.__func__ == BasicLevel.explain:
+        assert level.file('explanation.txt').is_file()
+
+
+@pytest.mark.parametrize('level', all_levels)
+def test_goal(level):
+    if level.goal.__func__ == BasicLevel.goal:
+        assert level.file('goal.txt').is_file()
 
 
 @pytest.mark.parametrize('level', all_levels)

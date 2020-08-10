@@ -1,5 +1,7 @@
 from importlib_resources import files
 
+import yaml
+
 from .parsing import test_ancestry
 from .parsing import level_json
 from .parsing import parse_spec
@@ -83,18 +85,26 @@ class BasicLevel(Level):
     def __init__(self, readable_name, name, skill_package):
         super().__init__(readable_name, name)
 
-        self.level_dir = files(skill_package).joinpath('_{}/'.format(name))
+        self.level_dir = files(skill_package) / '_{}/'.format(name)
 
     def file(self, path):
-        return self.level_dir.joinpath(path)
+        return self.level_dir / path
 
     def cat_file(self, path):
         cat_file(self.file(path))
 
     def _setup(self):
-        file_operator = operations.get_operator(initialize_repo=True)
+        file_operator = operations.get_operator()
+        file_operator.use_repo()
         commits, head = parse_spec(self.file('setup.spec'))
-        file_operator.create_tree(commits, head)
+
+        details_path = self.file('details.yaml')
+        if details_path.is_file():
+            details = yaml.safe_load(details_path.open())
+        else:
+            details = None
+
+        file_operator.create_tree(commits, head, details, self.level_dir)
 
         latest_commit = '0'
         for commit_name, _, _, _ in commits:
