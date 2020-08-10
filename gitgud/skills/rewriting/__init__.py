@@ -13,9 +13,14 @@ class SentenceLevel(BasicLevel):
         simulate_command('git log --reverse --oneline')
 
 
+class Easy(SentenceLevel):
+    pass
+
+
 skill = Skill(
     'Rewriting History',
     'rewriting',
     [
+        Easy('An Easy Level', 'easy', __name__)
     ]
 )
