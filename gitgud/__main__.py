@@ -19,7 +19,9 @@ class InitializationError(Exception):
 class GitGud:
     def __init__(self):
         # Only gets operator if Git Gud has been initialized
-        self.parser = argparse.ArgumentParser(prog='git gud')
+        self.parser = argparse.ArgumentParser(
+            prog='git gud',
+            description='A game to teach Git!')
         self.parser.add_argument(
                 '--version',
                 action='version',
