@@ -1,18 +1,16 @@
 import os
 import subprocess
-from gitgud import operations
 
 
-def simulate(gg, level, commands):
-
-    operations._operator = None
-
+def simulate(gg, level, commands, run_pretest=True):
     level._setup()
 
     for command in commands:
         if '^' in command and os.name == 'nt':
             command = command.replace('^', '^^')
+        # Only test if there are commands which change state.
+        if run_pretest:
+            assert not level._test()
         subprocess.call(command, shell=True)
 
-    operations._operator = None
     assert level._test()

@@ -25,10 +25,12 @@ class Welcome(BasicLevel):
 
 
 def get_name_and_email():
-    name = subprocess.check_output('git config user.name', shell=True) \
-        .decode().strip()
-    email = subprocess.check_output('git config user.email', shell=True) \
-        .decode().strip()
+    name = subprocess.run(
+        'git config user.name', shell=True,
+        check=False, stdout=subprocess.PIPE).stdout.decode().strip()
+    email = subprocess.run(
+        'git config user.email', shell=True,
+        check=False, stdout=subprocess.PIPE).stdout.decode().strip()
     return name, email
 
 
@@ -49,7 +51,7 @@ class Config(BasicLevel):
 
     def _test(self):
         name, email = get_name_and_email()
-        return name and email
+        return bool(name and email)
 
     def test_failed(self):
         default_fail_no_reset()
