@@ -387,7 +387,6 @@ class GitGud:
             else:
                 args.skill_name, args.level_name = argskillset[0], None
 
-        skill_to_load = self.get_level().skill.name
         if args.skill_name:
             if args.skill_name.lower() in {"next", "prev", "previous"}:
                 query = args.skill_name.lower()
@@ -410,6 +409,8 @@ class GitGud:
                 return
             else:
                 skill_to_load = args.skill_name
+        else:
+            skill_to_load = self.get_level().skill.name
 
         level_to_load = '1'
         if args.level_name:
@@ -421,7 +422,7 @@ class GitGud:
                 level = skill[level_to_load]
                 self.load_level(level)
             else:
-                print('Level "{}" does not exist'.format(args.level_name))
+                print('Level "{}" does not exist.'.format(args.level_name))
                 print('\nTo view levels/skills, use "git gud levels --all"')  # noqa: E501
         else:
             print('Skill "{}" does not exist'.format(args.skill_name))
