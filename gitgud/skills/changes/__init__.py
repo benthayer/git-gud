@@ -2,19 +2,20 @@ from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
 from gitgud import operations
 
+
 class FirstCommit(BasicLevel):
     def post_setup(self):
         self.cat_file('post-setup.txt')
-
 
     def is_one_commit(self):
         pass
 
     def status(self):
-
         op = operations.get_operator()
         from pathlib import Path
-        has_file = len(list(Path(op.path).iterdir())) >= 2  # git directory == 1
+
+        # git directory == 1
+        has_file = len(list(Path(op.path).iterdir())) >= 2
         try:
             op.repo.head.commit
             has_commit = True
@@ -28,7 +29,6 @@ class FirstCommit(BasicLevel):
         # Use the existing setup so that any commit matches the first one
         # Test branches
         pass
-
 
 
 skill = Skill(
