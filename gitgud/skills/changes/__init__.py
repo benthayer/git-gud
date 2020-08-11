@@ -1,6 +1,6 @@
 from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
-from gitgud.operations import get_operator
+from gitgud import operations
 
 class FirstCommit(BasicLevel):
     def post_setup(self):
@@ -12,9 +12,9 @@ class FirstCommit(BasicLevel):
 
     def status(self):
 
-        op = get_operator()
-        from path import Path
-        has_file = len(Path(op.path).listdir()) >= 2  # git directory == 1
+        op = operations.get_operator()
+        from pathlib import Path
+        has_file = len(list(Path(op.path).iterdir())) >= 2  # git directory == 1
         try:
             op.repo.head.commit
             has_commit = True
