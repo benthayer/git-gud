@@ -1,0 +1,4 @@
+Hey, this file is getting added by details.yaml to commit 4!
+
+All this content will be copied exactly as it appears here, even with extra blank lines at the end of the file!
+

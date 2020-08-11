@@ -126,6 +126,13 @@ def all_branches_correct(skill, test):
     return True
 
 
+def has_no_extra_branches(skill, test):
+    for branch_name in skill['branches']:
+        if branch_name not in test['branches']:
+            return False
+    return True
+
+
 def head_correct(skill, test):
     if skill['HEAD']['target'] != test['HEAD']['target']:
         return False
@@ -144,6 +151,13 @@ def all_tags_correct(skill, test):
     for tag_name in test['tags']:
         if skill['tags'][tag_name]['target'] != \
                 test['tags'][tag_name]['target']:
+            return False
+    return True
+
+
+def has_no_extra_tags(skill, test):
+    for tag_name in skill['tags']:
+        if tag_name not in test['tags']:
             return False
     return True
 
@@ -234,9 +248,13 @@ def test_ancestry(skill, test):
         return False
     if not all_branches_correct(skill, test):
         return False
+    if not has_no_extra_branches(skill, test):
+        return False
     if not has_all_tags(skill, test):
         return False
     if not all_tags_correct(skill, test):
+        return False
+    if not has_no_extra_tags(skill, test):
         return False
     if not head_correct(skill, test):
         return False

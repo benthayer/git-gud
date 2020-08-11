@@ -1,4 +1,4 @@
-"git gud status" tells you relevant information about the level. 
+"git gud status" tells you relevant information about the level.
 
 Below is an example status message, but for now don't worry about it.
 

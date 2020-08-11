@@ -1,3 +1,5 @@
+import sys
+import csv
 import shutil
 from pathlib import Path
 import datetime as dt
@@ -5,15 +7,18 @@ import email.utils
 import csv
 import json
 
-from git import Repo
+from git import Repo, Git
+from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
 
 from gitgud.skills.user_messages import mock_simulate, print_info
 
+from gitgud.hooks import all_hooks
+
 
 class Operator():
-    def __init__(self, path, initialize_repo=False):
+    def __init__(self, path):
         self.path = Path(path)
         self.git_path = self.path / '.git'
         self.hooks_path = self.git_path / 'hooks'
@@ -22,20 +27,22 @@ class Operator():
         self.commits_path = self.gg_path / 'commits.csv'
         self.level_path = self.gg_path / 'current_level.txt'
         self.progress_path = self.gg_path / 'progress.json'
-        self.repo = None
 
-        if initialize_repo:
-            self.repo = Repo.init(self.path)
+        try:
+            self.repo = Repo(path)
+        except InvalidGitRepositoryError:
+            self.repo = None
 
     def add_file_to_index(self, filename):
-        self.setup_repo()
-        open(self.path / filename, 'w+').close()
+        with open(self.path / filename, 'w+') as f:
+            f.write("Hello, I'm an auto-generated file!")
         self.repo.index.add([filename])
 
     def add_and_commit(self, name, silent=True):
         commit_msg = "Commit " + name
 
-        self.add_file_to_index(name)
+        filename = name + '.txt'
+        self.add_file_to_index(filename)
         commit = self.repo.index.commit(
             commit_msg,
             author=actor,
@@ -44,15 +51,14 @@ class Operator():
         )
 
         if not silent:
-            print_info('Created file "{}"'.format(commit_msg))
-            mock_simulate('git add {}'.format(commit_msg))
+            print_info('Created file "{}"'.format(filename))
+            mock_simulate('git add {}'.format(filename))
             mock_simulate('git commit -m "{}"'.format(commit_msg))
             print_info("New Commit: {}".format(commit.hexsha[:7]))
 
         return commit
 
     def clear_tree_and_index(self):
-        self.setup_repo()
         for path in self.path.glob('*'):
             if path.is_file():
                 path.unlink()
@@ -64,14 +70,59 @@ class Operator():
 
         # Easiest way to clear the index is to commit an empty directory
         self.repo.git.add(update=True)
-        self.repo.index.commit("Clearing index", skip_hooks=True)
 
     def shutoff_pager(self):
         self.repo.config_writer().set_value("core", "pager", '').release()
 
+    def git_version(self):
+        return Git(self.git_path).version_info
+
+    def init_gg(self):
+        # Init git if needed
+        try:
+            self.repo = Repo(self.path)
+        except InvalidGitRepositoryError:
+            self.repo = Repo.init(self.path)
+
+        # Disable pager so "git gud status" can use the output easily
+        self.shutoff_pager()
+
+        if not self.gg_path.exists():
+            self.gg_path.mkdir()
+
+        # Git uses unix-like path separators
+        python_exec = sys.executable.replace('\\', '/')
+
+        for git_hook_name, module_hook_name, accepts_args in all_hooks:
+            path = self.hooks_path / git_hook_name
+            if accepts_args:
+                forward_stdin = 'cat - | '
+                passargs = ' "$@"'
+            else:
+                forward_stdin = ''
+                passargs = ''
+
+            with open(path, 'w+') as hook_file:
+                hook_file.write(
+                    "#!/bin/bash\n"
+                    "{pipe}{python} -m gitgud.hooks.{hook_module}{args}\n"
+                    "if [[ $? -ne 0 ]]\n"
+                    "then\n"
+                    "\t exit 1\n"
+                    "fi\n".format(
+                        pipe=forward_stdin,
+                        python=python_exec,
+                        hook_module=module_hook_name,
+                        args=passargs))
+
+            # Make the files executable
+            mode = path.stat().st_mode
+            mode |= (mode & 0o444) >> 2
+            path.chmod(mode)
+
     def destroy_repo(self):
         # Clear all in installation directory
-        if self.repo_exists():
+        if self.repo is not None:
             self.clear_tree_and_index()
         # Clear all in .git/ directory except .git/gud
         for path in self.git_path.iterdir():
@@ -81,69 +132,116 @@ class Operator():
                 shutil.rmtree(path)
         self.repo = None
 
-    def repo_exists(self):
-        head_exists = (self.git_path / 'HEAD').exists()
-        if head_exists and self.repo is None:
-            self.repo = Repo(self.git_path)
-        return head_exists
-
-    def setup_repo(self):
-        if not self.repo_exists():
+    def use_repo(self):
+        if self.repo is None:
             self.repo = Repo.init(self.path)
-        return self.repo
 
-    def create_tree(self, commits, head):
-        self.setup_repo()
+    def commit(self, commit_message, parents, time_offset):
+        committime = dt.datetime.now(dt.timezone.utc).astimezone() \
+                .replace(microsecond=0)
+        committime_offset = dt.timedelta(seconds=time_offset) + \
+            committime.utcoffset()
+        committime_rfc = email.utils.format_datetime(
+                committime - committime_offset)
+        commit_obj = self.repo.index.commit(
+                commit_message,
+                author=actor,
+                committer=actor,
+                author_date=committime_rfc,
+                commit_date=committime_rfc,
+                parent_commits=parents,
+                skip_hooks=True)
+        return commit_obj
+
+    def create_tree(self, commits, head, details, level_dir):
+        if not details:
+            details = {}
 
         self.clear_tree_and_index()
+
+        # Commit so we know we're not on an orphan branch
+        self.repo.index.commit(
+                "Placeholder commit\n\n"
+                "This commit is used when initializing levels."
+                "Something must have gone wrong",
+                parent_commits=[],
+                skip_hooks=True)
+        # Detach HEAD so we can delete branches
         self.repo.git.checkout(self.repo.head.commit)
 
         branches = self.repo.branches
         for branch in branches:
             self.repo.delete_head(branch, force=True)
         self.repo.delete_tag(*self.repo.tags)
+        for remote in self.repo.remotes:
+            self.repo.delete_remote(remote)
 
         commit_objects = {}
         counter = len(commits)
         for name, parents, branches, tags in commits:
-            committime = dt.datetime.now(dt.timezone.utc).astimezone() \
-                    .replace(microsecond=0)
-            committime_offset = dt.timedelta(seconds=counter) + \
-                committime.utcoffset()
-            committime_rfc = email.utils.format_datetime(
-                    committime - committime_offset)
             # commit = (name, parents, branches, tags)
             parents = [commit_objects[parent] for parent in parents]
             if parents:
-                # TODO GitPython detach head
                 self.repo.git.checkout(parents[0])
-            if len(parents) < 2:
-                # Not a merge
-                self.add_file_to_index(name)
-                commit_obj = self.repo.index.commit(
-                        "Commit " + name,
-                        author=actor,
-                        committer=actor,
-                        author_date=committime_rfc,
-                        commit_date=committime_rfc,
-                        parent_commits=parents,
-                        skip_hooks=True)
-            else:
+
+            if len(parents) >= 2:
                 assert name[0] == 'M'
                 int(name[1:])  # Fails if not a number
 
-                # For octopus merges, merge branches one by one
+            if name in details and "message" in details[name]:
+                message = details[name]["message"]
+                if type(message) is list:
+                    message = message[0] + '\n\n' + '\n'.join(message[1:])
+            else:
+                if len(parents) < 2:
+                    message = "Commit " + name
+                else:
+                    message = "Merge " + name[1:]
+
+            if name in details and "files" in details[name]:
+                self.clear_tree_and_index()
+                for path, content in details[name]["files"].items():
+                    if type(content) is str:
+                        shutil.copyfile(level_dir / content, path)
+                    else:
+                        with open(path, 'w') as f:
+                            f.write('\n'.join(content))
+                    self.repo.index.add([path])
+            elif len(parents) >= 2:
+                # Merge branches one by one
                 for parent in parents[1:]:
                     merge_base = self.repo.merge_base(parents[0], parent)
                     self.repo.index.merge_tree(parent, base=merge_base)
-                commit_obj = self.repo.index.commit(
-                        name,
-                        author=actor,
-                        committer=actor,
-                        author_date=committime_rfc,
-                        commit_date=committime_rfc,
-                        parent_commits=parents,
-                        skip_hooks=True)
+            elif name in details and (
+                    'add-files' in details[name] or
+                    'remove-files' in details[name]):
+                level_files = set()
+                if 'add-files' in details[name]:
+                    for path in details[name]['add-files']:
+                        assert path not in level_files
+                        level_files.add(path)
+                if 'remove-files' in details[name]:
+                    for path in details[name]['remove-files']:
+                        assert path not in level_files
+                        assert Path(path).exists()
+                        level_files.add(path)
+
+                if 'add-files' in details[name]:
+                    for path, content in details[name]['add-files'].items():
+                        if type(content) is str:
+                            shutil.copyfile(level_dir / content, path)
+                        else:
+                            with open(path, 'w') as f:
+                                f.write('\n'.join(content))
+                        self.repo.index.add([path])
+                if 'remove-files' in details[name]:
+                    for path in details[name]['remove-files']:
+                        Path(path).unlink()
+                        self.repo.index.remove([path])
+            else:
+                self.add_file_to_index(name + '.txt')
+
+            commit_obj = self.commit(message, parents, counter)
 
             commit_objects[name] = commit_obj
             self.track_commit(name, commit_obj.hexsha)
@@ -165,7 +263,6 @@ class Operator():
             self.repo.git.checkout(commit_objects[head])
 
     def get_current_tree(self):
-        self.setup_repo()
         # Return a json object with the same structure as in level_json
 
         repo = self.repo
@@ -322,7 +419,6 @@ class Operator():
         return known_commits
 
     def get_diffs(self, known_commits):
-        self.setup_repo()
         diffs = {}
         for commit_hash, commit_name in known_commits.items():
             if commit_name == '1':
@@ -352,11 +448,11 @@ class Operator():
         return mapping
 
 
-def get_operator(operator_path=None, initialize_repo=False):
+def get_operator(operator_path=None):
     if operator_path:
-        return Operator(operator_path, initialize_repo=initialize_repo)
+        return Operator(operator_path)
     else:
         for path in (Path.cwd() / "_").parents:
             gg_path = path / '.git' / 'gud'
             if gg_path.is_dir():
-                return Operator(path, initialize_repo=initialize_repo)
+                return Operator(path)
