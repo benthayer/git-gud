@@ -1,12 +1,7 @@
-import os
-import sys
 import webbrowser
 from pathlib import Path
 
 import argparse
-
-from git import Repo
-from git.exc import InvalidGitRepositoryError
 
 import gitgud
 from gitgud import operations
@@ -14,10 +9,7 @@ from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import handle_solution_confirmation
-from gitgud.skills.user_messages import mock_simulate
-from gitgud.skills.user_messages import print_info
 from gitgud.skills.user_messages import show_skill_tree
-from gitgud.hooks import all_hooks
 
 
 class InitializationError(Exception):
@@ -27,7 +19,9 @@ class InitializationError(Exception):
 class GitGud:
     def __init__(self):
         # Only gets operator if Git Gud has been initialized
-        self.parser = argparse.ArgumentParser(prog='git gud')
+        self.parser = argparse.ArgumentParser(
+            prog='git gud',
+            description='A game to teach Git!')
         self.parser.add_argument(
                 '--version',
                 action='version',
@@ -149,6 +143,7 @@ class GitGud:
                 description='Initialize the direcotry with a git repository and load the first level of Git Gud.'  # noqa: E501
         )
         init_parser.add_argument('--force', action='store_true')
+        init_parser.add_argument('--prettyplease', action='store_true')
 
         load_parser = self.subparsers.add_parser(
                 'load',
@@ -233,15 +228,8 @@ class GitGud:
                         .format(level_name))
 
     def load_level(self, level):
-        # Clear remotes
         self.assert_initialized(skip_level_check=True)
         file_operator = operations.get_operator()
-        level_repo = file_operator.setup_repo()
-        if level_repo:
-            for remote in level_repo.remotes:
-                level_repo.delete_remote(remote)
-        else:
-            file_operator.setup_repo()
         file_operator.clear_tracked_commits()
         level.setup()
         file_operator.write_level(level)
@@ -264,74 +252,34 @@ class GitGud:
 
     def handle_init(self, args):
         # Make sure it's safe to initialize
+
         file_operator = operations.get_operator()
-        if not args.force:
-            # We aren't forcing
-            if file_operator and Path(file_operator.path) in Path(os.getcwd()).parents:  # noqa: E501:
-                print('Repo {} already initialized for git gud.'
+        if file_operator:
+            if not args.force:
+                print('Repo {} already initialized for Git Gud.'
                       .format(file_operator.path))
-                print('Use --force to initialize {}.'.format(os.getcwd()))
+                print('Use --force to initialize {}.'.format(Path.cwd()))
+                if file_operator.path != Path.cwd():
+                    print('{} will be left as is.'.format(file_operator.gg_path))  # noqa: E501
                 return
+            else:
+                print('Force initializing Git Gud.')
+        elif len(list(Path.cwd().iterdir())) != 0:
+            if not (args.force and args.prettyplease):
+                print('Current directory is nonempty. Initializing will delete all files.')  # noqa: E501
+                print('Use --force --prettyplease to force initialize here.')
+                return
+            else:
+                print('Deleting all files.')
+                print('Initializing Git Gud.')
 
-            file_operator = operations.get_operator(os.getcwd())
-
-            if os.path.exists(file_operator.gg_path):
-                # Current directory is a git repo
-                print('Git gud has already initialized. Use --force to force initialize again.')  # noqa: E501
-                return
-            if os.path.exists(os.path.join(file_operator.git_path, 'HEAD')):
-                # Current directory is a git repo
-                print('Currently in a git repo. Use --force to force initialize here.')  # noqa: E501
-                return
-            elif len(os.listdir(file_operator.path)) != 0:
-                print('Current directory is nonempty. Use --force to force initialize here.')  # noqa: E501
-                return
-        else:
-            print('Force initializing Git Gud.')
-            if not file_operator:
-                file_operator = operations.get_operator(os.getcwd())
+        file_operator = operations.get_operator(Path.cwd())
 
         assert file_operator is not None
-        # After here, we initialize everything
-        try:
-            file_operator.repo = Repo(file_operator.path)
-        except InvalidGitRepositoryError:
-            file_operator.repo = Repo.init(file_operator.path)
 
-        # Disable pager so "git gud status" can use the output easily
-        file_operator.shutoff_pager()
+        file_operator.init_gg()
 
-        if not os.path.exists(file_operator.gg_path):
-            os.mkdir(file_operator.gg_path)
-
-        # Git uses unix-like path separators
-        python_exec = sys.executable.replace('\\', '/')
-
-        for git_hook_name, module_hook_name, accepts_args in all_hooks:
-            path = os.path.join(file_operator.hooks_path, git_hook_name)
-            if accepts_args:
-                forward_stdin = 'cat - |'
-                passargs = ' "$@"'
-            else:
-                forward_stdin = ''
-                passargs = ''
-
-            with open(path, 'w+') as hook_file:
-                hook_file.write('#!/bin/bash' + os.linesep)
-                hook_file.write(
-                        forward_stdin +
-                        python_exec + ' -m gitgud.hooks.' + module_hook_name +
-                        passargs + os.linesep)
-                hook_file.write(
-                    "if [[ $? -ne 0 ]]" + os.linesep + ""
-                    "then" + os.linesep + ""
-                    "\t exit 1" + os.linesep + ""
-                    "fi" + os.linesep)
-
-            # Make the files executable
-            mode = os.stat(path).st_mode
-            mode |= (mode & 0o444) >> 2
-            os.chmod(path, mode)
+        print()
 
         self.load_level(all_skills["0"]["1"])
 
@@ -492,12 +440,7 @@ class GitGud:
             except ValueError:
                 pass
 
-        print_info('Created file "{}"'.format(commit_name))
-        mock_simulate('git add {}'.format(commit_name))
-        mock_simulate('git commit -m "{}"'.format(commit_name))
-
-        commit = file_operator.add_and_commit(commit_name)
-        print_info("New Commit: {}".format(commit.hexsha[:7]))
+        commit = file_operator.add_and_commit(commit_name, silent=False)
         file_operator.track_commit(commit_name, commit.hexsha)
 
         # Next "git gud commit" name

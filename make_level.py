@@ -1,5 +1,5 @@
 import sys
-import os
+from pathlib import Path
 from shutil import copyfile
 
 
@@ -44,17 +44,17 @@ def register_skill_package(skill_name):
 
 def make_folders(level_name, skill_name):
     # Make skill folder
-    skill_path = os.path.join("gitgud", "skills", "{}".format(skill_name))
-    if not os.path.exists(skill_path):
-        os.mkdir(skill_path)
+    skill_path = Path.cwd() / "gitgud" / "skills" / skill_name
+    if not skill_path.exists():
+        skill_path.mkdir()
         print("Created: {}".format(skill_path))
     else:
         print("Exists: {}".format(skill_path))
 
     # Make level folder
-    level_path = os.path.join(skill_path, "_{}".format(level_name))
-    if not os.path.exists(level_path):
-        os.mkdir(level_path)
+    level_path = skill_path / "_{}".format(level_name)
+    if not level_path.exists():
+        level_path.mkdir()
         print("Created: {}".format(level_path))
     else:
         print("Exists: {}".format(level_path))
@@ -70,11 +70,11 @@ def make_skill(skill_name, skill_long_name, skill_path):
     skill_file = skill_file.replace("{name}", skill_name)
     skill_file = skill_file.replace("{long_name}", skill_long_name)
 
-    with open(os.path.join(skill_path, "__init__.py"), 'w') as fp:
+    with open(skill_path / "__init__.py", 'w') as fp:
         fp.write(skill_file)
 
     # Register skill to skills/__init__.py
-    with open(os.path.join("gitgud", "skills", "__init__.py"), 'r') as fp:
+    with open(Path.cwd() / "gitgud" / "skills" / "__init__.py", 'r') as fp:
         filedata = fp.read()
 
     # Add import statement into skills/__init__.py
@@ -90,16 +90,16 @@ def make_skill(skill_name, skill_long_name, skill_path):
     filedata = filedata.replace("\n]", replace)
 
     # Write to file
-    filepath = os.path.join("gitgud", "skills", "__init__.py")
+    filepath = Path.cwd() / "gitgud" / "skills" / "__init__.py"
     with open(filepath, 'w') as fp:
         fp.write(filedata)
 
-    print("Registered skill \"{}\" in {}".format(skill_name, filepath))
+    print('Registered skill "{}" in {}'.format(skill_name, filepath))
 
 
 def make_level(level_name, level_long_name, skill_name, skill_path):
     # Add level to skills/<new_skill>/__init__.py
-    filepath = os.path.join(skill_path, "__init__.py")
+    filepath = skill_path / "__init__.py"
     with open(filepath, 'r') as fp:
         filedata = fp.read()
 
@@ -118,8 +118,8 @@ def make_level(level_name, level_long_name, skill_name, skill_path):
 
 
 def write_test(skill_path):
-    test_levels_path = os.path.join(skill_path, "test_levels.py")
-    if not os.path.exists(test_levels_path):
+    test_levels_path = skill_path / "test_levels.py"
+    if not test_levels_path.exists():
         copyfile("level_file_templates/test_levels.py", test_levels_path)
         print('Created: {}'.format(test_levels_path))
     else:
@@ -127,8 +127,8 @@ def write_test(skill_path):
 
 
 def create_level_file(level_path, filename):
-    filepath = os.path.join(level_path, filename)
-    copyfile("level_file_templates/{}".format(filename), "{}".format(filepath))
+    filepath = level_path / filename
+    copyfile("level_file_templates/{}".format(filename), filepath)
     print("Created: {}".format(filepath))
 
 
@@ -171,17 +171,17 @@ def confirm_name(level_name, skill_name):
 def main():
     level_name, level_long_name, skill_name, skill_long_name = get_new_level_name_from_args()  # noqa: E501
 
-    skill_path = os.path.join("gitgud", "skills", "{}".format(skill_name))
+    skill_path = Path.cwd() / "gitgud" / "skills" / skill_name
 
     # Check if current dir isn't ../gitgud directory. (i.e. dir of setup files)
-    if not os.path.isdir(os.path.join(os.getcwd(), 'gitgud')):
+    if not (Path.cwd() / 'gitgud').is_dir():
         print("Error: Script must be run in the git-gud directory.")
         exit(1)
     elif not level_long_name:
         print("Error: Level's long name must be specified in order to register a level.")  # noqa: E501
         exit(1)
 
-    skill_already_exists = os.path.exists(os.path.join(skill_path, "__init__.py"))  # noqa: E501
+    skill_already_exists = (skill_path / "__init__.py").exists()  # noqa: E501
     if not skill_already_exists and not skill_long_name:  # noqa: E501
         print("Error: Skill's long name must be specified if skill doesn't already exist.")  # noqa: E501
         exit(1)
@@ -215,6 +215,8 @@ def main():
     create_level_file(level_path, "goal.txt")
     create_level_file(level_path, "setup.spec")
     create_level_file(level_path, "test.spec")
+    create_level_file(level_path, "details.yaml")
+    create_level_file(level_path, "filename.txt")
     create_level_file(level_path, "solution.txt")
     print()
 

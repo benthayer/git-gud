@@ -1,0 +1,63 @@
+'1':
+  message:
+    - "Initial commit"
+    - By default, commits create a blank file with the same name as the commit
+    - This commit creates a blank file called '1.txt'
+'2':
+  message:
+    - Start solving an issue on a branch
+    - Solves issue 1
+    - Solves issue 2
+    - The add-files block below has the equivalent effect of the default behavior for commits without an add-files block
+  add-files:
+    2.txt:
+      - ''
+'3':
+  message:
+    - This portion of the message will be two lines below the first line
+    - This line is below the line above
+  add-files:
+    file.txt:
+      - "'add-files' will specify file names and add content"
+      - These lines will show up in file.txt
+    another.txt:
+      - "'add-files' and 'remove-files' are meant to be used together"
+  remove-files:
+    - 1.txt
+    - 2.txt
+'4':
+  message:
+    - "'remove-files' above can remove 1 and 2 because they were created by commits 1 and 2"
+    - There is no commit called 3 though
+  files:
+    file.txt: 'filename.txt'
+    file2.txt:
+      - Line 1
+      - Line 2
+      - "Because 'files' is here, 'add-files', and 'remove-files' are ignored"
+      - "'files' specifies which files should exist. There will be no other files"
+  add-files:
+    notgonnabethere.txt:
+      - "When 'files' is present, add-files is ignored"
+  remove-files:
+    - doesnt_exist.txt
+'5':
+  add-files:
+    hello.txt:
+      - "What's going on guys"
+'6':
+  remove-files:
+    - file.txt
+'M1':
+  message: Merge 6 into 3
+  files:
+    file.txt:
+      - Use files to fix the merge conflicts
+      - "You can only use 'files', not 'add-files' or 'remove-files'"
+      - You cannot specify remove-files, you must specify all files
+    file2.txt:
+      - "Other files won't be here"
+'8':
+  remove-files:
+    - file.txt
+    - file2.txt

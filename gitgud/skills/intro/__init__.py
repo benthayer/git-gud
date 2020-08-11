@@ -20,18 +20,17 @@ class Welcome(BasicLevel):
     def test_failed(self):
         default_fail_no_reset()
 
-    def test_passed(self):
-        self.cat_file("passed.txt")
-
     def _test(self):
         return True
 
 
 def get_name_and_email():
-    name = subprocess.check_output('git config user.name', shell=True) \
-        .decode().strip()
-    email = subprocess.check_output('git config user.email', shell=True) \
-        .decode().strip()
+    name = subprocess.run(
+        'git config user.name', shell=True,
+        check=False, stdout=subprocess.PIPE).stdout.decode().strip()
+    email = subprocess.run(
+        'git config user.email', shell=True,
+        check=False, stdout=subprocess.PIPE).stdout.decode().strip()
     return name, email
 
 
@@ -52,13 +51,10 @@ class Config(BasicLevel):
 
     def _test(self):
         name, email = get_name_and_email()
-        return name and email
+        return bool(name and email)
 
     def test_failed(self):
         default_fail_no_reset()
-
-    def test_passed(self):
-        self.cat_file("passed.txt")
 
 
 class Init(BasicLevel):
@@ -76,13 +72,10 @@ class Init(BasicLevel):
     def _test(self):
         # Check if we are in a git repo
         file_operator = operations.get_operator()
-        return file_operator.repo_exists()
+        return file_operator.repo is not None
 
     def test_failed(self):
         default_fail_no_reset()
-
-    def test_passed(self):
-        self.cat_file("passed.txt")
 
 
 skill = Skill(

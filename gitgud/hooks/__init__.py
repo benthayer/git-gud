@@ -2,5 +2,4 @@
 all_hooks = [
     # ('git-hook-name', 'modulename', accepts_args)
     ('post-rewrite', 'postrewrite', True),
-    ('pre-commit', 'precommit', False),
 ]
