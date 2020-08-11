@@ -1,7 +1,8 @@
 import subprocess
-from .util import Skill
-from . import level_builder
+
 import gitgud.operations
+from . import level_builder
+from .util import Skill
 
 user_has_seen_messages = False
 
@@ -117,10 +118,10 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
     initialized_gitgud = gitgud.operations.get_operator() is not None
 
     completion = {
-        "unvisited": '\N{DOTTED CIRCLE}',
-        "visited": '\N{BULLSEYE}',
+        "unvisited": '?',
+        "visited": 'X',
         "partial": '',
-        "complete": '\N{CIRCLED WHITE STAR}'
+        "complete": 'O'
     }
 
     format_string = "{index}. "
