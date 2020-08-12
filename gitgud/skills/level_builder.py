@@ -121,12 +121,10 @@ class BasicLevel(Level):
         show_tree()
 
     def explain(self):
-        for line in self.file('explanation.txt') \
-                .read_text().strip().split('\n'):
-            if line[:3] == '>>>':
-                input('>>>')
-            else:
-                print(line.strip())
+        lines = self.file('explanation.txt').read_text().strip().split('>>>')
+        for i, line in enumerate(lines):
+            print(line.strip())
+            input('>>> ({}/{})'.format(i+1, len(lines)))
 
     def goal(self):
         self.cat_file("goal.txt")
