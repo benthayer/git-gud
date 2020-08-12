@@ -1,6 +1,7 @@
 import webbrowser
 from pathlib import Path
 
+import sys
 import argparse
 
 import gitgud
@@ -210,6 +211,27 @@ class GitGud:
             'issues': self.handle_issues,
             'solution': self.handle_solution
         }
+
+        self.aliases = {
+            'h': 'help',
+            'i': 'issues',
+            's': 'status',
+            'e': 'explain',
+            'g': 'goal',
+            'r': 'reset',
+            't': 'test',
+            'l': 'load',
+            'c': 'commit',
+        }
+
+        self.parser.epilog = "The following aliases exist: "
+        for alias in self.aliases:
+            self.parser.epilog += "'{}' -> '{}', " \
+                    .format(alias, self.aliases[alias])
+        self.parser.epilog = self.parser.epilog[:-2]
+
+        for alias in self.aliases:
+            assert self.aliases[alias] in self.command_dict
 
     def is_initialized(self):
         return operations.get_operator() is not None
@@ -466,7 +488,9 @@ class GitGud:
         webbrowser.open_new(issues_website)
 
     def parse(self):
-        args, _ = self.parser.parse_known_args()
+        if len(sys.argv) >= 2 and sys.argv[1] in self.aliases:
+            sys.argv[1] = self.aliases[sys.argv[1]]
+        args, _ = self.parser.parse_known_args(sys.argv[1:])
         if args.command is None:
             if operations.get_operator() is None:
                 print('Currently in an uninitialized directory.')
