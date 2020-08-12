@@ -1,6 +1,7 @@
 
 import subprocess
 
+from gitgud import operations
 from gitgud.skills import all_skills
 
 
@@ -17,4 +18,5 @@ def test_load(gg):
 
     for command, level in load_tests:
         subprocess.call(command, shell=True)
-        assert level == gg.get_level()
+        op = operations.get_operator()
+        assert level == op.get_level()
