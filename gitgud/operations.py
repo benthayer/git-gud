@@ -408,11 +408,8 @@ class Operator():
         return mapping
 
 
-def get_operator(operator_path=None):
-    if operator_path:
-        return Operator(operator_path)
-    else:
-        for path in (Path.cwd() / "_").parents:
-            gg_path = path / '.git' / 'gud'
-            if gg_path.is_dir():
-                return Operator(path)
+def get_operator():
+    for path in (Path.cwd() / "_").parents:
+        gg_path = path / '.git' / 'gud'
+        if gg_path.is_dir():
+            return Operator(path)

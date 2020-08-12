@@ -5,7 +5,7 @@ import sys
 import argparse
 
 import gitgud
-from gitgud import operations
+from gitgud.operations import Operator, get_operator
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
@@ -234,7 +234,7 @@ class GitGud:
             assert self.aliases[alias] in self.command_dict
 
     def is_initialized(self):
-        return operations.get_operator() is not None
+        return get_operator() is not None
 
     def assert_initialized(self, error_message="", skip_level_check=False):
         if not self.is_initialized():
@@ -242,16 +242,16 @@ class GitGud:
 
         if not skip_level_check:
             try:
-                operations.get_operator().get_level()
+                get_operator().get_level()
             except KeyError:
-                level_name = operations.get_operator().read_level_file()
+                level_name = get_operator().read_level_file()
                 raise InitializationError(
                         'Currently loaded level does not exist: "{}".\n{}'
                         .format(level_name, error_message))
 
     def load_level(self, level):
         self.assert_initialized(skip_level_check=True)
-        file_operator = operations.get_operator()
+        file_operator = get_operator()
         file_operator.clear_tracked_commits()
         level.setup()
         file_operator.write_level(level)
@@ -271,7 +271,7 @@ class GitGud:
     def handle_init(self, args):
         # Make sure it's safe to initialize
 
-        file_operator = operations.get_operator()
+        file_operator = get_operator()
         if file_operator:
             if not args.force:
                 print('Repo {} already initialized for Git Gud.'
@@ -291,11 +291,8 @@ class GitGud:
                 print('Deleting all files.')
                 print('Initializing Git Gud.')
 
-        file_operator = operations.get_operator(Path.cwd())
-
-        assert file_operator is not None
-
-        file_operator.init_gg()
+        op = Operator(Path.cwd())
+        op.init_gg()
 
         print()
 
@@ -304,10 +301,10 @@ class GitGud:
     def handle_status(self, args):
         if self.is_initialized():
             try:
-                level = operations.get_operator().get_level()
+                level = get_operator().get_level()
                 level.status()
             except KeyError:
-                level_name = operations.get_operator().read_level_file()
+                level_name = get_operator().read_level_file()
                 print('Currently on unregistered level: "{}"'
                       .format(level_name))
         else:
@@ -316,25 +313,25 @@ class GitGud:
 
     def handle_explain(self, args):
         self.assert_initialized()
-        operations.get_operator().get_level().explain()
+        get_operator().get_level().explain()
 
     def handle_goal(self, args):
         self.assert_initialized()
-        operations.get_operator().get_level().goal()
+        get_operator().get_level().goal()
 
     def handle_reset(self, args):
         self.assert_initialized()
-        level = operations.get_operator().get_level()
+        level = get_operator().get_level()
         self.load_level(level)
 
     def handle_test(self, args):
         self.assert_initialized()
-        level = operations.get_operator().get_level()
+        level = get_operator().get_level()
         level.test()
 
     def handle_solution(self, args):
         self.assert_initialized()
-        current_level = operations.get_operator().get_level()
+        current_level = get_operator().get_level()
         if not args.confirm and \
                 not current_level.has_ever_been_completed():
             handle_solution_confirmation(current_level)
@@ -343,7 +340,7 @@ class GitGud:
 
     def handle_level(self, args):
         self.assert_initialized()
-        level = operations.get_operator().get_level()
+        level = get_operator().get_level()
         skill = level.skill
         show_skill_tree(
                 [skill, level],
@@ -373,7 +370,7 @@ class GitGud:
                     print('You may run "git gud levels --all" or "git gud levels --skills" to print all the skills.')  # noqa: E501
                     return
             elif self.is_initialized():
-                current_skill = operations.get_operator().get_level().skill
+                current_skill = get_operator().get_level().skill
                 skills_to_show = [current_skill]
                 print('Levels in the current skill "{}" :'.format(current_skill.name))  # noqa: E501
             else:
@@ -401,7 +398,7 @@ class GitGud:
 
                 self.assert_initialized("Cannot load {} level."
                                         .format(args.skill_name))
-                level = operations.get_operator().get_level()
+                level = get_operator().get_level()
 
                 if args.skill_name == "next":
                     level_to_load = level.next_level
@@ -430,7 +427,7 @@ class GitGud:
         args.skill_name, args.level_name = identifier.split('-')
 
         if not args.skill_name:
-            args.skill_name, loaded_level_name = operations.get_operator() \
+            args.skill_name, loaded_level_name = get_operator() \
                     .get_level_identifier()
             print("Inferring skill from currently loaded level: {} {}"
                   .format(args.skill_name, loaded_level_name))
@@ -451,7 +448,7 @@ class GitGud:
 
     def handle_commit(self, args):
         self.assert_initialized()
-        file_operator = operations.get_operator()
+        file_operator = get_operator()
         last_commit = file_operator.get_last_commit()
         commit_name = str(int(last_commit) + 1)
 
@@ -492,7 +489,7 @@ class GitGud:
             sys.argv[1] = self.aliases[sys.argv[1]]
         args, _ = self.parser.parse_known_args(sys.argv[1:])
         if args.command is None:
-            if operations.get_operator() is None:
+            if get_operator() is None:
                 print('Currently in an uninitialized directory.')
                 print('Get started by running "git gud init" in an empty directory!')  # noqa: E501
             else:
