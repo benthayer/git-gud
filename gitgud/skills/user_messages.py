@@ -115,7 +115,7 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
     middle_entry_bookend = '├──'
     last_entry_bookend = '└──'
 
-    initialized_gitgud = gitgud.operations.get_operator() is not None
+    file_operator = gitgud.operations.get_operator()
 
     completion = {
         "unvisited": '?',
@@ -161,7 +161,7 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
             else:
                 indent = middle_entry_bookend
 
-            if initialized_gitgud:
+            if file_operator:
                 indent += completion[item.get_progress()]
             indent += " "
 
