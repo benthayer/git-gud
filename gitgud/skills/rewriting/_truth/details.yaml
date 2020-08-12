@@ -1,10 +1,25 @@
 '1':
   message: This
+  add-files:
+    This.txt:
+      - "Hello, this file doesn't do anything."
 '2':
   message: is
+  add-files:
+    is.txt:
+      - "Hello, this file doesn't do anything."
 '3':
   message: an
+  add-files:
+    an.txt:
+      - "Hello, this file doesn't do anything."
 '4':
   message: easy
+  add-files:
+    easy.txt:
+      - "Hello, this file doesn't do anything."
 '5':
   message: level
+  add-files:
+    level.txt:
+      - "Hello, this file doesn't do anything."
