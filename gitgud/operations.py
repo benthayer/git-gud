@@ -10,6 +10,7 @@ from git import Repo, Git
 from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
+from gitgud import skills
 
 from gitgud.skills.user_messages import mock_simulate, print_info
 
@@ -118,6 +119,8 @@ class Operator():
             mode = path.stat().st_mode
             mode |= (mode & 0o444) >> 2
             path.chmod(mode)
+
+        self.initialize_progress_file(skills.all_skills)
 
     def destroy_repo(self):
         # Clear all in installation directory
@@ -379,6 +382,13 @@ class Operator():
         with open(self.level_path, 'w') as skill_file:
             skill_file.write(' '.join([level.skill.name, level.name]))
 
+    def get_level_identifier(self):
+        return self.read_level_file().split()
+
+    def get_level(self):
+        skill_name, level_name = self.get_level_identifier()
+        return skills.all_skills[skill_name][level_name]
+
     def get_last_commit(self):
         with open(self.last_commit_path) as last_commit_file:
             return last_commit_file.read()
@@ -447,11 +457,8 @@ class Operator():
         return mapping
 
 
-def get_operator(operator_path=None):
-    if operator_path:
-        return Operator(operator_path)
-    else:
-        for path in (Path.cwd() / "_").parents:
-            gg_path = path / '.git' / 'gud'
-            if gg_path.is_dir():
-                return Operator(path)
+def get_operator():
+    for path in (Path.cwd() / "_").parents:
+        gg_path = path / '.git' / 'gud'
+        if gg_path.is_dir():
+            return Operator(path)
