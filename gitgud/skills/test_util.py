@@ -1,38 +1,43 @@
-from gitgud.skills import all_skills
+import pytest
 from gitgud.skills.util import NamedList
 
 
-def test_init_NL():
-    _ = NamedList(['foo', 'bar'], [511, 522])
+@pytest.fixture
+def named_list():
+    return NamedList(['foo', 'bar', 'baz'], [51, 72, 93])
 
 
-def test_getitem_NL():
-    nltest = NamedList(['foo', 'bar', 'baz'], [5, 7, 9])
-    assert nltest['1'] == 5
-    assert nltest['baz'] == 9
+@pytest.fixture
+def all_skills(scope="module"):
+    from gitgud.skills import all_skills
+    return all_skills
 
 
-def test_iter_NL():
-    ['' for skill in all_skills]
+def test_getitem_NL(named_list):
+    assert named_list['1'] == 51
+    assert named_list['baz'] == 93
 
 
-def test_len_NL():
-    nltest = NamedList(['foo', 'bar', 'baz'], [51, 72, 93])
-    assert len(nltest) == 3
+def test_len_NL(named_list):
+    assert len(named_list) == 3
 
 
-def test_setitem_NL():
-    nltest = NamedList(['foo', 'bar', 'baz'], [51, 72, 93])
-    nltest['qux'] = -21
-    assert nltest['qux'] == -21
+def test_setitem_NL(named_list):
+    named_list['qux'] = -21
+    assert named_list['qux'] == -21
 
 
-def test_contains_NL():
+def test_contains_AS(all_skills):
     assert all_skills['1'] in all_skills
     assert all_skills['1']['1'] in all_skills['1']
 
 
-def test_get_index_NL():
-    nltest = NamedList(['foo', 'bar', 'baz'], [51, 72, 93], start_index=3)
-    assert nltest.index('foo') == '3'
-    assert nltest.index('baz') == '5'
+def test_iter_AS(all_skills):
+    for skill in all_skills:
+        pass
+
+
+def test_index_NL():
+    named_list = NamedList(['foo', 'bar', 'baz'], [51, 72, 93], start_index=3)
+    assert named_list.index('foo') == '3'
+    assert named_list.index('baz') == '5'
