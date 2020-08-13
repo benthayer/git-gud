@@ -59,8 +59,34 @@ jobs:
         cp ./asciicast.json /tmp/build
         cp ./preview.gif /tmp/build
 
-    - name: Upload all artifacts
+    - name: Upload asciicast.json
       uses: actions/upload-artifact@v2
       with:
-        name: build
-        path: /tmp/build
+        name: asciicast.json
+        path: /tmp/build/asciicast.json
+
+    - name: Upload preview.gif
+      uses: actions/upload-artifact@v2
+      with:
+        name: preview.gif
+        path: /tmp/build/preview.gif
+
+  create-pr:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    needs: generate
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: preview.gif
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: Automated update of preview.gif
+          title: Updated preview.gif by create-pull-request@v3 action
+          branch: create-pull-request/previewgif
