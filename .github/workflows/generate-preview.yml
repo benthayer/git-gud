@@ -1,8 +1,9 @@
 name: Generate asciinema preview gif
 
-# TODO: Before merging into benthayer/master, configure so this only runs on v* tags
 on:
   push:
+    tags:
+      - 'v*'
 
 jobs:
   generate:
