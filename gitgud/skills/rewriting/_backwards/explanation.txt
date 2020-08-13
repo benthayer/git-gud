@@ -1,0 +1,3 @@
+Use this file to explain to the users how to use the git feature that this level focuses on.
+>>>
+Separate blocks using ">>>", and be sure to include tips and examples as explanation aids.

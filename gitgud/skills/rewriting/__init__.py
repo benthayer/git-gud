@@ -17,5 +17,6 @@ skill = Skill(
     'Rewriting History',
     'rewriting',
     [
+        BasicLevel('A Backwards Level', 'backwards', __name__)
     ]
 )

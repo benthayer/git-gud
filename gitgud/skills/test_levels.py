@@ -68,4 +68,4 @@ def test_rebases_have_originals(level):
     rebases = [name for name in names if name[-1] == "'"]
 
     for rebase in rebases:
-        assert rebase[:-1] in names
+        assert rebase.replace("'", "") in names

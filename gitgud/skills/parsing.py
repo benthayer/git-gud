@@ -226,7 +226,7 @@ def name_merges(skill, test):
 
 
 def test_ancestry(skill, test):
-    # Tests that the graph of the git history matches
+    # Tests that the graph of the git history matches exactly
 
     if not check_commits(skill, test):
         return False

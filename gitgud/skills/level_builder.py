@@ -55,7 +55,7 @@ class Level:
         pass
 
     def status(self):
-        show_level_name(self)
+        show_tree()
 
     def has_ever_been_completed(self):
         return self._test()
@@ -148,7 +148,7 @@ class BasicLevel(Level):
             for command in solution:
                 print(command)
 
-    def _test(self):
+    def get_trees(self):
         file_operator = operations.get_operator()
         commits, head = parse_spec(self.file('test.spec'))
 
@@ -173,8 +173,11 @@ class BasicLevel(Level):
         # Name merges
         name_merges(level_tree, test_tree)
 
+        return level_tree, test_tree
+
+    def _test(self):
         # Test for similarity
-        return test_ancestry(level_tree, test_tree)
+        return test_ancestry(*self.get_trees())
 
     def test_passed(self):
         if self.file('passed.txt').exists():
