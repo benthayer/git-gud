@@ -83,13 +83,15 @@ class Level:
 
     def mark_complete(self):
         file_operator = operations.get_operator()
-        file_operator.mark_level_complete(self)
+        file_operator.mark_level(self, "complete")
+
+    def mark_partial(self):
+        file_operator = operations.get_operator()
+        file_operator.mark_level(self, "partial")
 
     def mark_visited(self):
         file_operator = operations.get_operator()
-        level_progress = file_operator.get_level_progress(self)
-        if level_progress == "unvisited":
-            file_operator.mark_level_visited(self)
+        file_operator.mark_level(self, "visited")
 
     def get_progress(self):
         file_operator = operations.get_operator()

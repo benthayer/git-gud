@@ -352,27 +352,17 @@ class Operator():
         progress_data = self.read_progress_file()
         return progress_data[level.skill.name][level.name]
 
-    def mark_level_complete(self, level):
+    def mark_level(self, level, status):
         progress_data = self.read_progress_file()
-        if (progress_data[level.skill.name][level.name] != "complete"):
+        hierarchy = [
+            "unvisited", "visited", "partial", "complete"
+        ]
+        current_progress = self.get_level_progress(level)
+        if hierarchy.index(status) > hierarchy.index(current_progress):
             progress_data[level.skill.name].update(
-                {level.name: "complete"}
+                {level.name: status}
             )
             self.update_progress_file(progress_data)
-
-    def mark_level_visited(self, level):
-        progress_data = self.read_progress_file()
-        progress_data[level.skill.name].update(
-            {level.name: "visited"}
-        )
-        self.update_progress_file(progress_data)
-
-    def mark_level_partial(self, level):
-        progress_data = self.read_progress_file()
-        progress_data[level.skill.name].update(
-            {level.name: "partial"}
-        )
-        self.update_progress_file(progress_data)
 
     def read_level_file(self):
         with open(self.level_path) as level_file:
