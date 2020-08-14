@@ -330,12 +330,12 @@ class Operator():
         return tree
 
     def initialize_progress_file(self, all_skills):
+        progress_data = {}
+        for skill in all_skills:
+            progress_data.update(
+                {skill.name: {level.name: 'unvisited' for level in skill}}
+            )
         with open(self.progress_path, 'w') as progress_file:
-            progress_data = {}
-            for skill in all_skills:
-                progress_data.update(
-                    {skill.name: {level.name: 'unvisited' for level in skill}}
-                )
             json.dump(progress_data, progress_file)
 
     def read_progress_file(self):
@@ -344,8 +344,8 @@ class Operator():
 
     def update_progress_file(self, data):
         progress_data = self.read_progress_file()
+        progress_data.update(data)
         with open(self.progress_path, 'w') as progress_file:
-            progress_data.update(data)
             json.dump(progress_data, progress_file)
 
     def get_level_progress(self, level):
