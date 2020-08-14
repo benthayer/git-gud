@@ -120,7 +120,7 @@ class Operator():
             mode |= (mode & 0o444) >> 2
             path.chmod(mode)
 
-        self.initialize_progress_file(skills.all_skills)
+        self.initialize_progress_file()
 
     def destroy_repo(self):
         # Clear all in installation directory
@@ -329,9 +329,9 @@ class Operator():
         }
         return tree
 
-    def initialize_progress_file(self, all_skills):
+    def initialize_progress_file(self):
         progress_data = {}
-        for skill in all_skills:
+        for skill in skills.all_skills:
             progress_data.update(
                 {skill.name: {level.name: 'unvisited' for level in skill}}
             )

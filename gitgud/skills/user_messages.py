@@ -1,6 +1,6 @@
 import subprocess
 
-import gitgud.operations
+from gitgud import operations
 from . import level_builder
 from .util import Skill
 
@@ -115,12 +115,12 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
     middle_entry_bookend = '├──'
     last_entry_bookend = '└──'
 
-    file_operator = gitgud.operations.get_operator()
+    file_operator = operations.get_operator()
 
     completion = {
-        "unvisited": '?',
+        "unvisited": ' ',
         "visited": 'X',
-        "partial": '',
+        "partial": 'P',
         "complete": 'O'
     }
 
