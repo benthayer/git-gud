@@ -79,15 +79,23 @@ jobs:
     needs: generate
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
           name: preview.gif
 
+      - name: Set tag
+        id: vars
+        run: |
+          echo ::set-output name=tag::$(git describe --tags)
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
+          base: ascii-tagbranch
           commit-message: Automated update of preview.gif
           title: Updated preview.gif by create-pull-request@v3 action
-          branch: create-pull-request/previewgif
+          branch: create-pull-request/previewgif-${{ steps.vars.outputs.tag }}
