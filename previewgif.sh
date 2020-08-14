@@ -31,7 +31,7 @@ p "# Now, let's initialize!"
 pe "git gud init"
 wait || true
 
-p "# Here's a demonstration of some of the levels that we have in store for you!"
+p "# Here are just a few of the levels that you can try out!"
 pe "git gud load 0 3"
 pe "git gud goal"
 pe "git init"
@@ -50,8 +50,10 @@ pe "git checkout bugFix"
 pe "git gud commit"
 pe "git gud test"
 pe "git gud levels --all"
+PROMPT_TIMEOUT=10
+wait || true
 p ""
 
 # ===== Cleanup
 rm -rf /tmp/my-git-gud
-cd $OLD_HOME 
+cd $OLD_HOME
