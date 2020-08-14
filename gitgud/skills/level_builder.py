@@ -2,6 +2,7 @@ from importlib_resources import files
 
 import yaml
 
+from .parsing import branches_to_lowercase
 from .parsing import test_ancestry
 from .parsing import level_json
 from .parsing import parse_spec
@@ -148,11 +149,14 @@ class BasicLevel(Level):
 
     def _test(self):
         file_operator = operations.get_operator()
-        commits, head = parse_spec(self.file('test.spec'))
 
         # Get commit trees
-        test_tree = level_json(commits, head)
+        test_tree = level_json(*parse_spec(self.file('test.spec')))
         level_tree = file_operator.get_current_tree()
+
+        # Make all user-created branches lowecase
+        setup_tree = level_json(*parse_spec(self.file('setup.spec')))
+        branches_to_lowercase(level_tree, setup_tree, test_tree)
 
         # Get commit info
         non_merges = get_non_merges(level_tree)
