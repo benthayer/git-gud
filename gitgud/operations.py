@@ -28,6 +28,8 @@ class Operator():
         self.level_path = self.gg_path / 'current_level.txt'
         self.progress_path = self.gg_path / 'progress.json'
 
+        self._streamed_content = {}
+
         try:
             self.repo = Repo(path)
         except InvalidGitRepositoryError:
@@ -154,6 +156,23 @@ class Operator():
                 parent_commits=parents,
                 skip_hooks=True)
         return commit_obj
+
+    def file_in_commit(self, commit, filepath):
+        commit = self.repo.commit(commit)
+        return filepath in commit.tree
+
+    def get_commit_content(self, commit, filepath):
+        if commit in self._streamed_content:
+            return self._streamed_content[commit]
+
+        commit = self.repo.commit(commit)
+
+        if not isinstance(filepath, str):
+            filepath = str(filepath)
+
+        commit_content = (commit.tree / filepath).data_stream.read().decode("ascii")  # noqa: E501
+        self._streamed_content[commit] = commit_content
+        return commit_content
 
     def create_tree(self, commits, head, details, level_dir):
         if not details:
