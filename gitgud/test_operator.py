@@ -22,6 +22,12 @@ def level():
     return all_skills["1"]["1"]
 
 
+@pytest.fixture
+def content_level():
+    from gitgud.skills import all_skills
+    return all_skills['intro']['welcome']
+
+
 def test_get_level_progress(file_operator, progress_data, level):
     assert file_operator.get_level_progress(level) in {
         "unvisited", "visited", "partial", "complete"
