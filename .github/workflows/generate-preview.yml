@@ -47,6 +47,13 @@ jobs:
     - name: Record to asciinema cast file (JSON)
       run: |
         python3 -m asciinema rec -c "$GITHUB_WORKSPACE/git-gud/previewgif.sh $GITHUB_WORKSPACE/git-gud" -e SHELL,TERM,DEMO_MAGIC_INSTALL asciicast.json
+        cp ./asciicast.json /tmp/build
+
+    - name: Upload asciicast.json
+      uses: actions/upload-artifact@v2
+      with:
+        name: asciicast.json
+        path: /tmp/build/asciicast.json
 
     - name: Use dgzlopes/asciicast-to-gif-action@v1.0
       uses: dgzlopes/asciicast-to-gif-action@v1.0
@@ -54,17 +61,10 @@ jobs:
         input: asciicast.json
         output: preview.gif
 
-    - name: Move everything to build
+    - name: Move preview.gif to build
       run: |
         mkdir /tmp/build
-        cp ./asciicast.json /tmp/build
         cp ./preview.gif /tmp/build
-
-    - name: Upload asciicast.json
-      uses: actions/upload-artifact@v2
-      with:
-        name: asciicast.json
-        path: /tmp/build/asciicast.json
 
     - name: Upload preview.gif
       uses: actions/upload-artifact@v2
