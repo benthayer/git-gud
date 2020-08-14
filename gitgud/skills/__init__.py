@@ -4,6 +4,7 @@ from gitgud.skills.rampup import skill as rampup_skill
 from gitgud.skills.rework import skill as rework_skill
 from gitgud.skills.mixedbag import skill as mixedbag_skill
 from gitgud.skills.extras import skill as extras_skill
+from gitgud.skills.newbasics import skill as newbasics_skill
 
 from gitgud.skills.util import AllSkills
 
@@ -13,7 +14,8 @@ all_skills = AllSkills([
     rampup_skill,
     rework_skill,
     mixedbag_skill,
-    extras_skill
+    extras_skill,
+    newbasics_skill
 ])
 
 all_levels = []

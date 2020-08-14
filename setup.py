@@ -18,6 +18,7 @@ setup(
         'gitgud',
         'gitgud.hooks',
         'gitgud.skills',
+        'gitgud.skills.newbasics',
         'gitgud.skills.basics',
         'gitgud.skills.extras',
         'gitgud.skills.rampup',
@@ -28,6 +29,7 @@ setup(
     package_data={
         'gitgud': ['version.txt', 'welcome.txt'],
         'gitgud.skills.intro': ['_*/*'],
+        'gitgud.skills.newbasics': ['_*/*'],
         'gitgud.skills.basics': ['_*/*'],
         'gitgud.skills.extras': ['_*/*'],
         'gitgud.skills.rampup': ['_*/*'],
