@@ -70,3 +70,14 @@ def test_mark_level_hierarchy(file_operator, level):
             initial_status = level.get_progress()
             file_operator.mark_level(level, weaker)
             assert initial_status == level.get_progress()
+
+
+def test_file_in_commit(file_operator, gg, content_level):
+    gg.load_level(content_level)
+    assert not file_operator.file_in_commit("master", "welcome.txt")
+    assert file_operator.file_in_commit("master", "Welcome.txt")
+
+
+def test_get_commit_content(file_operator, gg, content_level):
+    gg.load_level(content_level)
+    assert "Welcome" in file_operator.get_commit_content("HEAD", "Welcome.txt")
