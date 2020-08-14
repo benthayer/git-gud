@@ -1,3 +1,5 @@
+import subprocess
+
 import pytest
 
 from gitgud.operations import get_operator
@@ -81,3 +83,23 @@ def test_file_in_commit(file_operator, gg, content_level):
 def test_get_commit_content(file_operator, gg, content_level):
     gg.load_level(content_level)
     assert "Welcome" in file_operator.get_commit_content("HEAD", "Welcome.txt")
+
+
+def test_get_noncommit_changes(file_operator, gg, content_level):
+    gg.load_level(content_level)
+    with open("untracked.txt", "w"):
+        pass
+
+    change_data_staging = file_operator.get_staging_area()
+
+    for change_type in change_data_staging:
+        assert not change_data_staging[change_type]
+
+    change_data_working = file_operator.get_working_area()
+
+    assert "untracked.txt" in change_data_working["added"]
+
+    subprocess.call("git add untracked.txt", shell=True)
+    change_data = file_operator.get_staging_area()
+
+    assert "untracked.txt" in change_data["added"], change_data
