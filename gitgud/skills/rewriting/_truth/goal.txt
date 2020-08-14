@@ -1,0 +1,3 @@
+Just like last level, make the log messages form the sentence "This is an easy level"
+This time, instead of rebasing, detach HEAD using git checkout then use git cherry-pick.
+Save your changes on a new branch named whatever you want, but don't check it out.

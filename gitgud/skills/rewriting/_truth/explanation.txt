@@ -1,0 +1,47 @@
+There's something you need to know about...
+>>>
+The truth is...
+>>>
+What you did with "git rebase -i"...
+>>>
+Can be done by...
+>>>
+Detatching your head! Eek!
+>>>
+Let me clarify, I'm actually talking about your HEAD.
+>>>
+HEAD is used to refer to the commit or branch that is currently checked out.
+This basically means that when you're on branch "master", HEAD resolves to "master", which itself resolves to a commit.
+>>>
+This is important because when you're in a 'detached HEAD' state, cherry-picking still works the same way, and you can do exactly what you just did in the last level.
+>>>
+Normally, HEAD points to the branch that you have checked out, so it refers to whichever commit the branch does, even if there is a new commit!
+For example, if you have bugFix checked out, then when bugFix is updated, HEAD is updated as well, just like this:
+
+// HEAD points to bugFix.
+C1
+^ bugFix < HEAD
+
+// A new commit (C2) caused bugFix to move to C2, HEAD effectively points to C2
+C1 ---- C2
+        ^ bugFix < HEAD
+
+For us, since no branches point to the first commit, we can't check it out while staying on a branch.
+>>>
+What if we have HEAD to point at a commit rather than a branch?
+(e.g., HEAD > C1 instead of HEAD > bugFix > C1)
+>>>
+In comes the concept of the 'detached HEAD' state. Simply use "git checkout <commit_hash>" to modify HEAD so that it points to the commit instead of the branch.
+>>>
+As you've seen, a commit hash is a unique identifier for a commit.
+Use "git log" or "git gud status" to see the commit tree and to look for the hashes.
+>>>
+The hashes look something like: "d6ba740".
+The full commit hash is 40 characters long, and every one is unique.
+>>>
+In general, if you only have a few commits, even just the first few characters of the commit hash are going to be unique, so you can use as few as the first four characters to refer to the commit.
+Using the example has above "git checkout d6ba" will detach the HEAD so it refers to the commit with the hash "d6ba740"
+>>>
+Finally, to beat this level, you're going to need to check out the first commit (detaching HEAD) then cherry-pick the rest of the commits so they are in the right order.
+Finish the job by making a new branch with the re-ordered commits.
+It can be named anything, but don't check it out so we know you detached your HEAD!
