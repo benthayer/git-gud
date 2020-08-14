@@ -110,16 +110,20 @@ class BasicLevel(Level):
     def cat_file(self, path):
         cat_file(self.file(path))
 
+    def details(self):
+        details_path = self.file('details.yaml')
+        if details_path.is_file():
+            with open(details_path) as details_file:
+                return yaml.safe_load(details_file)
+        else:
+            return None
+
     def _setup(self):
         file_operator = operations.get_operator()
         file_operator.use_repo()
         commits, head = parse_spec(self.file('setup.spec'))
 
-        details_path = self.file('details.yaml')
-        if details_path.is_file():
-            details = yaml.safe_load(details_path.open())
-        else:
-            details = None
+        details = self.details()
 
         file_operator.create_tree(commits, head, details, self.level_dir)
 

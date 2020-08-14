@@ -24,6 +24,7 @@ setup(
         'gitgud.skills.rework',
         'gitgud.skills.intro',
         'gitgud.skills.mixedbag',
+        'gitgud.skills.new_basics',
     ],
     package_data={
         'gitgud': ['version.txt', 'welcome.txt'],
@@ -33,6 +34,7 @@ setup(
         'gitgud.skills.rampup': ['_*/*'],
         'gitgud.skills.rework': ['_*/*'],
         'gitgud.skills.mixedbag': ['_*/*'],
+        'gitgud.skills.new_basics': ['_*/*'],
     },
     python_requires='>=3.6',
     install_requires=[
