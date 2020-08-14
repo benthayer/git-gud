@@ -174,6 +174,37 @@ class Operator():
         self._streamed_content[commit] = commit_content
         return commit_content
 
+    def get_staging_area(self):
+        return self.get_tracked_changes("staging")
+
+    def get_working_area(self):
+        changes = self.get_tracked_changes("working")
+        changes["added"] += self.repo.untracked_files
+        return changes
+
+    def get_tracked_changes(self, change_type):
+        if change_type == "staging":
+            staged_files = self.repo.index.diff("HEAD")
+        elif change_type == "working":
+            staged_files = self.repo.index.diff(None)
+        else:
+            raise KeyError
+
+        change_key_map = {
+            "added": "A",
+            "deleted": "D",
+            "modified": "M",
+            "renamed": "R"
+        }
+
+        change_data = {}
+        for change in change_key_map:
+            change_data[change] = [
+                filename.a_path for filename in
+                staged_files.iter_change_type(change_key_map[change])
+            ]
+        return change_data
+
     def create_tree(self, commits, head, details, level_dir):
         if not details:
             details = {}
