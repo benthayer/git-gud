@@ -1,5 +1,4 @@
 import pytest
-import random
 
 from gitgud.operations import get_operator
 
@@ -53,6 +52,7 @@ def test_mark_level_partial(file_operator, level):
     assert file_operator.get_level_progress(level) == "unvisited"
     file_operator.mark_level(level, "partial")
     assert file_operator.get_level_progress(level) == "partial"
+
 
 def test_mark_level_hierarchy(file_operator, level):
     hierarchy = [
