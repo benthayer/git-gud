@@ -1,9 +1,10 @@
 import sys
-import csv
 import shutil
+from pathlib import Path
 import datetime as dt
 import email.utils
-from pathlib import Path
+import csv
+import json
 
 from git import Repo, Git
 from git.exc import InvalidGitRepositoryError
@@ -25,6 +26,7 @@ class Operator():
         self.last_commit_path = self.gg_path / 'last_commit.txt'
         self.commits_path = self.gg_path / 'commits.csv'
         self.level_path = self.gg_path / 'current_level.txt'
+        self.progress_path = self.gg_path / 'progress.json'
 
         try:
             self.repo = Repo(path)
@@ -117,6 +119,8 @@ class Operator():
             mode = path.stat().st_mode
             mode |= (mode & 0o444) >> 2
             path.chmod(mode)
+
+        self.initialize_progress_file()
 
     def destroy_repo(self):
         # Clear all in installation directory
@@ -324,6 +328,41 @@ class Operator():
             'id': 'HEAD'
         }
         return tree
+
+    def initialize_progress_file(self):
+        progress_data = {}
+        for skill in skills.all_skills:
+            progress_data.update(
+                {skill.name: {level.name: 'unvisited' for level in skill}}
+            )
+        with open(self.progress_path, 'w') as progress_file:
+            json.dump(progress_data, progress_file)
+
+    def read_progress_file(self):
+        with open(self.progress_path) as progress_file:
+            return json.load(progress_file)
+
+    def update_progress_file(self, data):
+        progress_data = self.read_progress_file()
+        progress_data.update(data)
+        with open(self.progress_path, 'w') as progress_file:
+            json.dump(progress_data, progress_file)
+
+    def get_level_progress(self, level):
+        progress_data = self.read_progress_file()
+        return progress_data[level.skill.name][level.name]
+
+    def mark_level(self, level, status):
+        progress_data = self.read_progress_file()
+        hierarchy = [
+            "unvisited", "visited", "partial", "complete"
+        ]
+        current_progress = self.get_level_progress(level)
+        if hierarchy.index(status) > hierarchy.index(current_progress):
+            progress_data[level.skill.name].update(
+                {level.name: status}
+            )
+            self.update_progress_file(progress_data)
 
     def read_level_file(self):
         with open(self.level_path) as level_file:

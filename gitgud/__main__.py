@@ -296,8 +296,8 @@ class GitGud:
                 print('Deleting all files.')
                 print('Initializing Git Gud.')
 
-        op = Operator(Path.cwd())
-        op.init_gg()
+        file_operator = Operator(Path.cwd())
+        file_operator.init_gg()
 
         print()
 

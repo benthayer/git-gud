@@ -1,6 +1,8 @@
 import subprocess
-from .util import Skill
+
+from gitgud import operations
 from . import level_builder
+from .util import Skill
 
 user_has_seen_messages = False
 
@@ -110,8 +112,17 @@ def default_fail_no_reset():
 
 
 def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_skills=False):  # noqa: E501
-    middle_entry_bookend = '├── '
-    last_entry_bookend = '└── '
+    middle_entry_bookend = '├──'
+    last_entry_bookend = '└──'
+
+    file_operator = operations.get_operator()
+
+    completion = {
+        "unvisited": ' ',
+        "visited": 'X',
+        "partial": 'P',
+        "complete": 'O'
+    }
 
     format_string = "{index}. "
     if show_human_names and not show_code_names:
@@ -149,6 +160,10 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
                 indent = last_entry_bookend
             else:
                 indent = middle_entry_bookend
+
+            if file_operator:
+                indent += completion[item.get_progress()]
+            indent += " "
 
             display_entry(
                 item.skill.index(item.name),
