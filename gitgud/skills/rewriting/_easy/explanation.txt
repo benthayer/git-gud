@@ -1,0 +1,10 @@
+You've already seen some of the stuff "git rebase -i" can do.
+"git rebase -i" can also be used to reorder commits.
+>>>
+When the editor opens, you will see several comments. You will see one line that reads:
+"These lines can be reordered; they are executed from top to bottom."
+>>>
+Just copy and paste the lines to move them.
+Moving lines will essentially replay the commits in the order that you want.
+>>>
+Note: By default, "git log" shows the most recent commit first, so in order to see the commits in chronological order, we use "git log --reversed".
