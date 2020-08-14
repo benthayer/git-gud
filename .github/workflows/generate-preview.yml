@@ -1,0 +1,101 @@
+name: Generate asciinema preview gif
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    env:
+      DEMO_MAGIC_INSTALL: /tmp/demo-magic
+      TERM: xterm
+    steps:
+    # Checks-out the project under $GITHUB_WORKSPACE/git-gud
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        path: git-gud
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '14'
+
+    - name: Set up packager-managed dependencies for gif build
+      # demo-magic.sh requires [pv]
+      run: |
+        sudo apt-get update
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine
+        pip install $GITHUB_WORKSPACE/git-gud
+        pip install asciinema
+        sudo apt-get install pv
+
+    - name: Download demo-magic.sh from repository
+      run: git clone --depth 1 https://github.com/paxtonhare/demo-magic.git $DEMO_MAGIC_INSTALL
+
+    - name: Test functionality of preview commands
+      run: |
+        chmod +x $GITHUB_WORKSPACE/git-gud/previewgif.sh
+        $GITHUB_WORKSPACE/git-gud/previewgif.sh $GITHUB_WORKSPACE/git-gud
+    
+    - name: Record to asciinema cast file (JSON)
+      run: |
+        python3 -m asciinema rec -c "$GITHUB_WORKSPACE/git-gud/previewgif.sh $GITHUB_WORKSPACE/git-gud" -e SHELL,TERM,DEMO_MAGIC_INSTALL asciicast.json
+        cp ./asciicast.json /tmp/build
+
+    - name: Upload asciicast.json
+      uses: actions/upload-artifact@v2
+      with:
+        name: asciicast.json
+        path: /tmp/build/asciicast.json
+
+    - name: Use dgzlopes/asciicast-to-gif-action@v1.0
+      uses: dgzlopes/asciicast-to-gif-action@v1.0
+      with:
+        input: asciicast.json
+        output: preview.gif
+
+    - name: Move preview.gif to build
+      run: |
+        mkdir /tmp/build
+        cp ./preview.gif /tmp/build
+
+    - name: Upload preview.gif
+      uses: actions/upload-artifact@v2
+      with:
+        name: preview.gif
+        path: /tmp/build/preview.gif
+
+  create-pr:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    needs: generate
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: preview.gif
+
+      - name: Set tag
+        id: vars
+        run: |
+          echo ::set-output name=tag::$(git describe --tags)
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          base: ascii-tagbranch
+          commit-message: Automated update of preview.gif
+          title: Updated preview.gif by create-pull-request@v3 action
+          branch: create-pull-request/previewgif-${{ steps.vars.outputs.tag }}
