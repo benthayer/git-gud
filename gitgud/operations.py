@@ -159,51 +159,52 @@ class Operator():
 
     def file_in_commit(self, commit, filepath):
         commit = self.repo.commit(commit)
+        if not isinstance(filepath, str):
+            filepath = str(filepath)
         return filepath in commit.tree
 
-    def get_commit_content(self, commit, filepath):
-        if commit in self._streamed_content:
-            return self._streamed_content[commit]
-
+    def get_commit_file_content(self, commit, filepath):
         commit = self.repo.commit(commit)
-
         if not isinstance(filepath, str):
             filepath = str(filepath)
 
-        commit_content = (commit.tree / filepath).data_stream.read().decode("ascii")  # noqa: E501
-        self._streamed_content[commit] = commit_content
+        if commit in self._streamed_content:
+            return self._streamed_content[commit][filepath]
+
+        commit_content = (commit.tree / filepath) \
+            .data_stream.read().decode("ascii")
+        if commit not in self._streamed_content:
+            self._streamed_content[commit] = {}
+
+        self._streamed_content[commit][filepath] = commit_content
         return commit_content
 
-    def get_staging_area(self):
-        return self.get_tracked_changes("staging")
+    def get_commit_content(self, commit):
+        content = {}
+        for filepath in commit.tree:
+            content.update(
+                {filepath: self.get_commit_file_content(commit, filepath)}
+            )
+        return content
 
-    def get_working_area(self):
-        changes = self.get_tracked_changes("working")
-        changes["added"] += self.repo.untracked_files
-        return changes
+    def get_staging_content(self):
+        content = {}
+        for (path, _stage), entry in self.repo.index.entries.items():
+            index_blob = entry.to_blob(self.repo)
+            content.update(
+                {path: index_blob.data_stream.read().decode("ascii")}
+            )
+        return content
 
-    def get_tracked_changes(self, change_type):
-        if change_type == "staging":
-            staged_files = self.repo.index.diff("HEAD")
-        elif change_type == "working":
-            staged_files = self.repo.index.diff(None)
-        else:
-            raise KeyError
-
-        change_key_map = {
-            "added": "A",
-            "deleted": "D",
-            "modified": "M",
-            "renamed": "R"
-        }
-
-        change_data = {}
-        for change in change_key_map:
-            change_data[change] = [
-                filename.a_path for filename in
-                staged_files.iter_change_type(change_key_map[change])
-            ]
-        return change_data
+    def get_working_content(self):
+        content = {}
+        for path in self.path.glob('*'):
+            # TODO: Add support for directories
+            if path.is_file():
+                content.update(
+                    {str(path.relative_to(self.path)): path.read_text()}
+                )
+        return content
 
     def create_tree(self, commits, head, details, level_dir):
         if not details:
