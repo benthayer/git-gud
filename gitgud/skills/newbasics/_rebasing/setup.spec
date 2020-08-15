@@ -1,4 +1,4 @@
 1
-2 (master)
-3 : 1 (other)
+2 (other)
+3 : 1 (master)
 master

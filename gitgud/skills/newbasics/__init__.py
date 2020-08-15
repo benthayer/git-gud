@@ -27,5 +27,6 @@ skill = Skill(
     'Placeholder',
     'newbasics',
     [
+        MergeConflicts('Rebasing', 'rebasing', __name__)
     ]
 )
