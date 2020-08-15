@@ -168,7 +168,8 @@ class Operator():
         if not isinstance(filepath, str):
             filepath = str(filepath)
 
-        if commit in self._streamed_content:
+        if commit in self._streamed_content and \
+                filepath in self._streamed_content[commit]:
             return self._streamed_content[commit][filepath]
 
         commit_content = (commit.tree / filepath) \
