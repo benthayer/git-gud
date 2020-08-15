@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 import pytest
@@ -27,6 +28,8 @@ def level():
 @pytest.fixture
 def content_level():
     from gitgud.skills import all_skills
+    # TODO: Make a proper testing level with details.yaml
+    # We're using intro/welcome because it specifies a details.yaml
     return all_skills['intro']['welcome']
 
 
@@ -80,26 +83,42 @@ def test_file_in_commit(file_operator, gg, content_level):
     assert file_operator.file_in_commit("master", "Welcome.txt")
 
 
-def test_get_commit_content(file_operator, gg, content_level):
+def test_get_commit_file_content(file_operator, gg, content_level):
     gg.load_level(content_level)
-    assert "Welcome" in file_operator.get_commit_content("HEAD", "Welcome.txt")
+    assert "Welcome" in file_operator.get_commit_file_content("HEAD", "Welcome.txt")  # noqa: E501
+    # Check caching of decoded blob data_stream
+    assert "Welcome" in file_operator.get_commit_file_content("HEAD", "Welcome.txt")  # noqa: E501
+    head_sha = file_operator.repo.head.commit.hexsha
+    assert "Welcome" in file_operator.get_commit_file_content(head_sha, "Welcome.txt")  # noqa: E501
 
 
-def test_get_noncommit_changes(file_operator, gg, content_level):
+def test_get_working_staging_content(file_operator, gg, content_level):
     gg.load_level(content_level)
+    assert "untracked.txt" not in file_operator.get_working_content()
+
     with open("untracked.txt", "w"):
         pass
 
-    change_data_staging = file_operator.get_staging_area()
+    staging_data = file_operator.get_staging_content()
+    working_data = file_operator.get_working_content()
 
-    for change_type in change_data_staging:
-        assert not change_data_staging[change_type]
+    assert "untracked.txt" in working_data
+    assert "untracked.txt" not in staging_data
 
-    change_data_working = file_operator.get_working_area()
+    assert "Welcome.txt" in staging_data
+    assert staging_data["Welcome.txt"] == working_data["Welcome.txt"]
 
-    assert "untracked.txt" in change_data_working["added"]
-
+    # Add untracked.txt to the index
     subprocess.call("git add untracked.txt", shell=True)
-    change_data = file_operator.get_staging_area()
+    # Remove Welcome.txt from the working directory, but don't add to index
+    os.unlink("Welcome.txt")
 
-    assert "untracked.txt" in change_data["added"], change_data
+    staging_data = file_operator.get_staging_content()
+    working_data = file_operator.get_working_content()
+    commit_content = \
+        file_operator.get_commit_file_content("HEAD", "Welcome.txt")
+
+    assert staging_data["Welcome.txt"] == commit_content
+
+    assert "untracked.txt" in staging_data, staging_data
+    assert "untracked.txt" in working_data, working_data
