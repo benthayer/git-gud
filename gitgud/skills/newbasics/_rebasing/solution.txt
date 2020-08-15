@@ -1,0 +1,4 @@
+git merge other
+echo "She lived a fulfilling life" > middle.txt
+git add middle.txt
+git commit --no-edit

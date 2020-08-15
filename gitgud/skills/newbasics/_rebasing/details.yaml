@@ -1,0 +1,26 @@
+'1':
+  message: "Added intro"
+  files:
+    intro.txt:
+      - Once upon a time, there was a princess
+'3':
+  message: "Added middle"
+  add-files:
+    middle.txt:
+      - She lived a fulfilling life
+'2':
+  message: "Added ending"
+  add-files:
+    middle.txt:
+      - She lived
+    ending.txt:
+      - And then she died
+'M1':
+  message: "Merge branch 'ending' into master"
+  files:
+    intro.txt:
+      - Once upon a time, there was a princess
+    middle.txt:
+      - She lived a fulfilling life
+    ending.txt:
+      - And then she died
