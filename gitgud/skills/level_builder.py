@@ -60,7 +60,7 @@ class Level:
         show_level_name(self)
 
     def has_ever_been_completed(self):
-        return self._test()
+        return self.get_progress() == "complete"
 
     def _test(self):
         raise NotImplementedError
