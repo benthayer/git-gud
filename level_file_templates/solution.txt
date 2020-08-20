@@ -1,0 +1,7 @@
+# Examples, change to solution for your level
+git revert HEAD
+git gud commit
+git gud commit
+git checkout HEAD^
+git checkout -b changes-to-be-made-by-player
+git checkout checked-out-branch

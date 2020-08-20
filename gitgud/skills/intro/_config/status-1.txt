@@ -1,0 +1,2 @@
+Here are your name and email as Git currently sees them:
+

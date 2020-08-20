@@ -10,10 +10,16 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Level synthesis test
+          command: |
+            echo -e "y\n" | python3 ./make_level.py testlevel1 "Test Level 1" testskill "Test Skill"
+            echo -e "y\n" | python3 ./make_level.py testlevel2 "Test Level 2" testskill
+      - run:
           name: Set up environment
           command: |
             pip3 install --user .
             pip3 install --user pytest
+            pip3 install --user flake8
             git config --global user.name "CircleCI"
             git config --global user.email "circleci@example.com"
       - run:
@@ -21,3 +27,7 @@ jobs:
           command: |
             export PATH=$PATH:$HOME/.local/bin
             python3 -m pytest gitgud
+      - run:
+          name: flake8 checks
+          command: |
+            python3 -m flake8 .

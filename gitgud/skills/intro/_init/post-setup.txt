@@ -1,0 +1,2 @@
+To see the goal for this level, type:
+    $ git gud goal

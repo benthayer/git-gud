@@ -1,3 +1,0 @@
-Welcome to Git Gud!
-Type 
-    $ git gud test

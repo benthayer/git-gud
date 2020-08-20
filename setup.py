@@ -8,7 +8,7 @@ setup(
     name='git-gud',
     version=open('gitgud/version.txt').read().strip(),
     url='https://github.com/benthayer/git-gud/',
-    description='A tool to learn git',
+    description='A command line game to learn git',
     author='Ben Thayer',
     author_email='ben@benthayer.com',
     license='MIT',
@@ -21,7 +21,10 @@ setup(
         'gitgud.skills.basics',
         'gitgud.skills.extras',
         'gitgud.skills.rampup',
+        'gitgud.skills.rework',
         'gitgud.skills.intro',
+        'gitgud.skills.mixedbag',
+        'gitgud.skills.rewriting',
     ],
     package_data={
         'gitgud': ['version.txt', 'welcome.txt'],
@@ -29,16 +32,20 @@ setup(
         'gitgud.skills.basics': ['_*/*'],
         'gitgud.skills.extras': ['_*/*'],
         'gitgud.skills.rampup': ['_*/*'],
+        'gitgud.skills.rework': ['_*/*'],
+        'gitgud.skills.mixedbag': ['_*/*'],
+        'gitgud.skills.rewriting': ['_*/*'],
     },
     python_requires='>=3.6',
     install_requires=[
         'gitpython',
-        'importlib_resources'
+        'importlib_resources',
+        'pyyaml',
     ],
     entry_points={
         "console_scripts": [
             "git-gud=gitgud.__main__:main"
         ]
     },
-    data_files = [('man/man1', ['git-gud.1'])]
+    data_files=[('man/man1', ['git-gud.1'])]
 )

@@ -1,0 +1,6 @@
+'1':
+  message:
+    - "Initial Commit"
+    - "Welcome to Git Gud!"
+  add-files:
+    Welcome.txt: "welcome.txt"

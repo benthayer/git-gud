@@ -1,0 +1,1 @@
+Using git rebase -i, re-order the commits, so that when reading the log messages in chronological order it reads "This" "is" "an" "easy" "level"
