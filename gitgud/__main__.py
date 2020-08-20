@@ -9,6 +9,7 @@ from gitgud.operations import Operator, get_operator
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
+from gitgud.skills.user_messages import handle_load_confirm
 from gitgud.skills.user_messages import handle_solution_confirmation
 from gitgud.skills.user_messages import show_skill_tree
 
@@ -164,6 +165,7 @@ class GitGud:
                 metavar='level',
                 nargs='?',
                 help='Level to load')
+        load_parser.add_argument('--force', action="store_true")
 
         skills_parser = self.subparsers.add_parser(
                 'skills',
@@ -175,9 +177,22 @@ class GitGud:
                 'levels',
                 help='List levels in a skill',
                 description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud levels --all`.')  # noqa: E501
-        levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
-        levels_parser.add_argument('-a', '--all', dest='opt_all', action='store_true', help="Prints all available skills with levels.")  # noqa: E501
-        levels_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
+
+        levels_parser.add_argument(
+                'skill_name',
+                metavar='skill',
+                nargs='?')
+        levels_parser.add_argument(
+                '-a',
+                '--all',
+                dest='opt_all',
+                action='store_true',
+                help="Prints all available skills with levels.")
+        levels_parser.add_argument(
+                '--short',
+                dest='opt_short',
+                action='store_true',
+                help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
 
         commit_parser = self.subparsers.add_parser(
                 'commit',
@@ -406,6 +421,9 @@ class GitGud:
                 level = get_operator().get_level()
 
                 if args.skill_name == "next":
+                    if not args.force and not level.has_ever_been_completed():
+                        handle_load_confirm()
+                        return
                     level_to_load = level.next_level
                 else:
                     level_to_load = level.prev_level
