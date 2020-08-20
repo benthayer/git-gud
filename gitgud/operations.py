@@ -196,9 +196,11 @@ class Operator():
 
     def get_working_content(self):
         content = {}
-        for path in self.path.glob('*'):
-            # TODO: Add support for directories
-            if path.is_file():
+        for path in self.path.rglob('*'):
+            git_is_parent = any(
+                ".git" == parent.name for parent in path.parents
+            )
+            if path.is_file() and not git_is_parent:
                 content.update(
                     {str(path.relative_to(self.path)): path.read_text()}
                 )

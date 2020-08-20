@@ -26,11 +26,21 @@ def level():
 
 
 @pytest.fixture
-def content_level():
+def content_level(gg):
     from gitgud.skills import all_skills
     # TODO: Make a proper testing level with details.yaml
     # We're using intro/welcome because it specifies a details.yaml
-    return all_skills['intro']['welcome']
+
+    gg.load_level(all_skills['intro']['welcome'])
+    os.mkdir("mydir")
+    with open("mydir/mydirfile.txt", "w") as dirfile:
+        dirfile.write("dirfile content")
+
+    with open("myfile.txt", "w") as myfile:
+        myfile.write("myfile content")
+
+    subprocess.call("git add .", shell=True)
+    subprocess.call('git commit -m "Testing commit"', shell=True)
 
 
 def test_get_level_progress(file_operator, progress_data, level):
@@ -78,22 +88,20 @@ def test_mark_level_hierarchy(file_operator, level):
 
 
 def test_file_in_commit(file_operator, gg, content_level):
-    gg.load_level(content_level)
     assert not file_operator.file_in_commit("master", "welcome.txt")
     assert file_operator.file_in_commit("master", "Welcome.txt")
 
 
 def test_get_commit_file_content(file_operator, gg, content_level):
-    gg.load_level(content_level)
     assert "Welcome" in file_operator.get_commit_file_content("HEAD", "Welcome.txt")  # noqa: E501
     # Check caching of decoded blob data_stream
     assert "Welcome" in file_operator.get_commit_file_content("HEAD", "Welcome.txt")  # noqa: E501
     head_sha = file_operator.repo.head.commit.hexsha
     assert "Welcome" in file_operator.get_commit_file_content(head_sha, "Welcome.txt")  # noqa: E501
+    assert file_operator.get_commit_file_content(head_sha, "mydir/mydirfile.txt")
 
 
-def test_get_working_staging_content(file_operator, gg, content_level):
-    gg.load_level(content_level)
+def test_get_working_staging_content(file_operator, content_level):
     assert "untracked.txt" not in file_operator.get_working_content()
 
     with open("untracked.txt", "w"):
