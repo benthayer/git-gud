@@ -165,6 +165,7 @@ class GitGud:
                 metavar='level',
                 nargs='?',
                 help='Level to load')
+        load_parser.add_argument('--force', action="store_true")
 
         skills_parser = self.subparsers.add_parser(
                 'skills',
@@ -191,17 +192,6 @@ class GitGud:
                 dest='opt_short',
                 action='store_true',
                 help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
-
-        load_parser.add_argument(
-                'skill_name',
-                metavar='skill',
-                help='Skill to load')
-        load_parser.add_argument(
-                'level_name',
-                metavar='level',
-                nargs='?',
-                help='Level to load')
-        load_parser.add_argument('--force', action="store_true")
 
         commit_parser = self.subparsers.add_parser(
                 'commit',
