@@ -168,16 +168,13 @@ class Operator():
         if not isinstance(filepath, str):
             filepath = str(filepath)
 
-        if commit in self._streamed_content and \
-                filepath in self._streamed_content[commit]:
-            return self._streamed_content[commit][filepath]
+        if (commit, filepath) in self._streamed_content:
+            return self._streamed_content[(commit, filepath)]
 
         commit_content = (commit.tree / filepath) \
             .data_stream.read().decode("ascii")
-        if commit not in self._streamed_content:
-            self._streamed_content[commit] = {}
 
-        self._streamed_content[commit][filepath] = commit_content
+        self._streamed_content[(commit, filepath)] = commit_content
         return commit_content
 
     def get_commit_content(self, commit):
