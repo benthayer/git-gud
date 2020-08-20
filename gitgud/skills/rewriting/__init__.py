@@ -29,20 +29,26 @@ class Easy(SentenceLevel):
                 commit = None
 
         # Chronological order
-        commits = reversed(commits)
+        commits = list(reversed(commits))
 
-        print('Run: "git rebase -i master~4"')
-        print("You will see this: ")
+        this_hash = commit_dict['This']
+        print('Run: "git rebase -i {}"'.format(this_hash))
+        print('"{}" is the hash of the commit with the message "This"'
+              .format(this_hash))
         print()
+        print("You will see this: ")
 
-        for sha, msg in commits:
-            print("pick {} {}".format(sha, msg))
+        for sha, msg in commits[1:]:
+            print(4*" " + "pick {} {}".format(sha, msg))
         print()
 
         print("Change it to this:")
-        for msg in 'This is an easy level'.split():
+        for msg in 'is an easy level'.split():
             sha = commit_dict[msg]
-            print("pick {} {}".format(sha, msg))
+            print(4*" " + "pick {} {}".format(sha, msg))
+
+        print()
+        print('The order of commits will now be "This is an easy level"')
 
 
 skill = Skill(
