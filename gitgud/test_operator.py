@@ -98,17 +98,18 @@ def test_get_commit_file_content(file_operator, gg, content_level):
     assert "Welcome" in file_operator.get_commit_file_content("HEAD", "Welcome.txt")  # noqa: E501
     head_sha = file_operator.repo.head.commit.hexsha
     assert "Welcome" in file_operator.get_commit_file_content(head_sha, "Welcome.txt")  # noqa: E501
-    assert file_operator.get_commit_file_content(head_sha, "mydir/mydirfile.txt")
+    assert file_operator.get_commit_file_content(
+                            head_sha, "mydir/mydirfile.txt")
 
 
 def test_get_working_staging_content(file_operator, content_level):
-    assert "untracked.txt" not in file_operator.get_working_content()
+    assert "untracked.txt" not in file_operator.get_working_directory_content()
 
     with open("untracked.txt", "w"):
         pass
 
     staging_data = file_operator.get_staging_content()
-    working_data = file_operator.get_working_content()
+    working_data = file_operator.get_working_directory_content()
 
     assert "untracked.txt" in working_data
     assert "untracked.txt" not in staging_data
@@ -122,7 +123,7 @@ def test_get_working_staging_content(file_operator, content_level):
     os.unlink("Welcome.txt")
 
     staging_data = file_operator.get_staging_content()
-    working_data = file_operator.get_working_content()
+    working_data = file_operator.get_working_directory_content()
     commit_content = \
         file_operator.get_commit_file_content("HEAD", "Welcome.txt")
 
