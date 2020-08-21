@@ -178,29 +178,45 @@ class Operator():
         return commit_content
 
     def get_commit_content(self, commit):
+        commit = self.repo.commit(commit)
+
+        trees = [commit.tree]
+        blobs = []
+        while trees:
+            current_tree = trees.pop()
+            for item in current_tree.traverse():
+                if item.type == 'blob':
+                    blobs.append(item)
+                else:
+                    trees.append(item)
+
         content = {}
-        for filepath in commit.tree:
+        for blob in blobs:
+            path = blob.path
+            data = blob.data_stream.read().decode("ascii")
+            self._streamed_content[(commit, path)] = content
             content.update(
-                {filepath: self.get_commit_file_content(commit, filepath)}
+                {path: data}
             )
         return content
 
     def get_staging_content(self):
         content = {}
-        for (path, _stage), entry in self.repo.index.entries.items():
-            index_blob = entry.to_blob(self.repo)
-            content.update(
-                {path: index_blob.data_stream.read().decode("ascii")}
-            )
+        for _stage, entry_blob in list(self.repo.index.iter_blobs()):
+            if _stage == 0:
+                path = entry_blob.path
+                content.update(
+                    {path: entry_blob.data_stream.read().decode("ascii")}
+                )
         return content
 
-    def get_working_content(self):
+    def get_working_directory_content(self):
         content = {}
         for path in self.path.rglob('*'):
             git_is_parent = any(
                 ".git" == parent.name for parent in path.parents
             )
-            if path.is_file() and not git_is_parent:
+            if not git_is_parent and path.is_file():
                 content.update(
                     {str(path.relative_to(self.path)): path.read_text()}
                 )
