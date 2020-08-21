@@ -170,12 +170,8 @@ class Operator():
 
         if (commit, filepath) in self._streamed_content:
             return self._streamed_content[(commit, filepath)]
-
-        commit_content = (commit.tree / filepath) \
-            .data_stream.read().decode("ascii")
-
-        self._streamed_content[(commit, filepath)] = commit_content
-        return commit_content
+        else:
+            return self.get_commit_content(commit)[filepath]
 
     def get_commit_content(self, commit):
         commit = self.repo.commit(commit)
@@ -190,15 +186,15 @@ class Operator():
                 else:
                     trees.append(item)
 
-        content = {}
+        commit_content = {}
         for blob in blobs:
             path = blob.path
             data = blob.data_stream.read().decode("ascii")
-            self._streamed_content[(commit, path)] = content
-            content.update(
+            self._streamed_content[(commit, path)] = data
+            commit_content.update(
                 {path: data}
             )
-        return content
+        return commit_content
 
     def get_staging_content(self):
         content = {}
