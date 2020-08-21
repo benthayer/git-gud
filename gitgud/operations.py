@@ -157,24 +157,19 @@ class Operator():
                 skip_hooks=True)
         return commit_obj
 
-    def file_in_commit(self, commit, filepath):
-        commit = self.repo.commit(commit)
-        if not isinstance(filepath, str):
-            filepath = str(filepath)
-        return filepath in commit.tree
-
     def get_commit_file_content(self, commit, filepath):
         commit = self.repo.commit(commit)
         if not isinstance(filepath, str):
             filepath = str(filepath)
-
-        if (commit, filepath) in self._streamed_content:
-            return self._streamed_content[(commit, filepath)]
+        commit_hash = commit.hexsha[:7]
+        if (commit_hash, filepath) in self._streamed_content:
+            return self._streamed_content[(commit_hash, filepath)]
         else:
-            return self.get_commit_content(commit)[filepath]
+            return self.get_commit_content(commit_hash)[filepath]
 
     def get_commit_content(self, commit):
         commit = self.repo.commit(commit)
+        commit_hash = commit.hexsha[:7]
 
         trees = [commit.tree]
         blobs = []
@@ -189,11 +184,12 @@ class Operator():
         commit_content = {}
         for blob in blobs:
             path = blob.path
-            data = blob.data_stream.read().decode("ascii")
-            self._streamed_content[(commit, path)] = data
-            commit_content.update(
-                {path: data}
-            )
+            if (commit_hash, path) in self._streamed_content:
+                data = self._streamed_content[(commit_hash, path)]
+            else:
+                data = blob.data_stream.read().decode("ascii")
+                self._streamed_content[(commit_hash, path)] = data
+            commit_content.update({path: data})
         return commit_content
 
     def get_staging_content(self):
