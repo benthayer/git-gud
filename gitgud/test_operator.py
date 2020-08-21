@@ -85,11 +85,6 @@ def test_mark_level_hierarchy(file_operator, level):
             assert initial_status == level.get_progress()
 
 
-def test_file_in_commit(file_operator, content_level):
-    assert not file_operator.file_in_commit("master", "welcome.txt")
-    assert file_operator.file_in_commit("master", "Welcome.txt")
-
-
 def test_get_commit_content(file_operator, content_level):
     assert "Welcome" in file_operator.get_commit_content("HEAD")["Welcome.txt"]  # noqa: E501
     # Check caching of decoded blob data_stream
