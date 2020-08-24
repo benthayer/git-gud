@@ -1,7 +1,10 @@
+version: 2.1
 
-version: 2
+orbs:
+  win: circleci/windows@2.2.0
+
 jobs:
-  build:
+  test-unix:
     docker:
       - image: circleci/python:3.6.1
 
@@ -31,3 +34,43 @@ jobs:
           name: flake8 checks
           command: |
             python3 -m flake8 .
+
+  test-windows:
+    executor:
+      name: win/default
+      shell: bash.exe
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - run:
+          name: Level synthesis test
+          command: |
+            echo -e "y\n" | python ./make_level.py testlevel1 "Test Level 1" testskill "Test Skill"
+            echo -e "y\n" | python ./make_level.py testlevel2 "Test Level 2" testskill
+      - run:
+          name: Set up environment
+          command: |
+            pip install .
+            pip install pytest
+            pip install flake8
+            git config --global user.name "CircleCI"
+            git config --global user.email "circleci@example.com"
+      - run:
+          name: Running tests
+          command: |
+            export PATH=$PATH:$HOME/.local/bin
+            python -m pytest gitgud
+      - run:
+          name: flake8 checks
+          command: |
+            python -m flake8 .
+
+workflows:
+  version: 2
+  run_tests:
+    jobs:
+      - test-unix
+      - test-windows
+

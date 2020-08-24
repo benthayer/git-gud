@@ -102,6 +102,12 @@ def handle_solution_confirmation(level):
     print('If so, run `git gud solution --confirm`')
 
 
+@separated
+def handle_load_confirm():
+    print("You haven't completed this level yet!")
+    print("Run `git gud load next` with --force to load the next level.")
+
+
 def no_solutions_available():
     print("No solutions available for this level.")
 
