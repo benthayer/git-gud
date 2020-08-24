@@ -8,6 +8,7 @@ jobs:
   tests:
     runs-on: ${{ matrix.platform }}
     strategy:
+      fail-fast: false
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
     defaults:
@@ -34,6 +35,7 @@ jobs:
         echo -e "y\n" | python ./make_level.py testlevel2 "Test Level 2" testskill
 
     - name: Set up environment
+      if: ${{ always() }}
       run: |
         pip install .
         pip install flake8
@@ -45,4 +47,5 @@ jobs:
       run: python -m pytest gitgud
 
     - name: flake8 checks
+      if: ${{ always() }}
       run: python -m flake8 .
