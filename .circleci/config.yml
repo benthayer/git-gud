@@ -4,7 +4,7 @@ orbs:
   win: circleci/windows@2.2.0
 
 jobs:
-  build-unix:
+  test-unix:
     docker:
       - image: circleci/python:3.6.1
 
@@ -35,7 +35,7 @@ jobs:
           command: |
             python3 -m flake8 .
 
-  build-windows:
+  test-windows:
     executor:
       name: win/default
       shell: bash.exe
@@ -66,4 +66,11 @@ jobs:
           name: flake8 checks
           command: |
             python -m flake8 .
+
+workflows:
+  version: 2
+  run_tests:
+    jobs:
+      - test-unix
+      - test-windows
 
