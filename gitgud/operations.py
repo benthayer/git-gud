@@ -209,10 +209,9 @@ class Operator():
                 ".git" == parent.name for parent in path.parents
             )
             if not git_is_parent and path.is_file():
-                with open(path, 'r') as filepath:
-                    filedata = filepath.read()
+                data = path.read_bytes().decode("ascii")
                 content.update(
-                    {str(path.relative_to(self.path).as_posix()): filedata}
+                    {str(path.relative_to(self.path).as_posix()): data}
                 )
         return content
 
