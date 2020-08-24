@@ -160,7 +160,7 @@ class Operator():
     def get_commit_file_content(self, commit, filepath):
         commit = self.repo.commit(commit)
         if not isinstance(filepath, str):
-            filepath = str(filepath)
+            filepath = str(filepath.as_posix())
         commit_hash = commit.hexsha[:7]
         if (commit_hash, filepath) in self._streamed_content:
             return self._streamed_content[(commit_hash, filepath)]
@@ -209,8 +209,10 @@ class Operator():
                 ".git" == parent.name for parent in path.parents
             )
             if not git_is_parent and path.is_file():
+                with open(path, 'r') as filepath:
+                    filedata = filepath.read()
                 content.update(
-                    {str(path.relative_to(self.path)): path.read_text()}
+                    {str(path.relative_to(self.path).as_posix()): filedata}
                 )
         return content
 
