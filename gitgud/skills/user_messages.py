@@ -6,6 +6,11 @@ from .util import Skill
 
 user_has_seen_messages = False
 
+def bool_to_word(condition):
+    if condition:
+        return "Yes"
+    else:
+        return "No"
 
 def start_marker():
     return '<' * 7
@@ -177,3 +182,9 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
                 code_name=item.name,
                 indent=indent
             )
+
+@separated
+def firstcommit_status(created, added, committed):
+    print("Created: ", bool_to_word(created))
+    print("Added: ", bool_to_word(added))
+    print("Committed: ", bool_to_word(committed))
