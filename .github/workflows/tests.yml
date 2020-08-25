@@ -2,7 +2,6 @@ name: Run OS tests
 
 on:
   push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -18,11 +17,6 @@ jobs:
       run:
         shell: bash
 
-  win-test:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: bash
     steps:
     - uses: actions/checkout@v2
       with:
