@@ -145,7 +145,8 @@ This project works off of the master branch.
 When working on your own changes, fork this repository, create a branch and submit a pull request from your forks branch to my master branch. 
 Give the pull request any name you like and submit it. 
 If there's already an open issue for your pull request, link it by including the line `fixes #[issue_id]` in the body of the pull request. 
-If you're not sure what to say, don't feel obligated to write more than you think you need to. 
+If you're not sure what to say, don't feel obligated to write more than you think you need to.
+Try to keep it to one PR at most for each issue you tackle. Don't worry about force pushing if you want to rebase your commits! As far as this project is concerned, that pre-existing branch is the definitive source of the work done to solve, so keeping it all in the same PR is best.
 I'll be able to see the code and tell what issue you're trying to solve. 
 I'm excited to get any contributions and look forward to seeing your code integrated into my repo and published on PyPI! 
 Good luck!
