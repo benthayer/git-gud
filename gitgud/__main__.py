@@ -5,6 +5,7 @@ import sys
 import argparse
 
 import gitgud
+from gitgud import logging
 from gitgud.operations import Operator, get_operator
 from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
@@ -13,6 +14,7 @@ from gitgud.skills.user_messages import handle_load_confirm
 from gitgud.skills.user_messages import handle_solution_confirmation
 from gitgud.skills.user_messages import show_skill_tree
 
+log=logging.getLogger(__name__)
 
 class InitializationError(Exception):
     pass
@@ -301,7 +303,7 @@ class GitGud:
                     print('{} will be left as is.'.format(file_operator.gg_path))  # noqa: E501
                 return
             else:
-                print('Force initializing Git Gud.')
+                log.info('Force initializing Git Gud.')
         elif len(list(Path.cwd().iterdir())) != 0:
             if not (args.force and args.prettyplease):
                 print('Current directory is nonempty. Initializing will delete all files.')  # noqa: E501
@@ -325,7 +327,7 @@ class GitGud:
                 level.status()
             except KeyError:
                 level_name = get_operator().read_level_file()
-                print('Currently on unregistered level: "{}"'
+                log.error('Currently on unregistered level: "{}"'
                       .format(level_name))
         else:
             print("Git Gud not initialized.")

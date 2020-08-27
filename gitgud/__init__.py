@@ -2,11 +2,15 @@ from importlib_resources import files
 
 import sys
 import subprocess
+import logging.config
 
 from git import Actor
 
 actor = Actor("Git Gud", "git-gud@example.com")
 actor_string = "Git Gud <git-gud@example.com>"
+
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 def create_alias():
