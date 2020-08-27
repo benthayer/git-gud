@@ -10,6 +10,9 @@ class FirstCommit(BasicLevel):
         file_operator.use_repo()
 
     def status(self):
+        firstcommit_status(*self._get_state())
+
+    def _get_state(self):
         created = False
         added = False
         committed = False
@@ -20,14 +23,14 @@ class FirstCommit(BasicLevel):
         added_files = file_operator.get_staging_content()
         if added_files:
             added = True
-        try:
-            committed_files = file_operator.get_commit_content("HEAD")
-            if committed_files:
-                committed = True
-        except:
-            pass
-        firstcommit_status(created, added, committed)
-        
+        if file_operator.repo.head.commit is not None:
+            committed = True
+
+        return created, added, committed
+
+    def _test(self):
+        return all(self._get_state())
+
 skill = Skill(
     'New Basics',
     'newbasics',
