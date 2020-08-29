@@ -28,7 +28,6 @@ jobs:
 
     - name: Set up environment
       run: |
-        pip install flake8
         pip install pytest
         git config --global user.name "Github Actions"
         git config --global user.email "action@github.com"
@@ -44,7 +43,3 @@ jobs:
 
     - name: Run tests
       run: python -m pytest gitgud
-
-    - name: Check flake8
-      if: ${{ always() }}
-      run: python -m flake8 .
