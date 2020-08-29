@@ -1,6 +1,7 @@
 import sys
 import shutil
 from pathlib import Path
+from functools import wraps, lru_cache
 import datetime as dt
 import email.utils
 import csv
@@ -32,6 +33,14 @@ class Operator():
             self.repo = Repo(path)
         except InvalidGitRepositoryError:
             self.repo = None
+
+    def normalize_commit(func):
+        @wraps(func)
+        def func_no_str(self, *args):
+            if isinstance(args[0], str):
+                args = (self.repo.commit(args[0]),) + args[1:]
+            return func(self, *args)
+        return func_no_str
 
     def add_file_to_index(self, filename):
         with open(self.path / filename, 'w+') as f:
@@ -155,6 +164,8 @@ class Operator():
                 skip_hooks=True)
         return commit_obj
 
+    @normalize_commit
+    @lru_cache(maxsize=None)
     def get_commit_file_content(self, commit, filepath):
         commit = self.repo.commit(commit)
         if not isinstance(filepath, str):
@@ -162,9 +173,9 @@ class Operator():
         commit_hash = commit.hexsha[:7]
         return self.get_commit_content(commit_hash)[filepath]
 
+    @normalize_commit
+    @lru_cache(maxsize=None)
     def get_commit_content(self, commit):
-        commit = self.repo.commit(commit)
-
         trees = [commit.tree]
         blobs = []
         while trees:
