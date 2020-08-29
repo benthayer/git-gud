@@ -28,8 +28,6 @@ class Operator():
         self.level_path = self.gg_path / 'current_level.txt'
         self.progress_path = self.gg_path / 'progress.json'
 
-        self._streamed_content = {}
-
         try:
             self.repo = Repo(path)
         except InvalidGitRepositoryError:
@@ -162,14 +160,10 @@ class Operator():
         if not isinstance(filepath, str):
             filepath = str(filepath.as_posix())
         commit_hash = commit.hexsha[:7]
-        if (commit_hash, filepath) in self._streamed_content:
-            return self._streamed_content[(commit_hash, filepath)]
-        else:
-            return self.get_commit_content(commit_hash)[filepath]
+        return self.get_commit_content(commit_hash)[filepath]
 
     def get_commit_content(self, commit):
         commit = self.repo.commit(commit)
-        commit_hash = commit.hexsha[:7]
 
         trees = [commit.tree]
         blobs = []
@@ -184,11 +178,7 @@ class Operator():
         commit_content = {}
         for blob in blobs:
             path = blob.path
-            if (commit_hash, path) in self._streamed_content:
-                data = self._streamed_content[(commit_hash, path)]
-            else:
-                data = blob.data_stream.read().decode("ascii")
-                self._streamed_content[(commit_hash, path)] = data
+            data = blob.data_stream.read().decode("ascii")
             commit_content.update({path: data})
         return commit_content
 
