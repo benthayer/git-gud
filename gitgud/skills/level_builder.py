@@ -18,6 +18,7 @@ from .user_messages import level_complete
 from .user_messages import skill_complete
 from .user_messages import all_levels_complete
 from .user_messages import no_solutions_available
+from .user_messages import basics_status
 
 from gitgud import operations
 

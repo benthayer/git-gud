@@ -177,3 +177,63 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
                 code_name=item.name,
                 indent=indent
             )
+
+
+def basics_status(show_content=True, show_branches=True, working=True, staging=True, file_count=2):
+
+    file_operator = operations.get_operator()
+
+    commit_format_str = "{message}"
+    if show_branches:
+        commit_format_str += " {branches}"
+    commit_format_str += ":"
+
+    file_format_str = "  {path} - {content}"
+
+    def existence_str(condition):
+        if condition:
+            return "Exists"
+        else:
+            return "Doesn't exist"
+
+    def content_display_data(data):
+        data_paths = list(data.keys())
+        # If there are more files than we requested, we want to show that too
+        for index in range(max(file_count, len(data_paths))):
+            file_exists = index < len(data_paths)
+            # Handle number of tracked files
+            if file_exists:
+                path = data_paths[index]
+            else:
+                path = "File " + str(index + 1)
+
+            if show_content and file_exists:
+                content = data[data_paths[index]]
+            else:
+                content = existence_str(file_exists)
+            print(file_format_str.format(path=path, content=content))
+
+    # Necessary for showing branches
+    tree = file_operator.get_current_tree()
+    referred_by = {}
+    for branch_name in tree['branches']:
+        target = tree['branches'][branch_name]['target']
+        if target not in referred_by:
+            referred_by.update({target:[branch_name]})
+        else:
+            referred_by[target].append(branch_name)
+    for target in referred_by:
+        referred_by[target] = ", ".join(referred_by[target])
+
+    # Iterate through heads to get a consistent output.
+    displayed = set()
+    for head in file_operator.repo.heads:
+        for commit in file_operator.repo.iter_commits(head, reverse=True):
+            if commit not in displayed:
+                if commit.hexsha in referred_by and show_branches:
+                    branches = "({})".format(referred_by[commit.hexsha])
+                else:
+                    branches = ""
+                print(commit_format_str.format(message=commit.message, branches=branches))
+                content_display_data(file_operator.get_commit_content(commit))
+                displayed.add(commit)
