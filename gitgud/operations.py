@@ -189,7 +189,7 @@ class Operator():
         commit_content = {}
         for blob in blobs:
             path = blob.path
-            data = blob.data_stream.read().decode("ascii")
+            data = blob.data_stream.read().decode("utf-8")
             commit_content.update({path: data})
         return commit_content
 
@@ -199,7 +199,7 @@ class Operator():
             if _stage == 0:
                 path = entry_blob.path
                 content.update(
-                    {path: entry_blob.data_stream.read().decode("ascii")}
+                    {path: entry_blob.data_stream.read().decode("utf-8")}
                 )
         return content
 
@@ -210,7 +210,7 @@ class Operator():
                 ".git" == parent.name for parent in path.parents
             )
             if not git_is_parent and path.is_file():
-                data = path.read_bytes().decode("ascii")
+                data = path.read_bytes().decode("utf-8")
                 content.update(
                     {str(path.relative_to(self.path).as_posix()): data}
                 )
