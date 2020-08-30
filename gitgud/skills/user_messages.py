@@ -186,6 +186,18 @@ def amending_message(before_ref, after_ref, show_hashes=True, show_files=True, s
         {"_name": "After", "_commit": file_operator.repo.commit(after_ref)}
     ]
 
+    # Necessary for showing branches
+    tree = file_operator.get_current_tree()
+    referred_by = {}
+    for branch_name in tree['branches']:
+        target = tree['branches'][branch_name]['target']
+        if target not in referred_by:
+            referred_by.update({target:[branch_name]})
+        else:
+            referred_by[target].append(branch_name)
+    for target in referred_by:
+        referred_by[target] = ", ".join(referred_by[target])
+
     for snapshot in display_data:
         commit = snapshot["_commit"]
         snapshot["Message"] = commit.message
@@ -196,7 +208,8 @@ def amending_message(before_ref, after_ref, show_hashes=True, show_files=True, s
             snapshot["File"] = "Present" if files else "Missing"
 
     for snapshot in display_data:
-        print(snapshot["_name"] + ":")
-        for feature in ["Hash", "Message", "File"]:
-            print(feature, ": ", str(snapshot[feature]).strip())
+        print(snapshot["_name"] + " ({}):".format(referred_by[snapshot["_commit"].hexsha]))
+        for feature in snapshot:
+            if not feature.startswith("_"):
+                print(feature, ": ", str(snapshot[feature]).strip())
         print()
