@@ -177,3 +177,26 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
                 code_name=item.name,
                 indent=indent
             )
+
+
+def amending_message(before_ref, after_ref, show_hashes=True, show_files=True, show_refs=True):  # noqa: E501
+    file_operator = operations.get_operator()
+    display_data = [
+        {"_name": "Before", "_commit": file_operator.repo.commit(before_ref)},
+        {"_name": "After", "_commit": file_operator.repo.commit(after_ref)}
+    ]
+
+    for snapshot in display_data:
+        commit = snapshot["_commit"]
+        snapshot["Message"] = commit.message
+        if show_hashes:
+            snapshot["Hash"] = commit.hexsha[:7]
+        if show_files:
+            files = file_operator.get_commit_content(commit)
+            snapshot["File"] = "Present" if files else "Missing"
+
+    for snapshot in display_data:
+        print(snapshot["_name"] + ":")
+        for feature in ["Hash", "Message", "File"]:
+            print(feature, ": ", str(snapshot[feature]).strip())
+        print()
