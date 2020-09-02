@@ -167,30 +167,17 @@ class Operator():
     @normalize_commit
     @lru_cache(maxsize=None)
     def get_commit_file_content(self, commit, filepath):
-        commit = self.repo.commit(commit)
-        if not isinstance(filepath, str):
+        if isinstance(filepath, Path):
             filepath = str(filepath.as_posix())
-        commit_hash = commit.hexsha[:7]
-        return self.get_commit_content(commit_hash)[filepath]
+        return self.get_commit_content(commit)[filepath]
 
     @normalize_commit
     @lru_cache(maxsize=None)
     def get_commit_content(self, commit):
-        trees = [commit.tree]
-        blobs = []
-        while trees:
-            current_tree = trees.pop()
-            for item in current_tree.traverse():
-                if item.type == 'blob':
-                    blobs.append(item)
-                else:
-                    trees.append(item)
-
         commit_content = {}
-        for blob in blobs:
-            path = blob.path
-            data = blob.data_stream.read().decode("utf-8")
-            commit_content.update({path: data})
+        for item in commit.tree.traverse():
+            if item.type == 'blob':
+                commit_content[item.path] = item.data_stream.read().decode('utf-8')
         return commit_content
 
     def get_staging_content(self):
