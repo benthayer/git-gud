@@ -34,13 +34,14 @@ class Operator():
         except InvalidGitRepositoryError:
             self.repo = None
 
-    def normalize_commit(func):
-        @wraps(func)
-        def func_no_str(self, *args):
-            if isinstance(args[0], str):
-                args = (self.repo.commit(args[0]),) + args[1:]
-            return func(self, *args)
-        return func_no_str
+    def normalize_commit_arg(commit_func):
+        @wraps(commit_func)
+        def commit_func_no_str(self, *args):
+            commit = args[0]
+            if isinstance(commit, str):
+                commit = self.repo.commit(commit)
+            return commit_func(self, commit, *args[1:])
+        return commit_func_no_str
 
     def add_file_to_index(self, filename):
         with open(self.path / filename, 'w+') as f:
@@ -164,14 +165,14 @@ class Operator():
                 skip_hooks=True)
         return commit_obj
 
-    @normalize_commit
+    @normalize_commit_arg
     @lru_cache(maxsize=None)
     def get_commit_file_content(self, commit, filepath):
         if isinstance(filepath, Path):
             filepath = str(filepath.as_posix())
         return self.get_commit_content(commit)[filepath]
 
-    @normalize_commit
+    @normalize_commit_arg
     @lru_cache(maxsize=None)
     def get_commit_content(self, commit):
         commit_content = {}
