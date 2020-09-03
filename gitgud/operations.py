@@ -173,11 +173,21 @@ class Operator():
     @normalize_commit_arg
     @lru_cache(maxsize=None)
     def get_commit_content(self, commit):
+
+        class CommitContent:
+            def __init__(self, commit_content):
+                self.commit_content = commit_content
+            def __getitem__(self, filepath):
+                if isinstance(filepath, Path):
+                    filepath = str(filepath.as_posix())
+                return self.commit_content[filepath]
+
         commit_content = {}
         for item in commit.tree.traverse():
             if item.type == 'blob':
                 commit_content[item.path] = item.data_stream.read().decode('utf-8')
-        return commit_content
+
+        return CommitContent(commit_content)
 
     def get_staging_content(self):
         content = {}
