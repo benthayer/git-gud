@@ -165,8 +165,6 @@ class Operator():
                 skip_hooks=True)
         return commit_obj
 
-    @normalize_commit_arg
-    @lru_cache(maxsize=None)
     def get_commit_file_content(self, commit, filepath):
         if isinstance(filepath, Path):
             filepath = str(filepath.as_posix())
