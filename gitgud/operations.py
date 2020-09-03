@@ -18,6 +18,21 @@ from gitgud.skills.user_messages import mock_simulate, print_info
 from gitgud.hooks import all_hooks
 
 
+class DirectoryContent:
+    def __init__(self, content):
+        self.content = content
+
+    def __contains__(self, filepath):
+        if isinstance(filepath, Path):
+            filepath = str(filepath.as_posix())
+        return filepath in self.content
+
+    def __getitem__(self, filepath):
+        if isinstance(filepath, Path):
+            filepath = str(filepath.as_posix())
+        return self.content[filepath]
+
+
 def normalize_commit_arg(commit_func):
     @wraps(commit_func)
     def commit_func_no_str(self, *args):
@@ -169,51 +184,31 @@ class Operator():
     @normalize_commit_arg
     @lru_cache(maxsize=None)
     def get_commit_content(self, commit):
-
-        class CommitContent:
-            def __init__(self, commit_content):
-                self.commit_content = commit_content
-
-            def __contains__(self, filepath):
-                if isinstance(filepath, Path):
-                    filepath = str(filepath.as_posix())
-                return filepath in self.commit_content
-
-            def __getitem__(self, filepath):
-                if isinstance(filepath, Path):
-                    filepath = str(filepath.as_posix())
-                return self.commit_content[filepath]
-
         commit_content = {}
         for item in commit.tree.traverse():
             if item.type == 'blob':
                 item_content = item.data_stream.read().decode('utf-8')
                 commit_content[item.path] = item_content
 
-        return CommitContent(commit_content)
+        return DirectoryContent(commit_content)
 
     def get_staging_content(self):
         content = {}
-        for _stage, entry_blob in list(self.repo.index.iter_blobs()):
-            if _stage == 0:
+        for stage, entry_blob in self.repo.index.iter_blobs():
+            if stage == 0:
                 path = entry_blob.path
-                content.update(
-                    {path: entry_blob.data_stream.read().decode("utf-8")}
-                )
-        return content
+                content[path] = entry_blob.data_stream.read().decode("utf-8")
+        return DirectoryContent(content)
 
     def get_working_directory_content(self):
         content = {}
-        for path in self.path.rglob('*'):
-            git_is_parent = any(
-                ".git" == parent.name for parent in path.parents
-            )
-            if not git_is_parent and path.is_file():
+        paths = set(self.path.rglob('*')) - set(self.path.glob('.git/**/*'))
+        for path in paths:
+            if path.is_file():
                 data = path.read_bytes().decode("utf-8")
-                content.update(
-                    {str(path.relative_to(self.path).as_posix()): data}
-                )
-        return content
+                path = str(path.relative_to(self.path).as_posix())
+                content[path] = data
+        return DirectoryContent(content)
 
     def create_tree(self, commits, head, details, level_dir):
         if not details:

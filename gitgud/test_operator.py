@@ -124,21 +124,26 @@ def test_get_commit_content_contains(file_operator, content_level):
     assert Path("dir/dirfile.txt") in commit_content
 
 
-def test_get_working_staging_content_tracked(file_operator, content_level):
+def test_unmodified_content(file_operator, content_level):
     staging_data = file_operator.get_staging_content()
     working_data = file_operator.get_working_directory_content()
+
     # Test unmodified
     assert "Welcome.txt" in staging_data
     assert staging_data["Welcome.txt"] == working_data["Welcome.txt"]
+
+
+def test_modified_content(file_operator, content_level):
     # Test modified
     write_file("Welcome.txt")
     staging_data = file_operator.get_staging_content()
     working_data = file_operator.get_working_directory_content()
+
     assert "Welcome.txt" in staging_data
     assert staging_data["Welcome.txt"] != working_data["Welcome.txt"]
 
 
-def test_get_working_staging_content_untracked(file_operator, content_level):
+def test_untracked_content(file_operator, content_level):
     untracked_files = [
         "untracked.txt", "dir/untracked.txt", "dir/subdir/untracked.txt"
     ]
@@ -154,18 +159,7 @@ def test_get_working_staging_content_untracked(file_operator, content_level):
         assert untracked_file not in staging_data
 
 
-def test_get_working_staging_content_added(file_operator, content_level):
-    added_files = [
-        "added.txt", "dir/added.txt", "dir/subdir/added.txt"
-    ]
-
-    for added_file in added_files:
-        write_file(added_file)
-        subprocess.call(
-            "git add {}".format(Path(added_file)),
-            shell=True
-        )
-
+def test_removed_content(file_operator, content_level):
     # Remove Welcome.txt & dirfile.txt from the working directory only
     os.unlink("Welcome.txt")
     os.unlink("dir/dirfile.txt")
@@ -174,14 +168,27 @@ def test_get_working_staging_content_added(file_operator, content_level):
     working_data = file_operator.get_working_directory_content()
     commit_data = file_operator.get_commit_content("HEAD")
 
-    for added_file in added_files:
-        assert added_file in staging_data
-        assert added_file in working_data
-
     assert staging_data["Welcome.txt"] == commit_data["Welcome.txt"]
     assert staging_data["dir/dirfile.txt"] == commit_data["dir/dirfile.txt"]
     assert "Welcome.txt" not in working_data
     assert "dir/dirfile.txt" not in working_data
+
+
+def test_added_content(file_operator, content_level):
+    added_files = [
+        "added.txt", "dir/added.txt", "dir/subdir/added.txt"
+    ]
+
+    for added_file in added_files:
+        write_file(added_file)
+        file_operator.repo.git.add(Path(added_file))
+
+    staging_data = file_operator.get_staging_content()
+    working_data = file_operator.get_working_directory_content()
+
+    for added_file in added_files:
+        assert added_file in staging_data
+        assert added_file in working_data
 
 
 def write_file(filepath):
