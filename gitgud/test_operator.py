@@ -86,17 +86,42 @@ def test_mark_level_hierarchy(file_operator, level):
 
 
 def test_get_commit_content(file_operator, content_level):
-    assert "Welcome" in file_operator.get_commit_content("HEAD")["Welcome.txt"]  # noqa: E501
-    # Check caching of decoded blob data_stream
-    assert "Welcome" in file_operator.get_commit_content("HEAD")["Welcome.txt"]  # noqa: E501
-    head_sha = file_operator.repo.head.commit.hexsha
-    assert "Welcome" in file_operator.get_commit_content(head_sha)["Welcome.txt"]  # noqa: E501
-    assert "dirfile" in file_operator.get_commit_content(head_sha)["dir/dirfile.txt"]  # noqa: E501
-    # Test with path objects
-    assert "subdirfile" in file_operator.get_commit_file_content(
-        head_sha, Path("dir") / "subdir" / "subdirfile.txt")
-    assert "dirfile" in file_operator.get_commit_file_content(
-        head_sha, "dir/dirfile.txt")
+    head = file_operator.repo.head.commit
+    commit_content = file_operator.get_commit_content(head)
+
+    assert "Welcome" in commit_content["Welcome.txt"]
+    assert "dirfile" in commit_content["dir/dirfile.txt"]
+
+    assert "Welcome" in commit_content[Path("Welcome.txt")]
+    assert "dirfile" in commit_content[Path("dir/dirfile.txt")]
+
+
+def test_get_commit_content_caching(file_operator, content_level):
+    content1 = file_operator.get_commit_content("HEAD")
+    content2 = file_operator.get_commit_content("HEAD")
+
+    assert "Welcome" in content1["Welcome.txt"]
+    assert "Welcome" in content2["Welcome.txt"]
+
+    head = file_operator.repo.head.commit
+    content3 = file_operator.get_commit_content(head)
+    content4 = file_operator.get_commit_content(head)
+
+    assert "Welcome" in content3["Welcome.txt"]
+    assert "Welcome" in content4["Welcome.txt"]
+
+    assert content1 == content2 == content3 == content4
+
+
+def test_get_commit_content_contains(file_operator, content_level):
+    head = file_operator.repo.head.commit
+    commit_content = file_operator.get_commit_content(head)
+
+    assert "Welcome.txt" in commit_content
+    assert "dir/dirfile.txt" in commit_content
+
+    assert Path("Welcome.txt") in commit_content
+    assert Path("dir/dirfile.txt") in commit_content
 
 
 def test_get_working_staging_content_tracked(file_operator, content_level):

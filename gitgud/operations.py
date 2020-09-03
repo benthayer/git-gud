@@ -18,6 +18,16 @@ from gitgud.skills.user_messages import mock_simulate, print_info
 from gitgud.hooks import all_hooks
 
 
+def normalize_commit_arg(commit_func):
+    @wraps(commit_func)
+    def commit_func_no_str(self, *args):
+        commit = args[0]
+        if isinstance(commit, str):
+            commit = self.repo.commit(commit)
+        return commit_func(self, commit, *args[1:])
+    return commit_func_no_str
+
+
 class Operator():
     def __init__(self, path):
         self.path = Path(path)
@@ -33,15 +43,6 @@ class Operator():
             self.repo = Repo(path)
         except InvalidGitRepositoryError:
             self.repo = None
-
-    def normalize_commit_arg(commit_func):
-        @wraps(commit_func)
-        def commit_func_no_str(self, *args):
-            commit = args[0]
-            if isinstance(commit, str):
-                commit = self.repo.commit(commit)
-            return commit_func(self, commit, *args[1:])
-        return commit_func_no_str
 
     def add_file_to_index(self, filename):
         with open(self.path / filename, 'w+') as f:
@@ -165,11 +166,6 @@ class Operator():
                 skip_hooks=True)
         return commit_obj
 
-    def get_commit_file_content(self, commit, filepath):
-        if isinstance(filepath, Path):
-            filepath = str(filepath.as_posix())
-        return self.get_commit_content(commit)[filepath]
-
     @normalize_commit_arg
     @lru_cache(maxsize=None)
     def get_commit_content(self, commit):
@@ -177,6 +173,12 @@ class Operator():
         class CommitContent:
             def __init__(self, commit_content):
                 self.commit_content = commit_content
+
+            def __contains__(self, filepath):
+                if isinstance(filepath, Path):
+                    filepath = str(filepath.as_posix())
+                return filepath in self.commit_content
+
             def __getitem__(self, filepath):
                 if isinstance(filepath, Path):
                     filepath = str(filepath.as_posix())
@@ -185,7 +187,8 @@ class Operator():
         commit_content = {}
         for item in commit.tree.traverse():
             if item.type == 'blob':
-                commit_content[item.path] = item.data_stream.read().decode('utf-8')
+                item_content = item.data_stream.read().decode('utf-8')
+                commit_content[item.path] = item_content
 
         return CommitContent(commit_content)
 
