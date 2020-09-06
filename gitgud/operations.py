@@ -1,6 +1,7 @@
 import sys
 import shutil
 from pathlib import Path
+from functools import wraps, lru_cache
 import datetime as dt
 import email.utils
 import csv
@@ -15,6 +16,31 @@ from gitgud import skills
 from gitgud.skills.user_messages import mock_simulate, print_info
 
 from gitgud.hooks import all_hooks
+
+
+class DirectoryContent:
+    def __init__(self, content):
+        self.content = content
+
+    def __contains__(self, filepath):
+        if isinstance(filepath, Path):
+            filepath = str(filepath.as_posix())
+        return filepath in self.content
+
+    def __getitem__(self, filepath):
+        if isinstance(filepath, Path):
+            filepath = str(filepath.as_posix())
+        return self.content[filepath]
+
+
+def normalize_commit_arg(commit_func):
+    @wraps(commit_func)
+    def commit_func_no_str(self, *args):
+        commit = args[0]
+        if isinstance(commit, str):
+            commit = self.repo.commit(commit)
+        return commit_func(self, commit, *args[1:])
+    return commit_func_no_str
 
 
 class Operator():
@@ -154,6 +180,35 @@ class Operator():
                 parent_commits=parents,
                 skip_hooks=True)
         return commit_obj
+
+    @normalize_commit_arg
+    @lru_cache(maxsize=None)
+    def get_commit_content(self, commit):
+        commit_content = {}
+        for item in commit.tree.traverse():
+            if item.type == 'blob':
+                item_content = item.data_stream.read().decode('utf-8')
+                commit_content[item.path] = item_content
+
+        return DirectoryContent(commit_content)
+
+    def get_staging_content(self):
+        content = {}
+        for stage, entry_blob in self.repo.index.iter_blobs():
+            if stage == 0:
+                path = entry_blob.path
+                content[path] = entry_blob.data_stream.read().decode("utf-8")
+        return DirectoryContent(content)
+
+    def get_working_directory_content(self):
+        content = {}
+        paths = set(self.path.rglob('*')) - set(self.path.glob('.git/**/*'))
+        for path in paths:
+            if path.is_file():
+                data = path.read_bytes().decode("utf-8")
+                path = str(path.relative_to(self.path).as_posix())
+                content[path] = data
+        return DirectoryContent(content)
 
     def create_tree(self, commits, head, details, level_dir):
         if not details:
