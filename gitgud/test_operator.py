@@ -91,9 +91,11 @@ def test_get_commit_content(file_operator, content_level):
 
     assert "Welcome" in commit_content["Welcome.txt"]
     assert "dirfile" in commit_content["dir/dirfile.txt"]
+    assert "subdirfile" in commit_content["dir/subdir/subdirfile.txt"]
 
     assert "Welcome" in commit_content[Path("Welcome.txt")]
     assert "dirfile" in commit_content[Path("dir/dirfile.txt")]
+    assert "subdirfile" in commit_content[Path("dir/subdir/subdirfile.txt")]
 
 
 def test_get_commit_content_caching(file_operator, content_level):
