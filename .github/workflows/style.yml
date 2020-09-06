@@ -1,0 +1,27 @@
+name: Check PEP8
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.6.7'
+
+    - name: Set up environment
+      run: |
+        pip install flake8
+
+    - name: Check flake8
+      run: python -m flake8 .
