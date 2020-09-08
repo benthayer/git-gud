@@ -13,9 +13,15 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest]
+        shell: [bash]
+        include:
+          - platform: windows-latest
+            shell: powershell
+          - platform: windows-latest
+            shell: cmd
     defaults:
       run:
-        shell: bash
+        shell: ${{ matrix.shell }}
 
     steps:
     - uses: actions/checkout@v2
