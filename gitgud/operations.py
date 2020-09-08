@@ -18,19 +18,16 @@ from gitgud.skills.user_messages import mock_simulate, print_info
 from gitgud.hooks import all_hooks
 
 
-class DirectoryContent:
-    def __init__(self, content):
-        self.content = content
-
+class DirectoryContent(dict):
     def __contains__(self, filepath):
         if isinstance(filepath, Path):
             filepath = str(filepath.as_posix())
-        return filepath in self.content
+        return super().__contains__(filepath)
 
     def __getitem__(self, filepath):
         if isinstance(filepath, Path):
             filepath = str(filepath.as_posix())
-        return self.content[filepath]
+        return super().__getitem__(filepath)
 
 
 def normalize_commit_arg(commit_func):
