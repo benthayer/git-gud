@@ -179,7 +179,7 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
             )
 
 
-def basics_status(show_content=True, show_branches=True, working=True, staging=True, file_count=2):
+def basics_status(show_content=True, show_branches=True, working=True, staging=True, file_count=2):  # noqa: E501
 
     file_operator = operations.get_operator()
 
@@ -219,13 +219,21 @@ def basics_status(show_content=True, show_branches=True, working=True, staging=T
     for branch_name in tree['branches']:
         target = tree['branches'][branch_name]['target']
         if target not in referred_by:
-            referred_by.update({target:[branch_name]})
+            referred_by.update({target: [branch_name]})
         else:
             referred_by[target].append(branch_name)
     for target in referred_by:
         referred_by[target] = ", ".join(referred_by[target])
 
     # Iterate through heads to get a consistent output.
+    if working:
+        print("Working Directory:")
+        working_data = file_operator.get_working_directory_content()
+        content_display_data(working_data)
+    if staging:
+        print("Staging Directory:")
+        staging_data = file_operator.get_staging_content()
+        content_display_data(staging_data)
     displayed = set()
     for head in file_operator.repo.heads:
         for commit in file_operator.repo.iter_commits(head, reverse=True):
@@ -234,6 +242,9 @@ def basics_status(show_content=True, show_branches=True, working=True, staging=T
                     branches = "({})".format(referred_by[commit.hexsha])
                 else:
                     branches = ""
-                print(commit_format_str.format(message=commit.message, branches=branches))
+                print(commit_format_str.format(
+                    message=commit.message,
+                    branches=branches
+                ))
                 content_display_data(file_operator.get_commit_content(commit))
                 displayed.add(commit)
