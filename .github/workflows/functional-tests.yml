@@ -40,8 +40,8 @@ jobs:
 
     - name: Synthesize level
       run: |
-        echo -e "y\n" | python ./make_level.py testlevel1 "Test Level 1" testskill "Test Skill"
-        echo -e "y\n" | python ./make_level.py testlevel2 "Test Level 2" testskill
+        python ./make_level.py -y testlevel1 "Test Level 1" testskill "Test Skill"
+        python ./make_level.py -y testlevel2 "Test Level 2" testskill
 
     - name: Install Git Gud
       run: |
