@@ -3,6 +3,7 @@ from gitgud.skills.util import Skill
 from gitgud import operations
 from gitgud.skills.user_messages import firstcommit_status
 
+
 class FirstCommit(BasicLevel):
     def _setup(self):
         file_operator = operations.get_operator()
@@ -15,7 +16,7 @@ class FirstCommit(BasicLevel):
     def _get_state(self):
         created = False
         added = False
-        committed = False
+        committed = True
         file_operator = operations.get_operator()
         created_files = file_operator.get_working_directory_content()
         if created_files:
@@ -23,13 +24,16 @@ class FirstCommit(BasicLevel):
         added_files = file_operator.get_staging_content()
         if added_files:
             added = True
-        if file_operator.repo.head.commit is not None:
-            committed = True
+        try:
+            file_operator.repo.head.commit
+        except ValueError:
+            committed = False
 
         return created, added, committed
 
     def _test(self):
         return all(self._get_state())
+
 
 skill = Skill(
     'New Basics',
