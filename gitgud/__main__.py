@@ -10,7 +10,7 @@ from gitgud.skills import all_skills
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import handle_load_confirm
-from gitgud.skills.user_messages import handle_solution_confirmation
+from gitgud.skills.user_messages import rerun_with_confirm_for_solution
 from gitgud.skills.user_messages import show_skill_tree
 
 
@@ -354,7 +354,7 @@ class GitGud:
         current_level = get_operator().get_level()
         if not args.confirm and \
                 not current_level.has_ever_been_completed():
-            handle_solution_confirmation(current_level)
+            rerun_with_confirm_for_solution(current_level)
         else:
             current_level.solution()
 
