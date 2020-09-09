@@ -97,7 +97,7 @@ def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')  # noqa: E501
 
 
-def handle_solution_confirmation(level):
+def rerun_with_confirm_for_solution(level):
     print('Are you sure you want to view the solution for "{}": "{}"?'.format(level.name, level.skill.name))  # noqa: E501
     print('If so, run `git gud solution --confirm`')
 
