@@ -187,16 +187,17 @@ def amending_message(before_ref, after_ref, show_hashes=True, show_files=True, s
     ]
 
     # Necessary for showing branches
-    tree = file_operator.get_current_tree()
-    referred_by = {}
-    for branch_name in tree['branches']:
-        target = tree['branches'][branch_name]['target']
-        if target not in referred_by:
-            referred_by.update({target:[branch_name]})
-        else:
-            referred_by[target].append(branch_name)
-    for target in referred_by:
-        referred_by[target] = ", ".join(referred_by[target])
+    if show_refs:
+        tree = file_operator.get_current_tree()
+        referred_by = {}
+        for branch_name in tree['branches']:
+            target = tree['branches'][branch_name]['target']
+            if target not in referred_by:
+                referred_by.update({target: [branch_name]})
+            else:
+                referred_by[target].append(branch_name)
+        for target in referred_by:
+            referred_by[target] = ", ".join(referred_by[target])
 
     for snapshot in display_data:
         commit = snapshot["_commit"]
@@ -208,8 +209,12 @@ def amending_message(before_ref, after_ref, show_hashes=True, show_files=True, s
             snapshot["File"] = "Present" if files else "Missing"
 
     for snapshot in display_data:
-        print(snapshot["_name"] + " ({}):".format(referred_by[snapshot["_commit"].hexsha]))
+        print(snapshot["_name"], end="")
+        if show_refs:
+            print(" ({}):".format(referred_by[snapshot["_commit"].hexsha]))
+        else:
+            print(":")
         for feature in snapshot:
             if not feature.startswith("_"):
-                print(feature, ": ", str(snapshot[feature]).strip())
+                print(feature + ":", str(snapshot[feature]).strip())
         print()
