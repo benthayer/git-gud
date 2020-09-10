@@ -1,3 +1,5 @@
+import os
+
 from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
 from gitgud import operations

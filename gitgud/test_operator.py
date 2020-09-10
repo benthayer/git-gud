@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from gitgud.operations import get_operator
-
+from gitgud.skills.testing import write_file
 
 @pytest.fixture
 def file_operator(gg):
@@ -191,8 +191,3 @@ def test_added_content(file_operator, content_level):
     for added_file in added_files:
         assert added_file in staging_data
         assert added_file in working_data
-
-
-def write_file(filepath):
-    with open(Path(filepath), "w") as newfile:
-        newfile.write("{} content".format(filepath))
