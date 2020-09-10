@@ -184,10 +184,3 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
                 code_name=item.name,
                 indent=indent
             )
-
-
-@separated
-def firstcommit_status(created, added, committed):
-    print("Created: ", bool_to_word(created))
-    print("Added: ", bool_to_word(added))
-    print("Committed: ", bool_to_word(committed))

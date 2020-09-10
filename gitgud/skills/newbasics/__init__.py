@@ -1,8 +1,7 @@
 from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
 from gitgud import operations
-from gitgud.skills.user_messages import firstcommit_status
-
+from gitgud.skills.user_messages import separated
 
 class FirstCommit(BasicLevel):
     def _setup(self):
@@ -10,8 +9,12 @@ class FirstCommit(BasicLevel):
         file_operator.destroy_repo()
         file_operator.use_repo()
 
+    @separated
     def status(self):
-        firstcommit_status(*self._get_state())
+        created, added, committed = self._get_state()
+        print("Created:", bool_to_word(created))
+        print("Added:", bool_to_word(added))
+        print("Committed:", bool_to_word(committed))
 
     def _get_state(self):
         created = False
@@ -24,10 +27,7 @@ class FirstCommit(BasicLevel):
         added_files = file_operator.get_staging_content()
         if added_files:
             added = True
-        try:
-            file_operator.repo.head.commit
-        except ValueError:
-            committed = False
+        committed = file_operator.repo.head.is_valid()
 
         return created, added, committed
 
