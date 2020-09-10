@@ -1,9 +1,8 @@
-import os
-
 from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
 from gitgud import operations
-from gitgud.skills.user_messages import separated
+from gitgud.skills.user_messages import separated, bool_to_word
+
 
 class FirstCommit(BasicLevel):
     def _setup(self):
@@ -31,10 +30,11 @@ class FirstCommit(BasicLevel):
             added = True
         committed = file_operator.repo.head.is_valid()
 
-        return created, added, committed
+        return bool(created), bool(added), bool(committed)
 
     def _test(self):
-        return all(self._get_state())
+        created, added, committed = self._get_state()
+        return created and added and committed
 
 
 skill = Skill(

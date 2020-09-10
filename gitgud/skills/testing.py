@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import subprocess
 
+
 def write_file(filepath):
     with open(Path(filepath), "w") as newfile:
         newfile.write("{} content".format(filepath))

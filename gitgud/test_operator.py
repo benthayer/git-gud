@@ -7,6 +7,7 @@ import pytest
 from gitgud.operations import get_operator
 from gitgud.skills.testing import write_file
 
+
 @pytest.fixture
 def file_operator(gg):
     file_operator = get_operator()
