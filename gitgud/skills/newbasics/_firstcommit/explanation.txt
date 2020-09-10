@@ -1,3 +1,10 @@
-Use this file to explain to the users how to use the git feature that this level focuses on.
+In this level, you'll learn how to add to the staging area and how to make your first commit!
 >>>
-Separate blocks using ">>>", and be sure to include tips and examples as explanation aids.
+First, create an empty file.
+>>>
+Second, add the file by running
+    git add NEWFILENAME.txt
+>>>
+Third, run
+    git commit
+to actually commit the file! Try it out!
