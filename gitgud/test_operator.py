@@ -5,6 +5,8 @@ from pathlib import Path
 import pytest
 
 from gitgud.operations import get_operator
+from gitgud.skills.user_messages import \
+    display_tree_content, display_commit_content
 
 
 @pytest.fixture
@@ -194,9 +196,18 @@ def test_added_content(file_operator, content_level):
 
 
 def test_get_all_commits(file_operator, content_level):
+    # Check for consistency
     commits1 = list(file_operator.get_all_commits())
     commits2 = list(file_operator.get_all_commits())
     assert commits1 == commits2
+
+
+def test_commit_messages(file_operator, content_level):
+    working_dir = file_operator.get_working_directory_content()
+    staging_area = file_operator.get_staging_content()
+    display_tree_content("Working", working_dir, file_count=2)
+    display_tree_content("Staging", staging_area, file_count=2)
+    display_commit_content()
 
 
 def write_file(filepath):
