@@ -469,6 +469,18 @@ class Operator():
                 known_commits[commit_hash] = name
         return known_commits
 
+    def target_branch_str():
+        file_operator = operations.get_operator()
+        tree = file_operator.get_current_tree()
+        referred_by = {}
+        for branch_name in tree['branches']:
+            target = tree['branches'][branch_name]['target']
+            if target not in referred_by:
+                referred_by.update({target: [branch_name]})
+            else:
+                referred_by[target].append(branch_name)
+        return referred_by
+
     def get_diffs(self, known_commits):
         diffs = {}
         for commit_hash, commit_name in known_commits.items():
