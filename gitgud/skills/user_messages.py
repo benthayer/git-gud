@@ -192,17 +192,12 @@ def display_tree_data(header, data, show_content, file_count=2):
     # If there are more files than we requested, we want to show that too
 
     print(header + ":")
-    for file_number in range(max(file_count, len(available_files))):
-        file_exists = file_number < len(available_files)
-        # Handle number of tracked files
-        path = available_files[file_number] if file_exists else f"File {file_number + 1}"
+    for filepath in available_files:
+        content = available_files[filepath] if show_content else existence_str(True)
+        print(file_format_str.format(path=filepath, content=content))
 
-        if show_content and file_exists:
-            content = data[available_files[file_number]]
-        else:
-            content = existence_str(file_exists)
-
-        print(file_format_str.format(path=path, content=content))
+    for missing_file_number in range(len(available_files), file_count):
+        print(file_format_str.format(path=f"File {missing_file_number + 1}", content="Missing"))
 
 
 def display_commit_content(show_branches=True, show_content=True, file_count=2):  # noqa: E501
@@ -225,7 +220,7 @@ def display_commit_content(show_branches=True, show_content=True, file_count=2):
                     message=commit.message,
                     branches=branches
                 )
-                display_tree_data(
+                display_tree_content(
                     header,
                     file_operator.get_commit_content(commit),
                     file_count=2
