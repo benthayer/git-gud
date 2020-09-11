@@ -188,21 +188,20 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
 def display_tree_data(header, data, show_content, file_count=2):
     file_format_str = "  {path} - {content}"
 
-    data_paths = list(data.keys())
+    available_files = list(data.keys())
     # If there are more files than we requested, we want to show that too
 
     print(header + ":")
-    for index in range(max(file_count, len(data_paths))):
-        file_exists = index < len(data_paths)
+    for file_number in range(max(file_count, len(available_files))):
+        file_exists = file_number < len(available_files)
         # Handle number of tracked files
-        if file_exists:
-            path = data_paths[index]
-        else:
-            path = "File " + str(index + 1)
+        path = available_files[file_number] if file_exists else f"File {file_number + 1}"
+
         if show_content and file_exists:
-            content = data[data_paths[index]]
+            content = data[available_files[file_number]]
         else:
             content = existence_str(file_exists)
+
         print(file_format_str.format(path=path, content=content))
 
 
