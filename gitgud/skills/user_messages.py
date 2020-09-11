@@ -6,6 +6,7 @@ from .util import Skill
 
 user_has_seen_messages = False
 
+
 def existence_str(condition):
     if condition:
         return "Exists"
@@ -193,43 +194,46 @@ def display_tree_data(header, data, show_content, file_count=2):
 
     print(header + ":")
     for filepath in available_files:
-        content = available_files[filepath] if show_content else existence_str(True)
-        print(file_format_str.format(path=filepath, content=content))
+        content = available_files[filepath] if show_content else existence_str(True)  # noqa: E501
+        print(file_format_str.format(
+            path=filepath,
+            content=content
+        ))
 
     for missing_file_number in range(len(available_files), file_count):
-        print(file_format_str.format(path=f"File {missing_file_number + 1}", content="Missing"))
+        print(file_format_str.format(
+            path=f"File {missing_file_number + 1}",
+            content="Missing"
+        ))
 
 
 def display_commit_content(show_branches=True, show_content=True, file_count=2):  # noqa: E501
-    referred_by = get_branches()
+    file_operator = operations.get_operator()
+    referred_by = commits_targeted_by()
 
     commit_format_str = "{message}"
     if show_branches:
         commit_format_str += " ({branches})"
     commit_format_str += ":"
 
-    displayed = set()
-    for head in file_operator.repo.heads:
-        for commit in file_operator.repo.iter_commits(head, reverse=True):
-            if commit not in displayed:
-                if commit.hexsha in referred_by and show_branches:
-                    branches = referred_by[commit.hexsha]
-                else:
-                    branches = ""
-                header = commit_format_str.format(
-                    message=commit.message,
-                    branches=branches
-                )
-                display_tree_content(
-                    header,
-                    file_operator.get_commit_content(commit),
-                    file_count=2
-                )
-                displayed.add(commit)
+    for commit in file_operator.get_all_commits():
+        if commit.hexsha in referred_by and show_branches:
+            branches = referred_by[commit.hexsha]
+        else:
+            branches = ""
+        header = commit_format_str.format(
+            message=commit.message,
+            branches=branches
+        )
+        display_tree_content(
+            header,
+            file_operator.get_commit_content(commit),
+            file_count=2
+        )
 
 def commits_targeted_by():
     file_operator = operations.get_operator()
-    referred_by = target_branch_str()
+    referred_by = file_operator.target_branch_str()
     for target in referred_by:
         referred_by[target] = ", ".join(referred_by[target])
     return referred_by

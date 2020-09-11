@@ -469,9 +469,8 @@ class Operator():
                 known_commits[commit_hash] = name
         return known_commits
 
-    def target_branch_str():
-        file_operator = operations.get_operator()
-        tree = file_operator.get_current_tree()
+    def target_branch_str(self):
+        tree = self.get_current_tree()
         referred_by = {}
         for branch_name in tree['branches']:
             target = tree['branches'][branch_name]['target']
@@ -509,6 +508,15 @@ class Operator():
                 mapping[commit_hash] = diffs[diff]
 
         return mapping
+
+    def get_all_commits(self):
+        yielded = set()
+        for head in self.repo.heads:
+            for commit in self.repo.iter_commits(head, reverse=True):
+                if commit not in yielded:
+                    yield commit
+                else:
+                    yielded.add(commit)
 
 
 def get_operator():

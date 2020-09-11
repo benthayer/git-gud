@@ -193,6 +193,12 @@ def test_added_content(file_operator, content_level):
         assert added_file in working_data
 
 
+def test_get_all_commits(file_operator, content_level):
+    commits1 = list(file_operator.get_all_commits())
+    commits2 = list(file_operator.get_all_commits())
+    assert commits1 == commits2
+
+
 def write_file(filepath):
     with open(Path(filepath), "w") as newfile:
         newfile.write("{} content".format(filepath))
