@@ -186,18 +186,18 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
             )
 
 
-def display_tree_data(header, data, show_content, file_count=2):
+def display_tree_content(header, content, show_content=True, file_count=2):
     file_format_str = "  {path} - {content}"
 
-    available_files = list(data.keys())
+    available_files = list(content.keys())
     # If there are more files than we requested, we want to show that too
 
     print(header + ":")
     for filepath in available_files:
-        content = available_files[filepath] if show_content else existence_str(True)  # noqa: E501
+        file_content = filepath if show_content else existence_str(True)
         print(file_format_str.format(
             path=filepath,
-            content=content
+            content=file_content
         ))
 
     for missing_file_number in range(len(available_files), file_count):
@@ -209,7 +209,7 @@ def display_tree_data(header, data, show_content, file_count=2):
 
 def display_commit_content(show_branches=True, show_content=True, file_count=2):  # noqa: E501
     file_operator = operations.get_operator()
-    referred_by = commits_targeted_by()
+    referred_by = target_branch_str()
 
     commit_format_str = "{message}"
     if show_branches:
@@ -231,9 +231,10 @@ def display_commit_content(show_branches=True, show_content=True, file_count=2):
             file_count=2
         )
 
-def commits_targeted_by():
+
+def target_branch_str():
     file_operator = operations.get_operator()
-    referred_by = file_operator.target_branch_str()
+    referred_by = file_operator.commits_targeted_by()
     for target in referred_by:
         referred_by[target] = ", ".join(referred_by[target])
     return referred_by
