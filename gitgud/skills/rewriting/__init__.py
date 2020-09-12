@@ -1,3 +1,5 @@
+from gitgud import operations
+
 from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
 
@@ -13,10 +15,24 @@ class SentenceLevel(BasicLevel):
         simulate_command('git log --reverse --oneline')
 
 
+class Truth(SentenceLevel):
+    def _test(self):
+        if not super()._test():
+            return False
+
+        file_operator = operations.get_operator()
+
+        for branch in file_operator.repo.branches:
+            if branch.commit == file_operator.repo.head.commit:
+                return True
+
+        return False
+
+
 skill = Skill(
     'Rewriting History',
     'rewriting',
     [
-        SentenceLevel('The Truth', 'truth', __name__)
+        Truth('The Truth', 'truth', __name__)
     ]
 )
