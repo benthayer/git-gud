@@ -5,6 +5,11 @@ import subprocess
 
 from git import Actor
 
+
+class InitializationError(Exception):
+    pass
+
+
 actor = Actor("Git Gud", "git-gud@example.com")
 actor_string = "Git Gud <git-gud@example.com>"
 
