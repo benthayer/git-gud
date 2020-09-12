@@ -7,6 +7,10 @@ import argparse
 import gitgud
 from gitgud.operations import Operator, get_operator
 from gitgud.skills import all_skills
+from gitgud.skills.user_messages import repo_already_initialized
+from gitgud.skills.user_messages import force_initializing
+from gitgud.skills.user_messages import cant_init_repo_not_empty
+from gitgud.skills.user_messages import deleting_and_initializing
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
 from gitgud.skills.user_messages import handle_load_confirm
@@ -294,27 +298,19 @@ class GitGud:
         file_operator = get_operator()
         if file_operator:
             if not args.force:
-                print('Repo {} already initialized for Git Gud.'
-                      .format(file_operator.path))
-                print('Use --force to initialize {}.'.format(Path.cwd()))
-                if file_operator.path != Path.cwd():
-                    print('{} will be left as is.'.format(file_operator.gg_path))  # noqa: E501
+                repo_already_initialized()
                 return
             else:
-                print('Force initializing Git Gud.')
+                force_initializing()
         elif len(list(Path.cwd().iterdir())) != 0:
             if not (args.force and args.prettyplease):
-                print('Current directory is nonempty. Initializing will delete all files.')  # noqa: E501
-                print('Use --force --prettyplease to force initialize here.')
+                cant_init_repo_not_empty()
                 return
             else:
-                print('Deleting all files.')
-                print('Initializing Git Gud.')
+                deleting_and_initializing()
 
         file_operator = Operator(Path.cwd())
         file_operator.init_gg()
-
-        print()
 
         self.load_level(all_skills["0"]["1"])
 
