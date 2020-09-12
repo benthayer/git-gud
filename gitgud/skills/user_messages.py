@@ -1,5 +1,7 @@
 import subprocess
 
+from pathlib import Path
+
 from gitgud import operations
 from . import level_builder
 from .util import Skill
@@ -54,6 +56,33 @@ def simulate_command(command):
     print(start_marker(), "Simulating: {}".format(command))
     subprocess.call(command, shell=True)
     print(end_marker())
+
+
+@separated
+def repo_already_initialized():
+    file_operator = operations.get_operator()
+    print('Repo {} already initialized for Git Gud.'
+          .format(file_operator.path))
+    print('Use --force to initialize {}.'.format(Path.cwd()))
+    if file_operator.path != Path.cwd():
+        print('{} will be left as is.'.format(file_operator.gg_path))  # noqa: E501
+
+
+@separated
+def force_initializing():
+    print('Force initializing Git Gud.')
+
+
+@separated
+def cant_init_repo_not_empty():
+    print('Current directory is nonempty. Initializing will delete all files.')  # noqa: E501
+    print('Use --force --prettyplease to force initialize here.')
+
+
+@separated
+def deleting_and_initializing():
+    print('Deleting all files.')
+    print('Initializing Git Gud.')
 
 
 def show_tree():
