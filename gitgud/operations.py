@@ -278,6 +278,8 @@ class Operator():
         commits = set()
         visited = set()
 
+        commits.add(repo.head.commit)
+
         for branch in repo.branches:
             commits.add(branch.commit)
             commit_hash = branch.commit.hexsha
