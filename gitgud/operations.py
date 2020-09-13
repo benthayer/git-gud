@@ -6,6 +6,7 @@ import email.utils
 from pathlib import Path
 
 from git import Repo, Git
+from git.exc import GitCommandError
 from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor
@@ -151,9 +152,16 @@ class Operator():
                 skip_hooks=True)
         return commit_obj
 
-    def create_tree(self, commits, head, details, level_dir):
-        if not details:
-            details = {}
+    def normalize_state(self):
+        # Make sure we're in a normal state
+        try:
+            self.repo.git.rebase('--abort')
+        except GitCommandError:
+            pass
+        try:
+            self.repo.git.bisect('reset')
+        except GitCommandError:
+            pass
 
         self.clear_tree_and_index()
 
@@ -167,12 +175,23 @@ class Operator():
         # Detach HEAD so we can delete branches
         self.repo.git.checkout(self.repo.head.commit)
 
+    def reset_repo(self):
+        self.normalize_state()
+
         branches = self.repo.branches
         for branch in branches:
             self.repo.delete_head(branch, force=True)
+
         self.repo.delete_tag(*self.repo.tags)
+
         for remote in self.repo.remotes:
             self.repo.delete_remote(remote)
+
+    def create_tree(self, commits, head, details, level_dir):
+        if not details:
+            details = {}
+
+        self.reset_repo()
 
         commit_objects = {}
         counter = len(commits)
