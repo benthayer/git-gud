@@ -66,7 +66,7 @@ class Operator():
             if path != self.git_path:
                 shutil.rmtree(path)
 
-        # Easiest way to clear the index is to commit an empty directory
+        # Since all files are gone, updating removes them from the index
         self.repo.git.add(update=True)
 
     def shutoff_pager(self):
@@ -161,7 +161,7 @@ class Operator():
         self.repo.index.commit(
                 "Placeholder commit\n\n"
                 "This commit is used when initializing levels."
-                "Something must have gone wrong",
+                "If you see this, something must have gone wrong.",
                 parent_commits=[],
                 skip_hooks=True)
         # Detach HEAD so we can delete branches
