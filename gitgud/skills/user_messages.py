@@ -189,21 +189,20 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
 def display_tree_content(header, content, show_content=True, file_count=2):
     file_format_str = "  {path} - {content}"
 
-    available_files = list(content.keys())
     # If there are more files than we requested, we want to show that too
 
     print(header + ":")
-    for filepath in available_files:
-        file_content = filepath if show_content else existence_str(True)
+    for filepath in content.keys():
+        file_details = content[filepath] if show_content else existence_str(True)
         print(file_format_str.format(
             path=filepath,
-            content=file_content
+            content=file_details
         ))
 
-    for missing_file_number in range(len(available_files), file_count):
+    for missing_file_number in range(len(content), file_count):
         print(file_format_str.format(
             path=f"File {missing_file_number + 1}",
-            content="Missing"
+            content="<MISSING>"
         ))
 
 
@@ -213,12 +212,11 @@ def display_commit_content(show_branches=True, show_content=True, file_count=2):
 
     commit_format_str = "{message}"
     if show_branches:
-        commit_format_str += " ({branches})"
-    commit_format_str += ":"
+        commit_format_str += " {branches}"
 
     for commit in file_operator.get_all_commits():
         if commit.hexsha in referred_by and show_branches:
-            branches = referred_by[commit.hexsha]
+            branches = f"({referred_by[commit.hexsha]})"
         else:
             branches = ""
         header = commit_format_str.format(
@@ -228,7 +226,7 @@ def display_commit_content(show_branches=True, show_content=True, file_count=2):
         display_tree_content(
             header,
             file_operator.get_commit_content(commit),
-            file_count=2
+            file_count=file_count
         )
 
 
