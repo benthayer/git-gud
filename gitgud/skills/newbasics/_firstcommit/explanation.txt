@@ -1,10 +1,18 @@
-In this level, you'll learn how to add to the staging area and how to make your first commit!
+Now that you have a repo, you're going to want to start using it.
 >>>
-First, create an empty file.
+As stated before, repos are used to keep track of your changes.
+Your changes a stored in what's known as a commit.
 >>>
-Second, add the file by running
-    git add NEWFILENAME.txt
+Commits are called "commits" because you use them to "commit" your changes.
 >>>
-Third, run
-    git commit
-to actually commit the file! Try it out!
+You can think of committing your changes as another way to save your files, just a little more advanced.
+Among other things, you need to manually add your files to commits, and each commit comes with a message.
+>>>
+Commits are also ordered, so there is naturally a first commit. Most people call this their "Initial commit".
+>>>
+Making your first commit will look something like this:
+Create a file, it can be named anything, and it can have anything in it.
+Type "git add myfile.txt" to add your file (in this case, the name of the file is "myfile.txt")
+Type "git commit -m "Initial commit""
+>>>
+After that, you'll have your first commit, and later on you'll be able to go back to it to see what changes you've made

@@ -1,1 +1,2 @@
-Create a file, add it, and commit it.
+Add a file and commit it to master
+
