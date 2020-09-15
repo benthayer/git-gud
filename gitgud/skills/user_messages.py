@@ -193,7 +193,7 @@ def display_tree_content(header, content, show_content=True, file_count=2):
 
     print(header + ":")
     for filepath in content.keys():
-        file_details = content[filepath] if show_content else existence_str(True)
+        file_details = content[filepath] if show_content else existence_str(True)  # noqa: E501
         print(file_format_str.format(
             path=filepath,
             content=file_details
@@ -206,17 +206,17 @@ def display_tree_content(header, content, show_content=True, file_count=2):
         ))
 
 
-def display_commit_content(show_branches=True, show_content=True, file_count=2):  # noqa: E501
+def display_commit_content(show_branches=True, show_content=True, sort_commits=True, file_count=2):  # noqa: E501
     file_operator = operations.get_operator()
     referred_by = target_branch_str()
 
     commit_format_str = "{message}"
     if show_branches:
-        commit_format_str += " {branches}"
+        commit_format_str += "{branches}"
 
     for commit in file_operator.get_all_commits():
         if commit.hexsha in referred_by and show_branches:
-            branches = f"({referred_by[commit.hexsha]})"
+            branches = f" ({referred_by[commit.hexsha]})"
         else:
             branches = ""
         header = commit_format_str.format(

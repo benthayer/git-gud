@@ -509,14 +509,15 @@ class Operator():
 
         return mapping
 
-    def get_all_commits(self):
-        yielded = set()
+    def get_all_commits(self, sort_commits=True):
+        all_commits = []
         for head in self.repo.heads:
             for commit in self.repo.iter_commits(head, reverse=True):
-                if commit not in yielded:
-                    yield commit
-                else:
-                    yielded.add(commit)
+                if commit not in all_commits:
+                    all_commits.append(commit)
+        if sort_commits:
+            all_commits.sort(key=lambda commit: commit.committed_date)
+        return all_commits
 
 
 def get_operator():
