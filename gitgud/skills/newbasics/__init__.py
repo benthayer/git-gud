@@ -12,12 +12,12 @@ class FirstCommit(BasicLevel):
 
     @separated
     def status(self):
-        created, added, committed = self._get_state()
+        created, added, committed = self.get_solved_state()
         print("Created:", bool_to_word(created))
         print("Added:", bool_to_word(added))
         print("Committed:", bool_to_word(committed))
 
-    def _get_state(self):
+    def get_solved_state(self):
         created = False
         added = False
         committed = True
@@ -33,8 +33,11 @@ class FirstCommit(BasicLevel):
         return bool(created), bool(added), bool(committed)
 
     def _test(self):
-        created, added, committed = self._get_state()
+        created, added, committed = self.get_solved_state()
         return created and added and committed
+
+    def post_setup(self):
+        self.cat_file("post-setup.txt")
 
 
 skill = Skill(
