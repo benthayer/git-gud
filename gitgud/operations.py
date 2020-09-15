@@ -469,7 +469,7 @@ class Operator():
                 known_commits[commit_hash] = name
         return known_commits
 
-    def commits_targeted_by(self):
+    def get_branches_by_commit(self):
         tree = self.get_current_tree()
         referred_by = {}
         for branch_name in tree['branches']:

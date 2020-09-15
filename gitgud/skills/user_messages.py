@@ -234,7 +234,7 @@ def display_commit_content(show_branches=True, show_content=True, file_count=2):
 
 def target_branch_str():
     file_operator = operations.get_operator()
-    referred_by = file_operator.commits_targeted_by()
+    referred_by = file_operator.get_branches_by_commit()
     for target in referred_by:
         referred_by[target] = ", ".join(referred_by[target])
     return referred_by
