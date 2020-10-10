@@ -1,7 +1,15 @@
+import pytest
+
 from git.exc import GitCommandError
 
 from gitgud.skills import all_skills
 from gitgud.operations import get_operator
+
+
+@pytest.fixture(autouse=True)
+def setup_level():
+    all_skills["1"]["1"]._setup()
+    yield
 
 
 def setup_rebase_conflict():
@@ -31,26 +39,22 @@ def setup_bisect():
 
 
 def test_reset_during_rebase_conflict(gg):
-    all_skills["1"]["1"]._setup()
     setup_rebase_conflict()
     all_skills["1"]["1"]._setup()
 
 
 def test_reset_during_bisect(gg):
-    all_skills["1"]["1"]._setup()
     setup_bisect()
     all_skills["1"]["1"]._setup()
 
 
 def test_reset_during_bisect_then_rebase_conflict(gg):
-    all_skills["1"]["1"]._setup()
     setup_bisect()
     setup_rebase_conflict()
     all_skills["1"]["1"]._setup()
 
 
 def test_reset_during_rebase_conflict_then_bisect(gg):
-    all_skills["1"]["1"]._setup()
     setup_rebase_conflict()
     setup_bisect()
     all_skills["1"]["1"]._setup()
