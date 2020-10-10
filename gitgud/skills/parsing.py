@@ -180,6 +180,29 @@ def check_commits(skill, test):
     return True
 
 
+def tree_branches_to_lowercase(tree, branches):
+    branch_dict = tree['branches']
+    for branch in list(branch_dict.keys()):
+        if branch in branches and not branch == branch.lower():
+            branch_dict[branch.lower()] = branch_dict[branch]
+            branch_dict[branch.lower()]['id'] = branch.lower()
+            del branch_dict[branch]
+
+    head = tree['HEAD']
+    if head['target'] in branches:
+        head['target'] = head['target'].lower()
+
+
+def branches_to_lowercase(level_tree, setup_tree, test_tree):
+    level_branches = set(level_tree['branches'].keys())
+    setup_branches = set(setup_tree['branches'].keys())
+    test_branches = set(test_tree['branches'].keys())
+    added_branches = (level_branches | test_branches) - setup_branches
+
+    tree_branches_to_lowercase(level_tree, added_branches)
+    tree_branches_to_lowercase(test_tree, added_branches)
+
+
 def name_from_map(level_tree, mapping):
     # Map other commits to themselves
     mapping = deepcopy(mapping)
@@ -244,18 +267,21 @@ def test_ancestry(skill, test):
 
     if not check_commits(skill, test):
         return False
+
     if not has_all_branches(skill, test):
         return False
     if not all_branches_correct(skill, test):
         return False
     if not has_no_extra_branches(skill, test):
         return False
+
     if not has_all_tags(skill, test):
         return False
     if not all_tags_correct(skill, test):
         return False
     if not has_no_extra_tags(skill, test):
         return False
+
     if not head_correct(skill, test):
         return False
 

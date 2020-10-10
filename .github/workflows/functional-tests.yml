@@ -1,0 +1,51 @@
+name: Run OS tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+        shell: [bash]
+        include:
+          - platform: windows-latest
+            shell: powershell
+          - platform: windows-latest
+            shell: cmd
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.6.7'
+
+    - name: Set up environment
+      run: |
+        pip install pytest
+        git config --global user.name "Github Actions"
+        git config --global user.email "action@github.com"
+
+    - name: Synthesize level
+      run: |
+        python ./make_level.py -y testlevel1 "Test Level 1" testskill "Test Skill"
+        python ./make_level.py -y testlevel2 "Test Level 2" testskill
+
+    - name: Install Git Gud
+      run: |
+        pip install .
+
+    - name: Run tests
+      run: python -m pytest gitgud

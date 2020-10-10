@@ -7,9 +7,14 @@ import argparse
 import gitgud
 from gitgud.operations import Operator, get_operator
 from gitgud.skills import all_skills
+from gitgud.skills.user_messages import repo_already_initialized
+from gitgud.skills.user_messages import force_initializing
+from gitgud.skills.user_messages import cant_init_repo_not_empty
+from gitgud.skills.user_messages import deleting_and_initializing
 from gitgud.skills.user_messages import all_levels_complete
 from gitgud.skills.user_messages import show_tree
-from gitgud.skills.user_messages import handle_solution_confirmation
+from gitgud.skills.user_messages import handle_load_confirm
+from gitgud.skills.user_messages import rerun_with_confirm_for_solution
 from gitgud.skills.user_messages import show_skill_tree
 
 
@@ -164,6 +169,7 @@ class GitGud:
                 metavar='level',
                 nargs='?',
                 help='Level to load')
+        load_parser.add_argument('--force', action="store_true")
 
         skills_parser = self.subparsers.add_parser(
                 'skills',
@@ -175,9 +181,22 @@ class GitGud:
                 'levels',
                 help='List levels in a skill',
                 description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud levels --all`.')  # noqa: E501
-        levels_parser.add_argument('skill_name', metavar='skill', nargs='?')
-        levels_parser.add_argument('--all', dest='opt_all', action='store_true', help="Prints all available skills with levels.")  # noqa: E501
-        levels_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
+
+        levels_parser.add_argument(
+                'skill_name',
+                metavar='skill',
+                nargs='?')
+        levels_parser.add_argument(
+                '-a',
+                '--all',
+                dest='opt_all',
+                action='store_true',
+                help="Prints all available skills with levels.")
+        levels_parser.add_argument(
+                '--short',
+                dest='opt_short',
+                action='store_true',
+                help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
 
         commit_parser = self.subparsers.add_parser(
                 'commit',
@@ -279,27 +298,19 @@ class GitGud:
         file_operator = get_operator()
         if file_operator:
             if not args.force:
-                print('Repo {} already initialized for Git Gud.'
-                      .format(file_operator.path))
-                print('Use --force to initialize {}.'.format(Path.cwd()))
-                if file_operator.path != Path.cwd():
-                    print('{} will be left as is.'.format(file_operator.gg_path))  # noqa: E501
+                repo_already_initialized()
                 return
             else:
-                print('Force initializing Git Gud.')
+                force_initializing()
         elif len(list(Path.cwd().iterdir())) != 0:
             if not (args.force and args.prettyplease):
-                print('Current directory is nonempty. Initializing will delete all files.')  # noqa: E501
-                print('Use --force --prettyplease to force initialize here.')
+                cant_init_repo_not_empty()
                 return
             else:
-                print('Deleting all files.')
-                print('Initializing Git Gud.')
+                deleting_and_initializing()
 
-        op = Operator(Path.cwd())
-        op.init_gg()
-
-        print()
+        file_operator = Operator(Path.cwd())
+        file_operator.init_gg()
 
         self.load_level(all_skills["0"]["1"])
 
@@ -339,7 +350,7 @@ class GitGud:
         current_level = get_operator().get_level()
         if not args.confirm and \
                 not current_level.has_ever_been_completed():
-            handle_solution_confirmation(current_level)
+            rerun_with_confirm_for_solution(current_level)
         else:
             current_level.solution()
 
@@ -406,6 +417,9 @@ class GitGud:
                 level = get_operator().get_level()
 
                 if args.skill_name == "next":
+                    if not args.force and not level.has_ever_been_completed():
+                        handle_load_confirm()
+                        return
                     level_to_load = level.next_level
                 else:
                     level_to_load = level.prev_level

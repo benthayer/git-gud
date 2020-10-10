@@ -2,6 +2,7 @@ from importlib_resources import files
 
 import yaml
 
+from .parsing import branches_to_lowercase
 from .parsing import test_ancestry
 from .parsing import level_json
 from .parsing import parse_spec
@@ -43,6 +44,7 @@ class Level:
 
     def setup(self):
         self._setup()
+        self.mark_visited()
         self.post_setup()
 
     def post_setup(self):
@@ -58,7 +60,7 @@ class Level:
         show_level_name(self)
 
     def has_ever_been_completed(self):
-        return self._test()
+        return self.get_progress() == "complete"
 
     def _test(self):
         raise NotImplementedError
@@ -80,11 +82,26 @@ class Level:
     def test_failed(self):
         default_fail()
 
+    def mark_complete(self):
+        file_operator = operations.get_operator()
+        file_operator.mark_level(self, "complete")
+
+    def mark_partial(self):
+        file_operator = operations.get_operator()
+        file_operator.mark_level(self, "partial")
+
+    def mark_visited(self):
+        file_operator = operations.get_operator()
+        file_operator.mark_level(self, "visited")
+
+    def get_progress(self):
+        file_operator = operations.get_operator()
+        return file_operator.get_level_progress(self)
+
 
 class BasicLevel(Level):
     def __init__(self, readable_name, name, skill_package):
         super().__init__(readable_name, name)
-
         self.level_dir = files(skill_package) / '_{}/'.format(name)
 
     def file(self, path):
@@ -121,12 +138,10 @@ class BasicLevel(Level):
         show_tree()
 
     def explain(self):
-        for line in self.file('explanation.txt') \
-                .read_text().strip().split('\n'):
-            if line[:3] == '>>>':
-                input('>>>')
-            else:
-                print(line.strip())
+        lines = self.file('explanation.txt').read_text().strip().split('>>>')
+        for i, line in enumerate(lines):
+            print(line.strip())
+            input('>>> ({}/{})'.format(i+1, len(lines)))
 
     def goal(self):
         self.cat_file("goal.txt")
@@ -150,11 +165,14 @@ class BasicLevel(Level):
 
     def _test(self):
         file_operator = operations.get_operator()
-        commits, head = parse_spec(self.file('test.spec'))
 
         # Get commit trees
-        test_tree = level_json(commits, head)
+        test_tree = level_json(*parse_spec(self.file('test.spec')))
         level_tree = file_operator.get_current_tree()
+
+        # Make all user-created branches lowecase
+        setup_tree = level_json(*parse_spec(self.file('setup.spec')))
+        branches_to_lowercase(level_tree, setup_tree, test_tree)
 
         # Get commit info
         non_merges = get_non_merges(level_tree)
@@ -177,6 +195,7 @@ class BasicLevel(Level):
         return test_ancestry(level_tree, test_tree)
 
     def test_passed(self):
+        self.mark_complete()
         if self.file('passed.txt').exists():
             self.cat_file('passed.txt')
         else:

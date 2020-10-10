@@ -146,7 +146,7 @@ def get_new_level_name_from_args():
         else:
             error_message = "Too few arguments: "
         print(error_message + "Takes 3 or 4 arguments, but {} was given.".format(num_args))  # noqa: E501
-        print('Usage: "python make_level.py <level_name> <level_long_name> <skill_name> <skill_long_name>"')  # noqa: E501
+        print('Usage: "python make_level.py [-y] <level_name> <level_long_name> <skill_name> <skill_long_name>"')  # noqa: E501
         exit(1)
 
 
@@ -169,6 +169,10 @@ def confirm_name(level_name, skill_name):
 
 
 def main():
+    if sys.argv[1] == '-y':
+        should_confirm_name = False
+        del sys.argv[1]
+
     level_name, level_long_name, skill_name, skill_long_name = get_new_level_name_from_args()  # noqa: E501
 
     skill_path = Path.cwd() / "gitgud" / "skills" / skill_name
@@ -186,7 +190,8 @@ def main():
         print("Error: Skill's long name must be specified if skill doesn't already exist.")  # noqa: E501
         exit(1)
 
-    confirm_name(level_name, skill_name)
+    if should_confirm_name:
+        confirm_name(level_name, skill_name)
     print()
 
     print("Registering package: {}".format(skill_name))

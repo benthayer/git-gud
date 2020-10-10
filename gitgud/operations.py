@@ -1,9 +1,11 @@
 import sys
-import csv
 import shutil
+from pathlib import Path
+from functools import wraps, lru_cache
 import datetime as dt
 import email.utils
-from pathlib import Path
+import csv
+import json
 
 from git import Repo, Git
 from git.exc import GitCommandError
@@ -17,6 +19,31 @@ from gitgud.skills.user_messages import mock_simulate, print_info
 from gitgud.hooks import all_hooks
 
 
+class DirectoryContent:
+    def __init__(self, content):
+        self.content = content
+
+    def __contains__(self, filepath):
+        if isinstance(filepath, Path):
+            filepath = str(filepath.as_posix())
+        return filepath in self.content
+
+    def __getitem__(self, filepath):
+        if isinstance(filepath, Path):
+            filepath = str(filepath.as_posix())
+        return self.content[filepath]
+
+
+def normalize_commit_arg(commit_func):
+    @wraps(commit_func)
+    def commit_func_no_str(self, *args):
+        commit = args[0]
+        if isinstance(commit, str):
+            commit = self.repo.commit(commit)
+        return commit_func(self, commit, *args[1:])
+    return commit_func_no_str
+
+
 class Operator():
     def __init__(self, path):
         self.path = Path(path)
@@ -26,6 +53,7 @@ class Operator():
         self.last_commit_path = self.gg_path / 'last_commit.txt'
         self.commits_path = self.gg_path / 'commits.csv'
         self.level_path = self.gg_path / 'current_level.txt'
+        self.progress_path = self.gg_path / 'progress.json'
 
         try:
             self.repo = Repo(path)
@@ -119,6 +147,8 @@ class Operator():
             mode |= (mode & 0o444) >> 2
             path.chmod(mode)
 
+        self.initialize_progress_file()
+
     def destroy_repo(self):
         # Clear all in installation directory
         if self.repo is not None:
@@ -151,6 +181,35 @@ class Operator():
                 parent_commits=parents,
                 skip_hooks=True)
         return commit_obj
+
+    @normalize_commit_arg
+    @lru_cache(maxsize=None)
+    def get_commit_content(self, commit):
+        commit_content = {}
+        for item in commit.tree.traverse():
+            if item.type == 'blob':
+                item_content = item.data_stream.read().decode('utf-8')
+                commit_content[item.path] = item_content
+
+        return DirectoryContent(commit_content)
+
+    def get_staging_content(self):
+        content = {}
+        for stage, entry_blob in self.repo.index.iter_blobs():
+            if stage == 0:
+                path = entry_blob.path
+                content[path] = entry_blob.data_stream.read().decode("utf-8")
+        return DirectoryContent(content)
+
+    def get_working_directory_content(self):
+        content = {}
+        paths = set(self.path.rglob('*')) - set(self.path.glob('.git/**/*'))
+        for path in paths:
+            if path.is_file():
+                data = path.read_bytes().decode("utf-8")
+                path = str(path.relative_to(self.path).as_posix())
+                content[path] = data
+        return DirectoryContent(content)
 
     def normalize_state(self):
         # Make sure we're in a normal state
@@ -343,6 +402,41 @@ class Operator():
             'id': 'HEAD'
         }
         return tree
+
+    def initialize_progress_file(self):
+        progress_data = {}
+        for skill in skills.all_skills:
+            progress_data.update(
+                {skill.name: {level.name: 'unvisited' for level in skill}}
+            )
+        with open(self.progress_path, 'w') as progress_file:
+            json.dump(progress_data, progress_file)
+
+    def read_progress_file(self):
+        with open(self.progress_path) as progress_file:
+            return json.load(progress_file)
+
+    def update_progress_file(self, data):
+        progress_data = self.read_progress_file()
+        progress_data.update(data)
+        with open(self.progress_path, 'w') as progress_file:
+            json.dump(progress_data, progress_file)
+
+    def get_level_progress(self, level):
+        progress_data = self.read_progress_file()
+        return progress_data[level.skill.name][level.name]
+
+    def mark_level(self, level, status):
+        progress_data = self.read_progress_file()
+        hierarchy = [
+            "unvisited", "visited", "partial", "complete"
+        ]
+        current_progress = self.get_level_progress(level)
+        if hierarchy.index(status) > hierarchy.index(current_progress):
+            progress_data[level.skill.name].update(
+                {level.name: status}
+            )
+            self.update_progress_file(progress_data)
 
     def read_level_file(self):
         with open(self.level_path) as level_file:

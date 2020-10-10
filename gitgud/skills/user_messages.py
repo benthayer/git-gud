@@ -1,6 +1,10 @@
 import subprocess
-from .util import Skill
+
+from pathlib import Path
+
+from gitgud import operations
 from . import level_builder
+from .util import Skill
 
 user_has_seen_messages = False
 
@@ -54,6 +58,33 @@ def simulate_command(command):
     print(end_marker())
 
 
+@separated
+def repo_already_initialized():
+    file_operator = operations.get_operator()
+    print('Repo {} already initialized for Git Gud.'
+          .format(file_operator.path))
+    print('Use --force to initialize {}.'.format(Path.cwd()))
+    if file_operator.path != Path.cwd():
+        print('{} will be left as is.'.format(file_operator.gg_path))  # noqa: E501
+
+
+@separated
+def force_initializing():
+    print('Force initializing Git Gud.')
+
+
+@separated
+def cant_init_repo_not_empty():
+    print('Current directory is nonempty. Initializing will delete all files.')  # noqa: E501
+    print('Use --force --prettyplease to force initialize here.')
+
+
+@separated
+def deleting_and_initializing():
+    print('Deleting all files.')
+    print('Initializing Git Gud.')
+
+
 def show_tree():
     simulate_command("git log --graph --oneline --all")
 
@@ -95,9 +126,15 @@ def default_fail():
     print('Level not complete, keep trying. "git gud reset" to start from scratch.')  # noqa: E501
 
 
-def handle_solution_confirmation(level):
+def rerun_with_confirm_for_solution(level):
     print('Are you sure you want to view the solution for "{}": "{}"?'.format(level.name, level.skill.name))  # noqa: E501
     print('If so, run `git gud solution --confirm`')
+
+
+@separated
+def handle_load_confirm():
+    print("You haven't completed this level yet!")
+    print("Run `git gud load next` with --force to load the next level.")
 
 
 def no_solutions_available():
@@ -110,8 +147,17 @@ def default_fail_no_reset():
 
 
 def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_skills=False):  # noqa: E501
-    middle_entry_bookend = '├── '
-    last_entry_bookend = '└── '
+    middle_entry_bookend = '├──'
+    last_entry_bookend = '└──'
+
+    file_operator = operations.get_operator()
+
+    completion = {
+        "unvisited": ' ',
+        "visited": 'X',
+        "partial": 'P',
+        "complete": 'O'
+    }
 
     format_string = "{index}. "
     if show_human_names and not show_code_names:
@@ -149,6 +195,10 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
                 indent = last_entry_bookend
             else:
                 indent = middle_entry_bookend
+
+            if file_operator:
+                indent += completion[item.get_progress()]
+            indent += " "
 
             display_entry(
                 item.skill.index(item.name),

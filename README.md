@@ -33,10 +33,11 @@ Some levels are really easy and only require you to read the explanation, but ot
 
 
 ### How to install
-Git Gud is written in Python, so you'll need to have Python installed in your system.
+Git Gud is written in Python 3.
+You'll need to have Python >=3.6 installed in your system for Git Gud to work.
 I prefer using [Anaconda](https://docs.anaconda.com/anaconda/install/) to make sure everything works correctly, but you can also install with pip if you now what you're doing.
 
-Once your environment is set up, installing is simple:
+Once your environment is set up with Python >=3.6, installing is simple:
 ```
 pip3 install git-gud
 ```
