@@ -12,28 +12,23 @@ class FirstCommit(BasicLevel):
 
     @separated
     def status(self):
-        created, added, committed = self.get_solved_state()
+        created, added, committed = self.get_state()
         print("Created:", bool_to_word(created))
         print("Added:", bool_to_word(added))
         print("Committed:", bool_to_word(committed))
 
-    def get_solved_state(self):
-        created = False
-        added = False
-        committed = True
+    def get_state(self):
         file_operator = operations.get_operator()
-        created_files = file_operator.get_working_directory_content()
-        if created_files:
-            created = True
-        added_files = file_operator.get_staging_content()
-        if added_files:
-            added = True
-        committed = file_operator.repo.head.is_valid()
 
-        return bool(created), bool(added), bool(committed)
+        created = bool(file_operator.get_working_directory_content())
+        added = bool(file_operator.get_staging_content())
+        committed = file_operator.repo.head.is_valid() \
+            and bool(file_operator.repo.get_commit_content('HEAD'))
+
+        return created, added, committed
 
     def _test(self):
-        created, added, committed = self.get_solved_state()
+        created, added, committed = self.get_state()
         return created and added and committed
 
     def post_setup(self):
