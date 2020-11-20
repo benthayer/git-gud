@@ -207,21 +207,33 @@ def show_skill_tree(items, include_progress, show_human_names=True, show_code_na
             )
 
 
-def display_tree_content(header, content, show_content=True, num_files=2):
-    file_format_str = "  {path}: {content}"
+def display_tree_content(header, content, content_order=None, show_content=True, num_files=2):
+    if not content_order:
+        content_order = list(content.keys())
 
-    # If there are more files than we requested, we want to show that too
+    # Include all content, even if it's not in content_order
+    for key in content:
+        if key not in content_order:
+            content_order.append(key)
 
-    print(header + ":")
-    for filepath in content.keys():
-        file_details = content[filepath] if show_content else existence_str(True)  # noqa: E501
-        print(file_format_str.format(
-            path=filepath,
-            content=file_details
-        ))
+    # Display info for at least num_files
+    if len(content_order) < num_files:
+        content_order += [None] * (num_files - len(content_order))
 
-    for missing_file_number in range(len(content), num_files):
-        print(file_format_str.format(
-            path=f"File {missing_file_number + 1}",
-            content="Doesn't exist"
+    print(header)
+    for file_number, filepath in enumerate(content_order):
+        file_name = f"File {file_number + 1}"
+
+        if filepath in content:
+            if show_content:
+                file_name = filepath
+                file_details = content[filepath]
+            else:
+                file_details = filepath
+        else:
+            file_details = existence_str(False)
+
+        print("  {name}: {details}".format(
+            name=file_name,
+            details=file_details
         ))
