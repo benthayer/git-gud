@@ -1,7 +1,7 @@
 from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
 from gitgud import operations
-from gitgud.skills.user_messages import separated, bool_to_word
+from gitgud.user_messages import separated, bool_to_word
 
 
 class FirstCommit(BasicLevel):

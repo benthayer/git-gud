@@ -1,10 +1,7 @@
 import subprocess
 
-from pathlib import Path
-
-# Operations needs to be done initializing before this happens
-from . import level_builder
-from .util import Skill
+from gitgud.skills import level_builder
+from gitgud.skills.util import Skill
 
 user_has_seen_messages = False
 
@@ -14,6 +11,13 @@ def bool_to_word(condition):
         return "Yes"
     else:
         return "No"
+
+
+def existence_str(condition):
+    if condition:
+        return "Exists"
+    else:
+        return "Doesn't exist"
 
 
 def start_marker():
@@ -63,15 +67,6 @@ def simulate_command(command):
     print(start_marker(), "Simulating: {}".format(command))
     subprocess.call(command, shell=True)
     print(end_marker())
-
-
-@separated
-def repo_already_initialized(file_operator):
-    print('Repo {} already initialized for Git Gud.'
-          .format(file_operator.path))
-    print('Use --force to initialize {}.'.format(Path.cwd()))
-    if file_operator.path != Path.cwd():
-        print('{} will be left as is.'.format(file_operator.gg_path))  # noqa: E501
 
 
 @separated
@@ -210,3 +205,23 @@ def show_skill_tree(items, include_progress, show_human_names=True, show_code_na
                 code_name=item.name,
                 indent=indent
             )
+
+
+def display_tree_content(header, content, show_content=True, file_count=2):
+    file_format_str = "  {path}: {content}"
+
+    # If there are more files than we requested, we want to show that too
+
+    print(header + ":")
+    for filepath in content.keys():
+        file_details = content[filepath] if show_content else existence_str(True)  # noqa: E501
+        print(file_format_str.format(
+            path=filepath,
+            content=file_details
+        ))
+
+    for missing_file_number in range(len(content), file_count):
+        print(file_format_str.format(
+            path=f"File {missing_file_number + 1}",
+            content="Doesn't exist"
+        ))

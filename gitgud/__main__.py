@@ -7,15 +7,16 @@ import argparse
 from gitgud import __version__, InitializationError
 from gitgud.operations import Operator, get_operator
 from gitgud.skills import all_skills
-from gitgud.skills.user_messages import repo_already_initialized
-from gitgud.skills.user_messages import force_initializing
-from gitgud.skills.user_messages import cant_init_repo_not_empty
-from gitgud.skills.user_messages import deleting_and_initializing
-from gitgud.skills.user_messages import all_levels_complete
-from gitgud.skills.user_messages import show_tree
-from gitgud.skills.user_messages import handle_load_confirm
-from gitgud.skills.user_messages import rerun_with_confirm_for_solution
-from gitgud.skills.user_messages import show_skill_tree
+
+from gitgud.user_messages import force_initializing
+from gitgud.user_messages import cant_init_repo_not_empty
+from gitgud.user_messages import deleting_and_initializing
+from gitgud.user_messages import all_levels_complete
+from gitgud.user_messages import show_tree
+from gitgud.user_messages import handle_load_confirm
+from gitgud.user_messages import rerun_with_confirm_for_solution
+from gitgud.user_messages import show_skill_tree
+from gitgud.user_messages.stateful import repo_already_initialized
 
 
 class GitGud:
@@ -258,7 +259,7 @@ class GitGud:
 
     def assert_initialized(self):
         if not self.is_initialized():
-            raise InitializationError('Git gud has not been initialized. Use "git gud init" to initialize.')  # noqa: E501
+            raise InitializationError('Git Gud has not been initialized. Use "git gud init" to initialize.')  # noqa: E501
 
     def load_level(self, level):
         self.assert_initialized()
@@ -285,7 +286,7 @@ class GitGud:
         file_operator = get_operator()
         if file_operator:
             if not args.force:
-                repo_already_initialized(file_operator)
+                repo_already_initialized()
                 return
             else:
                 force_initializing()

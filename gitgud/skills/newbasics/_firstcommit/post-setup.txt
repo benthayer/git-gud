@@ -1,9 +1,9 @@
-Now that we've initialized a repo, we're going to take the git gud training wheels off and let you focus on git.
+Now that we've initialized a repo, we're going to take the Git Gud training wheels off and let you focus on git.
 
 Here are the most important commands that you should commit to memory:
     git gud goal
     git gud status
-    git gud explain 
+    git gud explain
     git gud test
     git gud load
 

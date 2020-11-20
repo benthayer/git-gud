@@ -2,7 +2,7 @@ from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
 
 from gitgud import operations
-from gitgud.skills.user_messages import simulate_command
+from gitgud.user_messages import simulate_command
 
 
 class SentenceLevel(BasicLevel):

@@ -6,6 +6,9 @@ import pytest
 
 from gitgud.operations import get_operator
 from gitgud.skills.testing import write_file
+from gitgud.user_messages.stateful import display_commit_content
+from gitgud.user_messages.stateful import display_working_directory_content
+from gitgud.user_messages.stateful import display_staging_area_content
 
 
 @pytest.fixture
@@ -192,3 +195,16 @@ def test_added_content(file_operator, content_level):
     for added_file in added_files:
         assert added_file in staging_data
         assert added_file in working_data
+
+
+def test_get_all_commits(file_operator, content_level):
+    # Check for consistency
+    commits1 = list(file_operator.get_all_commits())
+    commits2 = list(file_operator.get_all_commits())
+    assert commits1 == commits2
+
+
+def test_commit_messages(file_operator, content_level):
+    display_staging_area_content()
+    display_working_directory_content()
+    display_commit_content()

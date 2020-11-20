@@ -13,27 +13,21 @@ from git.exc import InvalidGitRepositoryError
 
 from gitgud import actor, skills, InitializationError
 
-from gitgud.skills.user_messages import mock_simulate, print_info
+from gitgud.user_messages import mock_simulate, print_info
 
 from gitgud.hooks import all_hooks
 
 
-class DirectoryContent:
-    def __init__(self, content):
-        self.content = content
-
+class DirectoryContent(dict):
     def __contains__(self, filepath):
         if isinstance(filepath, Path):
             filepath = str(filepath.as_posix())
-        return filepath in self.content
+        return super().__contains__(filepath)
 
     def __getitem__(self, filepath):
         if isinstance(filepath, Path):
             filepath = str(filepath.as_posix())
-        return self.content[filepath]
-
-    def __bool__(self):
-        return bool(self.content)
+        return super().__getitem__(filepath)
 
 
 def normalize_commit_arg(commit_func):
@@ -497,6 +491,17 @@ class Operator():
                 known_commits[commit_hash] = name
         return known_commits
 
+    def get_branches_by_commit(self):
+        tree = self.get_current_tree()
+        referred_by = {}
+        for branch_name in tree['branches']:
+            target = tree['branches'][branch_name]['target']
+            if target not in referred_by:
+                referred_by[target] = [branch_name]
+            else:
+                referred_by[target].append(branch_name)
+        return referred_by
+
     def get_diffs(self, known_commits):
         diffs = {}
         for commit_hash, commit_name in known_commits.items():
@@ -525,6 +530,16 @@ class Operator():
                 mapping[commit_hash] = diffs[diff]
 
         return mapping
+
+    def get_all_commits(self, sort_commits=True):
+        all_commits = []
+        for head in self.repo.heads:
+            for commit in self.repo.iter_commits(head, reverse=True):
+                if commit not in all_commits:
+                    all_commits.append(commit)
+        if sort_commits:
+            all_commits.sort(key=lambda commit: commit.committed_date)
+        return all_commits
 
 
 def get_operator():

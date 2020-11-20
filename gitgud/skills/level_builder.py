@@ -10,14 +10,14 @@ from .parsing import name_from_map
 from .parsing import get_non_merges
 from .parsing import name_merges
 
-from .user_messages import cat_file
-from .user_messages import show_level_name
-from .user_messages import show_tree
-from .user_messages import default_fail
-from .user_messages import level_complete
-from .user_messages import skill_complete
-from .user_messages import all_levels_complete
-from .user_messages import no_solutions_available
+from gitgud.user_messages import cat_file
+from gitgud.user_messages import show_level_name
+from gitgud.user_messages import show_tree
+from gitgud.user_messages import default_fail
+from gitgud.user_messages import level_complete
+from gitgud.user_messages import skill_complete
+from gitgud.user_messages import all_levels_complete
+from gitgud.user_messages import no_solutions_available
 
 from gitgud import operations
 
