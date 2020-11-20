@@ -1,0 +1,3 @@
+{create} newfile.txt
+git add newfile.txt
+git commit -m "New Commit"

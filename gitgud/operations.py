@@ -32,6 +32,9 @@ class DirectoryContent:
             filepath = str(filepath.as_posix())
         return self.content[filepath]
 
+    def __bool__(self):
+        return bool(self.content)
+
 
 def normalize_commit_arg(commit_func):
     @wraps(commit_func)

@@ -9,6 +9,13 @@ from .util import Skill
 user_has_seen_messages = False
 
 
+def bool_to_word(condition):
+    if condition:
+        return "Yes"
+    else:
+        return "No"
+
+
 def start_marker():
     return '<' * 7
 

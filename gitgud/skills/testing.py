@@ -1,12 +1,20 @@
 import os
+from pathlib import Path
 import subprocess
+
+
+def write_file(filepath):
+    with open(Path(filepath), "w") as newfile:
+        newfile.write("{} content".format(filepath))
 
 
 def simulate(gg, level, commands, run_pretest=True):
     level._setup()
 
     for command in commands:
-        if '^' in command and os.name == 'nt':
+        if command.startswith(r'{create}'):
+            write_file(command.split(' ')[1])
+        elif '^' in command and os.name == 'nt':
             command = command.replace('^', '^^')
         # Only test if there are commands which change state.
         if run_pretest:
