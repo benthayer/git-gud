@@ -155,7 +155,9 @@ def confirm_name(level_name, level_long_name, skill_name, skill_long_name):
     choices = [
         "level_name: {}".format(level_name),
         "Level Name: {}".format(level_long_name),
-        "skill_name: {}".format(skill_name) + (" (exists)" if skill_long_name is None else ""),
+        "skill_name: {}".format(skill_name) + (
+            " (exists)" if skill_long_name is None else ""
+        ),
     ]
     if skill_long_name:
         choices.append("Skill Name: {}".format(skill_long_name))

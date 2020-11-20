@@ -143,7 +143,8 @@ class Operator():
             mode |= (mode & 0o444) >> 2
             path.chmod(mode)
 
-        self.initialize_progress_file()
+        with open(self.progress_path, 'w') as progress_file:
+            json.dump({}, progress_file)
 
     def destroy_repo(self):
         # Clear all in installation directory
@@ -399,15 +400,6 @@ class Operator():
         }
         return tree
 
-    def initialize_progress_file(self):
-        progress_data = {}
-        for skill in skills.all_skills:
-            progress_data.update(
-                {skill.name: {level.name: 'unvisited' for level in skill}}
-            )
-        with open(self.progress_path, 'w') as progress_file:
-            json.dump(progress_data, progress_file)
-
     def read_progress_file(self):
         with open(self.progress_path) as progress_file:
             return json.load(progress_file)
@@ -420,7 +412,11 @@ class Operator():
 
     def get_level_progress(self, level):
         progress_data = self.read_progress_file()
-        return progress_data[level.skill.name][level.name]
+        if level.skill.name in progress_data:
+            skill_progress = progress_data[level.skill.name]
+            if level.name in skill_progress:
+                return skill_progress[level.name]
+        return 'unvisited'
 
     def mark_level(self, level, status):
         progress_data = self.read_progress_file()
@@ -429,6 +425,8 @@ class Operator():
         ]
         current_progress = self.get_level_progress(level)
         if hierarchy.index(status) > hierarchy.index(current_progress):
+            if level.skill.name not in progress_data:
+                progress_data[level.skill.name] = {}
             progress_data[level.skill.name].update(
                 {level.name: status}
             )

@@ -51,9 +51,12 @@ def test_get_level_progress(file_operator, progress_data, level):
     }
 
 
-def test_update_progress_file(file_operator, progress_data, level):
-    file_operator.read_progress_file()
-    progress_data[level.skill.name].update({level.name: "value"})
+def test_update_progress_file(file_operator, level):
+    progress_data = {
+        level.skill.name: {
+            level.name: "value"
+        }
+    }
     file_operator.update_progress_file(progress_data)
     assert file_operator.get_level_progress(level) == "value"
     assert file_operator.get_level_progress(level.next_level) == "unvisited"
