@@ -13,7 +13,7 @@ from git.exc import InvalidGitRepositoryError
 from gitgud import actor
 from gitgud import skills
 
-from gitgud.skills.user_messages import mock_simulate, print_info
+from gitgud.user_messages import mock_simulate, print_info
 
 from gitgud.hooks import all_hooks
 

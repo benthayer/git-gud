@@ -7,11 +7,11 @@ import argparse
 import gitgud
 from gitgud.operations import Operator, get_operator
 from gitgud.skills import all_skills
-from gitgud.skills.user_messages import all_levels_complete
-from gitgud.skills.user_messages import show_tree
-from gitgud.skills.user_messages import handle_load_confirm
-from gitgud.skills.user_messages import handle_solution_confirmation
-from gitgud.skills.user_messages import show_skill_tree
+from gitgud.user_messages import all_levels_complete
+from gitgud.user_messages import show_tree
+from gitgud.user_messages import handle_load_confirm
+from gitgud.user_messages import handle_solution_confirmation
+from gitgud.user_messages import show_skill_tree
 
 
 class InitializationError(Exception):

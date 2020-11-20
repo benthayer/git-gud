@@ -1,5 +1,5 @@
 from gitgud.operations import get_operator
-from gitgud.skills.user_messages import display_tree_content
+from gitgud.user_messages import display_tree_content
 
 
 def target_branch_str():

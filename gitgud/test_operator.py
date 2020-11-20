@@ -5,9 +5,9 @@ from pathlib import Path
 import pytest
 
 from gitgud.operations import get_operator
-from gitgud.skills.state_messages import display_commit_content
-from gitgud.skills.state_messages import display_working_directory_content
-from gitgud.skills.state_messages import display_staging_area_content
+from gitgud.user_messages.stateful import display_commit_content
+from gitgud.user_messages.stateful import display_working_directory_content
+from gitgud.user_messages.stateful import display_staging_area_content
 
 
 @pytest.fixture
