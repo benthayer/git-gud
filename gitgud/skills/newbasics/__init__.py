@@ -23,7 +23,7 @@ class FirstCommit(BasicLevel):
         created = bool(file_operator.get_working_directory_content())
         added = bool(file_operator.get_staging_content())
         committed = file_operator.repo.head.is_valid() \
-            and bool(file_operator.repo.get_commit_content('HEAD'))
+            and bool(file_operator.get_commit_content('HEAD'))
 
         return created, added, committed
 

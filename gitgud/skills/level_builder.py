@@ -161,7 +161,10 @@ class BasicLevel(Level):
             no_solutions_available()
         else:
             for command in solution:
-                print(command)
+                if command.split()[0] == '{create}':
+                    print(f'Create a new file named "{command.split()[1]}"')
+                else:
+                    print(command)
 
     def _test(self):
         file_operator = operations.get_operator()
