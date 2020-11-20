@@ -475,7 +475,7 @@ class Operator():
         for branch_name in tree['branches']:
             target = tree['branches'][branch_name]['target']
             if target not in referred_by:
-                referred_by.update({target: [branch_name]})
+                referred_by[target] = [branch_name]
             else:
                 referred_by[target].append(branch_name)
         return referred_by

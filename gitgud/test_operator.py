@@ -5,8 +5,9 @@ from pathlib import Path
 import pytest
 
 from gitgud.operations import get_operator
-from gitgud.skills.user_messages import \
-    display_tree_content, display_commit_content
+from gitgud.skills.state_messages import display_commit_content
+from gitgud.skills.state_messages import display_working_directory_content
+from gitgud.skills.state_messages import display_staging_area_content
 
 
 @pytest.fixture
@@ -203,10 +204,8 @@ def test_get_all_commits(file_operator, content_level):
 
 
 def test_commit_messages(file_operator, content_level):
-    working_dir = file_operator.get_working_directory_content()
-    staging_area = file_operator.get_staging_content()
-    display_tree_content("Working", working_dir, file_count=2)
-    display_tree_content("Staging", staging_area, file_count=2)
+    display_staging_area_content()
+    display_working_directory_content()
     display_commit_content()
 
 
