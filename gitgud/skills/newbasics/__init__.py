@@ -2,6 +2,7 @@ from gitgud.skills.level_builder import BasicLevel
 from gitgud.skills.util import Skill
 from gitgud import operations
 from gitgud.user_messages import separated, bool_to_word
+from gitgud.user_messages.stateful import display_repo_files
 
 
 class FirstCommit(BasicLevel):
@@ -35,10 +36,22 @@ class FirstCommit(BasicLevel):
         self.cat_file("post-setup.txt")
 
 
+class TwoCommits(BasicLevel):
+    def _setup(self):
+        file_operator = operations.get_operator()
+        file_operator.destroy_repo()
+        file_operator.use_repo()
+
+    def status(self):
+        display_repo_files()
+
+
+
 skill = Skill(
     'New Basics',
     'newbasics',
     [
-        FirstCommit('First Commit', 'firstcommit', __name__)
+        FirstCommit('First Commit', 'firstcommit', __name__),
+        BasicLevel('Two Commits', 'two', __name__)
     ]
 )

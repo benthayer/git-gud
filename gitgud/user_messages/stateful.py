@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from gitgud.operations import get_operator
+from gitgud import operations
 from gitgud.user_messages import display_tree_content, separated
 
 
 @separated
 def repo_already_initialized():
-    file_operator = get_operator()
+    file_operator = operations.get_operator()
     print('Repo {} already initialized for Git Gud.'
           .format(file_operator.path))
     print('Use --force to initialize {}.'.format(Path.cwd()))
@@ -15,7 +15,7 @@ def repo_already_initialized():
 
 
 def target_branch_str():
-    file_operator = get_operator()
+    file_operator = operations.get_operator()
     referred_by = file_operator.get_branches_by_commit()
     for target in referred_by:
         referred_by[target] = ", ".join(referred_by[target])
@@ -23,7 +23,7 @@ def target_branch_str():
 
 
 def display_commit_content(show_branches=True, show_content=True, sort_commits=True, file_count=2):  # noqa: E501
-    file_operator = get_operator()
+    file_operator = operations.get_operator()
     referred_by = target_branch_str()
 
     commit_format_str = "{message}"
@@ -48,12 +48,18 @@ def display_commit_content(show_branches=True, show_content=True, sort_commits=T
 
 
 def display_working_directory_content(**kwargs):
-    file_operator = get_operator()
+    file_operator = operations.get_operator()
     working_dir = file_operator.get_working_directory_content()
     display_tree_content("Working Directory", working_dir, **kwargs)
 
 
 def display_staging_area_content(**kwargs):
-    file_operator = get_operator()
+    file_operator = operations.get_operator()
     staging_area = file_operator.get_staging_content()
     display_tree_content("Staging Area", staging_area, **kwargs)
+
+
+def display_repo_files():
+    display_staging_area_content()
+    display_working_directory_content()
+    display_commit_content(show_branches=False, show_content=False)
