@@ -146,17 +146,22 @@ def get_new_level_name_from_args():
         else:
             error_message = "Too few arguments: "
         print(error_message + "Takes 3 or 4 arguments, but {} was given.".format(num_args))  # noqa: E501
-        print('Usage: "python make_level.py [-y] <level_name> <level_long_name> <skill_name> <skill_long_name>"')  # noqa: E501
+        print('Usage: "python make_level.py [-y] <level_name> <level_long_name> <skill_name> [<skill_long_name>]"')  # noqa: E501
         exit(1)
 
 
-def confirm_name(level_name, skill_name):
+def confirm_name(level_name, level_long_name, skill_name, skill_long_name):
     # Confirm choice to avoid making a mess
-    print("\n".join([
-        "skill_name: {}".format(skill_name),
+    choices = [
         "level_name: {}".format(level_name),
-        "Confirm[y/n] "
-    ]), end='')
+        "Level Name: {}".format(level_long_name),
+        "skill_name: {}".format(skill_name) + (" (exists)" if skill_long_name is None else ""),
+    ]
+    if skill_long_name:
+        choices.append("Skill Name: {}".format(skill_long_name))
+
+    print("\n".join(choices))
+    print("Confirm[y/n] ", end="")
 
     choice = ''
     while choice != 'y':
@@ -168,10 +173,12 @@ def confirm_name(level_name, skill_name):
             print("Confirm[y/n] ", end='')
 
 
-def main():
+def get_valid_args():
     if len(sys.argv) != 1 and sys.argv[1] == '-y':
         should_confirm_name = False
         del sys.argv[1]
+    else:
+        should_confirm_name = True
 
     level_name, level_long_name, skill_name, skill_long_name = get_new_level_name_from_args()  # noqa: E501
 
@@ -191,8 +198,19 @@ def main():
         exit(1)
 
     if should_confirm_name:
-        confirm_name(level_name, skill_name)
+        confirm_name(
+            level_name,
+            level_long_name,
+            skill_name,
+            skill_long_name if skill_already_exists else None
+        )
     print()
+
+    return level_name, level_long_name, skill_name, skill_long_name
+
+
+def main():
+    level_name, level_long_name, skill_name, skill_long_name = get_valid_args()
 
     print("Registering package: {}".format(skill_name))
     register_skill_package(skill_name)
@@ -202,7 +220,7 @@ def main():
     level_path, skill_path = make_folders(level_name, skill_name)
     print()
 
-    if not skill_already_exists:
+    if skill_long_name:
         print("Registering Skill:")
         make_skill(skill_name, skill_long_name, skill_path)
         print()
