@@ -285,7 +285,7 @@ class GitGud:
         file_operator = get_operator()
         if file_operator:
             if not args.force:
-                repo_already_initialized()
+                repo_already_initialized(file_operator)
                 return
             else:
                 force_initializing()
@@ -338,6 +338,7 @@ class GitGud:
         skill = level.skill
         show_skill_tree(
                 [skill, level],
+                True,
                 expand_skills=False)
 
     def handle_skills(self, args):
@@ -345,6 +346,7 @@ class GitGud:
         print()
         show_skill_tree(
             [skill for skill in all_skills],
+            bool(get_operator()),
             expand_skills=False,
             show_human_names=not args.opt_short
         )
@@ -374,6 +376,7 @@ class GitGud:
         print()
         show_skill_tree(
             skills_to_show,
+            bool(get_operator()),
             expand_skills=True,
             show_human_names=not args.opt_short
         )

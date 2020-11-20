@@ -2,7 +2,7 @@ import subprocess
 
 from pathlib import Path
 
-from gitgud import operations
+# Operations needs to be done initializing before this happens
 from . import level_builder
 from .util import Skill
 
@@ -66,8 +66,7 @@ def simulate_command(command):
 
 
 @separated
-def repo_already_initialized():
-    file_operator = operations.get_operator()
+def repo_already_initialized(file_operator):
     print('Repo {} already initialized for Git Gud.'
           .format(file_operator.path))
     print('Use --force to initialize {}.'.format(Path.cwd()))
@@ -153,11 +152,9 @@ def default_fail_no_reset():
     print('Level not complete, keep trying.')
 
 
-def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_skills=False):  # noqa: E501
+def show_skill_tree(items, include_progress, show_human_names=True, show_code_names=True, expand_skills=False):  # noqa: E501
     middle_entry_bookend = '├──'
     last_entry_bookend = '└──'
-
-    file_operator = operations.get_operator()
 
     completion = {
         "unvisited": ' ',
@@ -203,7 +200,7 @@ def show_skill_tree(items, show_human_names=True, show_code_names=True, expand_s
             else:
                 indent = middle_entry_bookend
 
-            if file_operator:
+            if include_progress:
                 indent += completion[item.get_progress()]
             indent += " "
 
