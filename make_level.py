@@ -169,7 +169,7 @@ def confirm_name(level_name, skill_name):
 
 
 def main():
-    if sys.argv[1] == '-y':
+    if len(sys.argv) != 1 and sys.argv[1] == '-y':
         should_confirm_name = False
         del sys.argv[1]
 
