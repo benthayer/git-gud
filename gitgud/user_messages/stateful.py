@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from gitgud import operations
-from gitgud.user_messages import display_tree_content, separated
+from gitgud.user_messages import display_tree_content, separated, existence_str
 
 
 @separated
@@ -22,15 +22,16 @@ def target_branch_str():
     return referred_by
 
 
-def display_commit_content(show_branches=True, show_content=True, sort_commits=True, file_count=2):  # noqa: E501
+def display_commit_content(show_branches=True, show_content=True, sort_commits=True, num_files=2, num_commits=2):  # noqa: E501
     file_operator = operations.get_operator()
     referred_by = target_branch_str()
 
-    commit_format_str = "{message}"
+    commit_format_str = '"{message}"'
     if show_branches:
         commit_format_str += "{branches}"
 
-    for commit in file_operator.get_all_commits(sort_commits):
+    commits = file_operator.get_all_commits(sort_commits)
+    for commit in commits:
         if commit.hexsha in referred_by and show_branches:
             branches = f" ({referred_by[commit.hexsha]})"
         else:
@@ -43,9 +44,11 @@ def display_commit_content(show_branches=True, show_content=True, sort_commits=T
             header,
             file_operator.get_commit_content(commit),
             show_content=show_content,
-            file_count=file_count
+            num_files=num_files
         )
 
+    for commit_num in range(len(commits), num_commits):
+        print(f"Commit {commit_num+1}: " + existence_str(False))
 
 def display_working_directory_content(**kwargs):
     file_operator = operations.get_operator()
@@ -60,6 +63,8 @@ def display_staging_area_content(**kwargs):
 
 
 def display_repo_files():
-    display_staging_area_content()
-    display_working_directory_content()
+    display_working_directory_content(show_content=False)
+    display_staging_area_content(show_content=False)
+    print()
+    print("Commits:")
     display_commit_content(show_branches=False, show_content=False)

@@ -207,7 +207,7 @@ def show_skill_tree(items, include_progress, show_human_names=True, show_code_na
             )
 
 
-def display_tree_content(header, content, show_content=True, file_count=2):
+def display_tree_content(header, content, show_content=True, num_files=2):
     file_format_str = "  {path}: {content}"
 
     # If there are more files than we requested, we want to show that too
@@ -220,7 +220,7 @@ def display_tree_content(header, content, show_content=True, file_count=2):
             content=file_details
         ))
 
-    for missing_file_number in range(len(content), file_count):
+    for missing_file_number in range(len(content), num_files):
         print(file_format_str.format(
             path=f"File {missing_file_number + 1}",
             content="Doesn't exist"
