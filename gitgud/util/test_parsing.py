@@ -1,6 +1,6 @@
-from gitgud.skills.parsing import branches_to_lowercase
+from gitgud.util.parsing import branches_to_lowercase
 from gitgud.skills import all_skills
-from gitgud.skills.testing import simulate
+from gitgud.util.testing import simulate
 
 
 def test_lowercase_level(gg):

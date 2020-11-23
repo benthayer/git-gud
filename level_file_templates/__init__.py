@@ -1,4 +1,4 @@
-from gitgud.skills.util import Skill
+from gitgud.util import Skill
 
 skill = Skill(
     '{long_name}',

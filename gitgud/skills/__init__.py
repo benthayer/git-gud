@@ -7,7 +7,7 @@ from gitgud.skills.extras import skill as extras_skill
 from gitgud.skills.rewriting import skill as rewriting_skill
 from gitgud.skills.newbasics import skill as newbasics_skill
 
-from gitgud.skills.util import AllSkills
+from gitgud.util import AllSkills
 
 all_skills = AllSkills([
     intro_skill,

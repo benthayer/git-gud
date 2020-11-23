@@ -81,9 +81,9 @@ def make_skill(skill_name, skill_long_name, skill_path):
     new_import = "\n".join([
         "from gitgud.skills.{0} import skill as {0}_skill".format(skill_name),  # noqa: E501
         "",
-        "from gitgud.skills.util import AllSkills"
+        "from gitgud.util import AllSkills"
     ])
-    filedata = filedata.replace("\nfrom gitgud.skills.util import AllSkills", new_import)  # noqa: E501
+    filedata = filedata.replace("\nfrom gitgud.util import AllSkills", new_import)  # noqa: E501
 
     # Add skill to AllSkills
     replace = ",\n    {}_skill\n]".format(skill_name)
@@ -103,7 +103,7 @@ def make_level(level_name, level_long_name, skill_name, skill_path):
     with open(filepath, 'r') as fp:
         filedata = fp.read()
 
-    basic_level_import_string = "from gitgud.skills.level_builder import BasicLevel\n"  # noqa: E501
+    basic_level_import_string = "from gitgud.util.level_builder import BasicLevel\n"  # noqa: E501
     if basic_level_import_string not in filedata:
         filedata = basic_level_import_string + filedata
 

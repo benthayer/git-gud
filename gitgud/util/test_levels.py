@@ -1,9 +1,9 @@
 import pytest
 
 from gitgud.skills import all_skills, all_levels
-from gitgud.skills.level_builder import Level, BasicLevel
-from gitgud.skills.util import Skill
-from gitgud.skills.parsing import parse_spec
+from gitgud.util.level_builder import Level, BasicLevel
+from gitgud.util import Skill
+from gitgud.util.parsing import parse_spec
 
 
 def test_skill_access():
