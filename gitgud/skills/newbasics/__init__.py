@@ -42,6 +42,9 @@ class TwoCommits(BasicLevel):
         file_operator.destroy_repo()
         file_operator.use_repo()
 
+    def post_setup(self):
+        self.goal()
+
     def status(self):
         display_repo_files()
 
