@@ -18,6 +18,7 @@ setup(
         'gitgud',
         'gitgud.hooks',
         'gitgud.skills',
+        'gitgud.user_messages',
         'gitgud.skills.basics',
         'gitgud.skills.extras',
         'gitgud.skills.rampup',
