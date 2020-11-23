@@ -1,7 +1,7 @@
 import subprocess
 
-from gitgud.skills import level_builder
-from gitgud.skills.util import Skill
+from gitgud.util import level_builder
+from gitgud.util import Skill
 
 user_has_seen_messages = False
 

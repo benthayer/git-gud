@@ -1,5 +1,5 @@
 import pytest
-from gitgud.skills.util import NamedList
+from gitgud.util import NamedList
 
 
 @pytest.fixture
