@@ -1,7 +1,7 @@
 Now that you have a repo, you're going to want to start using it.
 >>>
 As stated before, repos are used to keep track of your changes.
-Your changes a stored in what's known as a commit.
+Your changes are stored in what's known as a commit.
 >>>
 Commits are called "commits" because you use them to "commit" your changes.
 >>>
