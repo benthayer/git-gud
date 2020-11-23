@@ -72,7 +72,7 @@ def display_repo_files():
         key=lambda f: os.stat(f).st_ctime
     )
 
-    display_working_directory_content(show_content=False, content_order=content_order)
-    display_staging_area_content(show_content=False, content_order=content_order)
+    display_working_directory_content(show_content=False, content_order=content_order)  # noqa: E501
+    display_staging_area_content(show_content=False, content_order=content_order)  # noqa: E501
     print()
-    display_commit_content(show_branches=False, show_content=False, content_order=content_order)
+    display_commit_content(show_branches=False, show_content=False, content_order=content_order)  # noqa: E501

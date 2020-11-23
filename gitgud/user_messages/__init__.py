@@ -207,7 +207,7 @@ def show_skill_tree(items, include_progress, show_human_names=True, show_code_na
             )
 
 
-def display_tree_content(header, content, content_order=None, show_content=True, num_files=2):
+def display_tree_content(header, content, content_order=None, show_content=True, num_files=2): # noqa E501
     if not content_order:
         content_order = list(content.keys())
 
