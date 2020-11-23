@@ -1,6 +1,6 @@
 import pytest
 
-from gitgud.skills.testing import simulate
+from gitgud.util.testing import simulate
 
 from . import skill
 

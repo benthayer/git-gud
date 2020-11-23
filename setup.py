@@ -16,6 +16,7 @@ setup(
     long_description_content_type='text/markdown',
     packages=[
         'gitgud',
+        'gitgud.util',
         'gitgud.hooks',
         'gitgud.skills',
         'gitgud.user_messages',
