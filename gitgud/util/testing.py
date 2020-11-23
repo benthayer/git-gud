@@ -12,8 +12,9 @@ def simulate(gg, level, commands, run_pretest=True):
     level._setup()
 
     for command in commands:
-        if command.startswith(r'{create}'):
-            write_file(command.split(' ')[1])
+        if command.startswith('{create}'):
+            filename = command[len('{create} '):].strip()
+            write_file(filename)
         elif '^' in command and os.name == 'nt':
             command = command.replace('^', '^^')
         # Only test if there are commands which change state.

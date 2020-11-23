@@ -1,0 +1,6 @@
+{create} File 1.txt
+git add "File 1.txt"
+git commit -m "Added file 1"
+{create} File 2.txt
+git add "File 2.txt"
+git commit -m "Added file 2"

@@ -147,12 +147,13 @@ class BasicLevel(Level):
         self.cat_file("goal.txt")
 
     def solution_list(self):
-        solution_commands = []
+        solution_text = self.file('solution.txt').read_text()
 
-        for command in self.file('solution.txt').read_text().split('\n'):
-            if command and command.strip()[0] != "#":
-                solution_commands.append(command)
+        # Needed because split('\n') would return ['']
+        if len(solution_text) == 0:
+            return []
 
+        solution_commands = solution_text.strip().split('\n')
         return solution_commands
 
     def solution(self):
@@ -161,8 +162,13 @@ class BasicLevel(Level):
             no_solutions_available()
         else:
             for command in solution:
-                if command.split()[0] == '{create}':
-                    print(f'Create a new file named "{command.split()[1]}"')
+                words = command.split()
+                if len(words) == 0:
+                    continue
+
+                if words[0] == '{create}':
+                    filename = command[len('{create} '):].strip()
+                    print(f'Create a new file named "{filename}"')
                 else:
                     print(command)
 

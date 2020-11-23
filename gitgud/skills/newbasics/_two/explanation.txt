@@ -1,0 +1,39 @@
+In the previous level, you saw three status indicators:
+    Created
+    Added
+    Committed
+That's a good way for us to show you what's happening, but it's not how Git sees things.
+>>>
+Instead of
+    Created
+    Added
+    Committed
+Git sees:
+    Working Directory
+    Staging Area
+    "master" branch
+>>>
+The "Working Directory" changes immediately when you add, remove or modify files.
+Git knows about the Working Directory, but it doen't do anything with it.
+>>>
+The "Staging Area" is what Git sees, and is what eventually turns into a commit when you run "git commit".
+"git add" is just one way to update the Staging Area, and there are several others that you'll get to learn about in upcoming levels.
+Using "git status" (not "git gud status") will show you the difference between the Working Directory and the Staging Area
+>>>
+Finally, the "master" branch is how Git finds the commits.
+You'll learn more about what branches can do later, but for now, you need to know that the "master" branch references a commit.
+
+The commit "master" references (the commit "on" master) stores a version of the code. It also references the previous commit, which stores the previous version of the code.
+>>>
+Also, Git compresses things, so don't worry about whether Git seems like it's saving an entire copy of your code every time! It never stores the same file twice!
+>>>
+Now, back to the goal:
+    Commit one file, then commit another file
+
+By the end, you'll have two commits:
+    The first commit will have one file
+    The second commit will have two files
+>>>
+The point of this level is to show you that each commit comes with the contents of the previous commit, unless you explicitly modify it.
+>>>
+Use "git gud status" throughout to see the progress you're making and get a better feel for what's happening while you're making changes
