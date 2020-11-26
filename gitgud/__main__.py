@@ -19,6 +19,13 @@ from gitgud.user_messages import show_skill_tree
 from gitgud.user_messages.stateful import repo_already_initialized
 
 
+def link_command(parser):
+    def set_default(handler):
+        parser.set_defaults(func=lambda gg, args: handler(gg, args))
+        return handler
+    return set_default
+
+
 class GitGud:
     parser = argparse.ArgumentParser(
         prog='git gud',
@@ -86,8 +93,8 @@ class GitGud:
             metavar='cmd',
             help="Command to get help on", nargs='?'
     )
-    help_parser.set_defaults(func=lambda gg, args: gg.handle_help(args))
 
+    @link_command(help_parser)
     def handle_help(self, args):
         if args.command_name is None:
             self.parser.print_help()
@@ -107,8 +114,8 @@ class GitGud:
     )
     init_parser.add_argument('--force', action='store_true')
     init_parser.add_argument('--prettyplease', action='store_true')
-    init_parser.set_defaults(func=lambda gg, args: gg.handle_init(args))
 
+    @link_command(init_parser)
     def handle_init(self, args):
         # Make sure it's safe to initialize
 
@@ -131,53 +138,58 @@ class GitGud:
 
         self.load_level(all_skills["0"]["1"])
 
-    subparsers.add_parser(
+    status_parser = subparsers.add_parser(
             'status',
             help='Print out the name of the current level',
             description='Print out the name of the current level'
-    ).set_defaults(func=lambda gg, args: gg.handle_status(args))
+    )
 
+    @link_command(status_parser)
     def handle_status(self, args):
         self.assert_initialized()
         get_operator().get_level().status()
 
-    subparsers.add_parser(
+    explain_parser = subparsers.add_parser(
             'explain',
             help='Show the explain for the current level',
             description='Show the explain for the current level'
-    ).set_defaults(func=lambda gg, args: gg.handle_explain(args))
+    )
 
+    @link_command(explain_parser)
     def handle_explain(self, args):
         self.assert_initialized()
         get_operator().get_level().explain()
 
-    subparsers.add_parser(
+    goal_parser = subparsers.add_parser(
             'goal',
             help='Show a description of the current goal',
             description='Show a description of the current goal'
-    ).set_defaults(func=lambda gg, args: gg.handle_goal(args))
+    )
 
+    @link_command(goal_parser)
     def handle_goal(self, args):
         self.assert_initialized()
         get_operator().get_level().goal()
 
-    subparsers.add_parser(
+    reset_parser = subparsers.add_parser(
             'reset',
             help='Reset the current level',
             description='Reset the current level'
-    ).set_defaults(func=lambda gg, args: gg.handle_reset(args))
+    )
 
+    @link_command(reset_parser)
     def handle_reset(self, args):
         self.assert_initialized()
         level = get_operator().get_level()
         self.load_level(level)
 
-    subparsers.add_parser(
+    test_parser = subparsers.add_parser(
             'test',
             help="Test to see if you've successfully completed the current level",  # noqa: E501
             description="Test to see if you've successfully completed the current level"  # noqa: E501
-    ).set_defaults(func=lambda gg, args: gg.handle_test(args))
+    )
 
+    @link_command(test_parser)
     def handle_test(self, args):
         self.assert_initialized()
         level = get_operator().get_level()
@@ -189,10 +201,8 @@ class GitGud:
             description='Show the solution for the given level'
     )
     solution_parser.add_argument('--confirm', action='store_true')
-    solution_parser.set_defaults(
-            func=lambda gg, args: gg.handle_solution(args)
-    )
 
+    @link_command(solution_parser)
     def handle_solution(self, args):
         self.assert_initialized()
         current_level = get_operator().get_level()
@@ -202,12 +212,13 @@ class GitGud:
         else:
             current_level.solution()
 
-    subparsers.add_parser(
+    level_parser = subparsers.add_parser(
             'level',
             help='Display current level',
             description='Display the currently loaded level'
-    ).set_defaults(func=lambda gg, args: gg.handle_level(args))
+    )
 
+    @link_command(level_parser)
     def handle_level(self, args):
         self.assert_initialized()
         level = get_operator().get_level()
@@ -222,8 +233,8 @@ class GitGud:
             help='List skills',
             description='List skills')
     skills_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills usable with `git gud load`.")  # noqa: E501
-    skills_parser.set_defaults(func=lambda gg, args: gg.handle_skills(args))
 
+    @link_command(skills_parser)
     def handle_skills(self, args):
         print("All skills:")
         print()
@@ -253,8 +264,8 @@ class GitGud:
             dest='opt_short',
             action='store_true',
             help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
-    levels_parser.set_defaults(func=lambda gg, args: gg.handle_levels(args))
 
+    @link_command(levels_parser)
     def handle_levels(self, args):
         if args.opt_all:
             skills_to_show = [skill for skill in all_skills]
@@ -368,8 +379,8 @@ class GitGud:
             nargs='?',
             help='Level to load')
     load_parser.add_argument('--force', action="store_true")
-    load_parser.set_defaults(func=lambda gg, args: gg.handle_load(args))
 
+    @link_command(load_parser)
     def handle_load(self, args):
         self.assert_initialized()
         args.skill_name = args.skill_name.lower()
@@ -420,8 +431,8 @@ class GitGud:
             help='Quickly create and commit a file',
             description='Quickly create and commit a file')
     commit_parser.add_argument('file', nargs='?')
-    commit_parser.set_defaults(func=lambda gg, args: gg.handle_commit(args))
 
+    @link_command(commit_parser)
     def handle_commit(self, args):
         self.assert_initialized()
         file_operator = get_operator()
@@ -451,8 +462,8 @@ class GitGud:
             metavar='cmd',
             help='Command to show information',
             nargs='?')
-    show_parser.set_defaults(func=lambda gg, args: gg.handle_show(args))
 
+    @link_command(show_parser)
     def handle_show(self, args):
         if args.cmd == "tree":
             show_tree()
@@ -462,32 +473,35 @@ class GitGud:
     def handle_show_tree(self, args):
         show_tree()
 
-    subparsers.add_parser(
+    contributors_parser = subparsers.add_parser(
             'contributors',
             help='Show project contributors webpage',
             description='Show all the contributors of the project'
-    ).set_defaults(func=lambda gg, args: gg.handle_contributors(args))
+    )
 
+    @link_command(contributors_parser)
     def handle_contributors(self, args):
         contrib_website = "https://github.com/benthayer/git-gud/graphs/" \
             "contributors"
         webbrowser.open_new(contrib_website)
 
-    subparsers.add_parser(
+    issues_parser = subparsers.add_parser(
             'issues',
             help='Show project issues webpage',
             description="Show all the issues for the project"
-    ).set_defaults(func=lambda gg, args: gg.handle_issues(args))
+    )
 
+    @link_command(issues_parser)
     def handle_issues(self, args):
         issues_website = "https://github.com/benthayer/git-gud/issues"
         webbrowser.open_new(issues_website)
 
-    subparsers.add_parser(
+    debug_parser = subparsers.add_parser(
             'debug',
             description='Debug git-gud with necessary imports set up.'
-    ).set_defaults(func=lambda gg, args: gg.handle_debug(args))
+    )
 
+    @link_command(debug_parser)
     def handle_debug(self, args):
         import readline  # noqa: F401
         import code
