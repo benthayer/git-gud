@@ -141,8 +141,8 @@ If something isn't self-explanatory, comment on whatever issue you're working on
 I'll be happy to respond there and to update this document. 
 
 ## Submitting Your Changes
-This project works off of the master branch. 
-When working on your own changes, fork this repository, create a branch and submit a pull request from your forks branch to my master branch. 
+This project works off of the `main` branch. 
+When working on your own changes, fork this repository, create a branch and submit a pull request from your forks branch to my `main` branch. 
 Give the pull request any name you like and submit it. 
 If there's already an open issue for your pull request, link it by including the line `fixes #[issue_id]` in the body of the pull request. 
 If you're not sure what to say, don't feel obligated to write more than you think you need to.

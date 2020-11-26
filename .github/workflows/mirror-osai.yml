@@ -3,10 +3,10 @@
 name: Push to open-source-at-illinois/git-gud
 
 # Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
+# events but only for the main branch
 on:
   push:
-    branches: master
+    branches: main
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -32,4 +32,4 @@ jobs:
         echo "$OSAI_ID_RSA" > $HOME/.ssh/id_rsa
         chmod 600 $HOME/.ssh/id_rsa
         git remote add osai git@github.com:open-source-at-illinois/git-gud.git
-        git push -f osai master
+        git push -f osai main

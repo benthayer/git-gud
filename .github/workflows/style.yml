@@ -2,7 +2,7 @@ name: Check PEP8
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
 
 

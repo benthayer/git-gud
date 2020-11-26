@@ -6,7 +6,7 @@
 Welcome to Git Gud, a command line game designed to help you learn how to use the popular version control system known as Git!
 As levels progress, you will know more and more about git, and eventually become a git grandmaster!
 
-If something's missing feel free to add an issue, or if you're interested, view the [contributors file](https://github.com/benthayer/git-gud/blob/master/CONTRIBUTING.md) and add something yourself! The project is intentially structured to make it very easy to add new levels!
+If something's missing feel free to add an issue, or if you're interested, view the [contributors file](https://github.com/benthayer/git-gud/blob/main/CONTRIBUTING.md) and add something yourself! The project is intentially structured to make it very easy to add new levels!
 
 If you're more of a visual learner, you should start with ["Learn Git Branching"](https://learngitbranching.js.org), and and then give Git Gud a try. Learn Git Branching is more visual, but with Git Gud, you're actually using git to complete the levels.
 
