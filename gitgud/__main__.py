@@ -19,230 +19,48 @@ from gitgud.user_messages import show_skill_tree
 from gitgud.user_messages.stateful import repo_already_initialized
 
 
+def link_command(parser):
+    def set_default(handler):
+        parser.set_defaults(func=lambda gg, args: handler(gg, args))
+        return handler
+    return set_default
+
+
 class GitGud:
+    parser = argparse.ArgumentParser(
+        prog='git gud',
+        description='A game to teach Git!')
+    parser.add_argument(
+            '--version',
+            action='version',
+            version='%(prog)s ' + __version__)
+
+    show_description = "\n".join([
+        "Helper command to show certain information.",
+        "\n",
+        "Subcommands:",
+        "  <command>",
+        "    tree\tShow the current state of the branching tree"
+    ])
+
+    subparsers = parser.add_subparsers(
+            title='Subcommands',
+            metavar='<command>',
+            dest='command'
+    )
+
     def __init__(self):
-        # Only gets operator if Git Gud has been initialized
-        self.parser = argparse.ArgumentParser(
-            prog='git gud',
-            description='A game to teach Git!')
-        self.parser.add_argument(
-                '--version',
-                action='version',
-                version='%(prog)s ' + __version__)
-
-        load_description = '\n'.join([
-            "Load a specific skill or level. This command can be used in several ways.",  # noqa: E501
-            "\n",
-            "============Basic Usage============",
-            "\n",
-            "These commands are the simplest commands to load a level on a certain skill, and are identical in functionality:",  # noqa: E501
-            "\n",
-            "   git gud load <skill> <level>",
-            "   git gud load <skill>-<level>",
-            "\n",
-            "<skill> and <level> could either be the name of the skill/level or the number of the skill/level.",  # noqa: E501
-            "Running `git gud levels --all --short` will help you find the number and name associated with each skill/level.",  # noqa: E501
-            "\n",
-            "Here are example uses which load the same level:",
-            "\n",
-            "   git gud load basics-2",
-            "   git gud load 1 branching",
-            "\n",
-            "============Additional Commands============",
-            "\n",
-            "`git gud load` supports additional shortcut commands to ease level navigation.",  # noqa: E501
-            "\n",
-            "======Loading the first level on a skill======",
-            "\n",
-            "This command loads the first level on the specified skill:",
-            "\n",
-            "   git gud load <skill>",
-            "\n",
-            "======Loading a level on the current skill======",
-            "\n",
-            "This command loads the specified level of the current skill.",
-            "NOTE: <level> MUST be a number in order for this command to work.",  # noqa: E501
-            "\n",
-            "   git gud load -<level>",
-            "\n",
-        ])
-
-        show_description = "\n".join([
-            "Helper command to show certain information.",
-            "\n",
-            "Subcommands:",
-            "  <command>",
-            "    tree\tShow the current state of the branching tree"
-        ])
-
-        self.subparsers = self.parser.add_subparsers(
-                title='Subcommands',
-                metavar='<command>',
-                dest='command'
-        )
-
-        self.subparsers.add_parser(
-                'debug',
-                description='Debug git-gud with necessary imports set up.'
-        )
-        self.subparsers.add_parser(
-                'status',
-                help='Print out the name of the current level',
-                description='Print out the name of the current level')
-        self.subparsers.add_parser(
-                'explain',
-                help='Show the explain for the current level',
-                description='Show the explain for the current level')
-        self.subparsers.add_parser(
-                'goal',
-                help='Concisely show what needs to be done to complete the level.',  # noqa: E501
-                description='Concisely show what needs to be done to complete the level.')  # noqa: E501
-        self.subparsers.add_parser(
-                'reset',
-                help='Reset the current level',
-                description='Reset the current level')
-        self.subparsers.add_parser(
-                'reload',
-                help='Alias for reset',
-                description='Reset the current level. Reload command is an alias for reset command.')  # noqa: E501
-        self.subparsers.add_parser(
-                'test',
-                help="Test to see if you've successfully completed the current level",  # noqa: E501
-                description="Test to see if you've successfully completed the current level")  # noqa: E501
-        self.subparsers.add_parser(
-                'level',
-                help='Display current level',
-                description='Display the currently loaded level')
-        self.subparsers.add_parser(
-                'goal',
-                help='Show a description of the current goal',
-                description='Show a description of the current goal')
-        self.subparsers.add_parser(
-                'contributors',
-                help='Show project contributors webpage',
-                description='Show all the contributors of the project')
-        self.subparsers.add_parser(
-                'issues',
-                help='Show project issues webpage',
-                description="Show all the issues for the project")
-
-        help_parser = self.subparsers.add_parser(
-                'help',
-                help='Show help for commands',
-                description='Show help for commands'
-        )
-        help_parser.add_argument(
-                'command_name',
-                metavar='cmd',
-                help="Command to get help on", nargs='?'
-        )
-
-        solution_parser = self.subparsers.add_parser(
-                'solution',
-                help='Show solution for the given level',
-                description='Show the solution for the given level'
-        )
-        solution_parser.add_argument('--confirm', action='store_true')
-
-        init_parser = self.subparsers.add_parser(
-                'init',
-                help='Init Git Gud and load first level',
-                description='Initialize the direcotry with a git repository and load the first level of Git Gud.'  # noqa: E501
-        )
-        init_parser.add_argument('--force', action='store_true')
-        init_parser.add_argument('--prettyplease', action='store_true')
-
-        load_parser = self.subparsers.add_parser(
-                'load',
-                help='Load a specific skill or level',
-                description=load_description,
-                formatter_class=argparse.RawDescriptionHelpFormatter)
-        load_parser.add_argument(
-                'skill_name',
-                metavar='skill',
-                help='Skill to load')
-        load_parser.add_argument(
-                'level_name',
-                metavar='level',
-                nargs='?',
-                help='Level to load')
-        load_parser.add_argument('--force', action="store_true")
-
-        skills_parser = self.subparsers.add_parser(
-                'skills',
-                help='List skills',
-                description='List skills')
-        skills_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills usable with `git gud load`.")  # noqa: E501
-
-        levels_parser = self.subparsers.add_parser(
-                'levels',
-                help='List levels in a skill',
-                description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud levels --all`.')  # noqa: E501
-
-        levels_parser.add_argument(
-                'skill_name',
-                metavar='skill',
-                nargs='?')
-        levels_parser.add_argument(
-                '-a',
-                '--all',
-                dest='opt_all',
-                action='store_true',
-                help="Prints all available skills with levels.")
-        levels_parser.add_argument(
-                '--short',
-                dest='opt_short',
-                action='store_true',
-                help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
-
-        commit_parser = self.subparsers.add_parser(
-                'commit',
-                help='Quickly create and commit a file',
-                description='Quickly create and commit a file')
-        commit_parser.add_argument('file', nargs='?')
-
-        show_parser = self.subparsers.add_parser(
-                'show',
-                description=show_description,
-                formatter_class=argparse.RawDescriptionHelpFormatter)
-        show_parser.add_argument(
-                'cmd',
-                metavar='cmd',
-                help='Command to show information',
-                nargs='?')
-
-        self.command_dict = {
-            'help': self.handle_help,
-            'init': self.handle_init,
-            'status': self.handle_status,
-            'explain': self.handle_explain,
-            'goal': self.handle_goal,
-            'reset': self.handle_reset,
-            'reload': self.handle_reset,
-            'test': self.handle_test,
-            'level': self.handle_level,
-            'skills': self.handle_skills,
-            'levels': self.handle_levels,
-            'load': self.handle_load,
-            'commit': self.handle_commit,
-            'show-tree': self.handle_show_tree,
-            'show': self.handle_show,
-            'contributors': self.handle_contrib,
-            'issues': self.handle_issues,
-            'solution': self.handle_solution,
-            'debug': self.handle_debug
-        }
-
         self.aliases = {
             'h': 'help',
             'i': 'issues',
             's': 'status',
             'e': 'explain',
             'g': 'goal',
-            'r': 'reset',
             't': 'test',
             'l': 'load',
             'c': 'commit',
+            'r': 'reset',
+            'reload': 'reset',
         }
 
         self.parser.epilog = "The following aliases exist: "
@@ -250,9 +68,6 @@ class GitGud:
             self.parser.epilog += "'{}' -> '{}', " \
                     .format(alias, self.aliases[alias])
         self.parser.epilog = self.parser.epilog[:-2]
-
-        for alias in self.aliases:
-            assert self.aliases[alias] in self.command_dict
 
     def is_initialized(self):
         return get_operator() is not None
@@ -268,6 +83,18 @@ class GitGud:
         level.setup()
         file_operator.write_level(level)
 
+    help_parser = subparsers.add_parser(
+            'help',
+            help='Show help for commands',
+            description='Show help for commands'
+    )
+    help_parser.add_argument(
+            'command_name',
+            metavar='cmd',
+            help="Command to get help on", nargs='?'
+    )
+
+    @link_command(help_parser)
     def handle_help(self, args):
         if args.command_name is None:
             self.parser.print_help()
@@ -280,6 +107,15 @@ class GitGud:
                 print()
                 self.parser.print_help()
 
+    init_parser = subparsers.add_parser(
+            'init',
+            help='Init Git Gud and load first level',
+            description='Initialize the direcotry with a git repository and load the first level of Git Gud.'  # noqa: E501
+    )
+    init_parser.add_argument('--force', action='store_true')
+    init_parser.add_argument('--prettyplease', action='store_true')
+
+    @link_command(init_parser)
     def handle_init(self, args):
         # Make sure it's safe to initialize
 
@@ -302,28 +138,71 @@ class GitGud:
 
         self.load_level(all_skills["0"]["1"])
 
+    status_parser = subparsers.add_parser(
+            'status',
+            help='Print out the name of the current level',
+            description='Print out the name of the current level'
+    )
+
+    @link_command(status_parser)
     def handle_status(self, args):
         self.assert_initialized()
         get_operator().get_level().status()
 
+    explain_parser = subparsers.add_parser(
+            'explain',
+            help='Show the explain for the current level',
+            description='Show the explain for the current level'
+    )
+
+    @link_command(explain_parser)
     def handle_explain(self, args):
         self.assert_initialized()
         get_operator().get_level().explain()
 
+    goal_parser = subparsers.add_parser(
+            'goal',
+            help='Show a description of the current goal',
+            description='Show a description of the current goal'
+    )
+
+    @link_command(goal_parser)
     def handle_goal(self, args):
         self.assert_initialized()
         get_operator().get_level().goal()
 
+    reset_parser = subparsers.add_parser(
+            'reset',
+            help='Reset the current level',
+            description='Reset the current level'
+    )
+
+    @link_command(reset_parser)
     def handle_reset(self, args):
         self.assert_initialized()
         level = get_operator().get_level()
         self.load_level(level)
 
+    test_parser = subparsers.add_parser(
+            'test',
+            help="Test to see if you've successfully completed the current level",  # noqa: E501
+            description="Test to see if you've successfully completed the current level"  # noqa: E501
+    )
+
+    @link_command(test_parser)
     def handle_test(self, args):
         self.assert_initialized()
         level = get_operator().get_level()
         level.test()
 
+    solution_parser = subparsers.add_parser(
+            'solution',
+            help='Show solution for the given level',
+            description='Show the solution for the given level'
+    )
+    solution_parser.add_argument('--confirm', action='store_true')
+
+    @link_command(solution_parser)
     def handle_solution(self, args):
         self.assert_initialized()
         current_level = get_operator().get_level()
@@ -333,6 +212,13 @@ class GitGud:
         else:
             current_level.solution()
 
+    level_parser = subparsers.add_parser(
+            'level',
+            help='Display current level',
+            description='Display the currently loaded level'
+    )
+
+    @link_command(level_parser)
     def handle_level(self, args):
         self.assert_initialized()
         level = get_operator().get_level()
@@ -342,6 +228,13 @@ class GitGud:
                 True,
                 expand_skills=False)
 
+    skills_parser = subparsers.add_parser(
+            'skills',
+            help='List skills',
+            description='List skills')
+    skills_parser.add_argument('--short', dest='opt_short', action='store_true', help="Prints with the short name of skills usable with `git gud load`.")  # noqa: E501
+
+    @link_command(skills_parser)
     def handle_skills(self, args):
         print("All skills:")
         print()
@@ -352,6 +245,27 @@ class GitGud:
             show_human_names=not args.opt_short
         )
 
+    levels_parser = subparsers.add_parser(
+            'levels',
+            help='List levels in a skill',
+            description='List the levels in the specified skill or in the current skill if Git Gud has been initialized and no skill is provided. To see levels in all skills, use `git gud levels --all`.')  # noqa: E501
+    levels_parser.add_argument(
+            'skill_name',
+            metavar='skill',
+            nargs='?')
+    levels_parser.add_argument(
+            '-a',
+            '--all',
+            dest='opt_all',
+            action='store_true',
+            help="Prints all available skills with levels.")
+    levels_parser.add_argument(
+            '--short',
+            dest='opt_short',
+            action='store_true',
+            help="Prints with the short name of skills/levels usable with `git gud load`.")  # noqa: E501
+
+    @link_command(levels_parser)
     def handle_levels(self, args):
         if args.opt_all:
             skills_to_show = [skill for skill in all_skills]
@@ -413,6 +327,60 @@ class GitGud:
                 print('Already on the first level. To reload the level, use "git gud reload".')  # noqa: E501
             print('\nTo view levels/skills, use "git gud levels --all"')  # noqa: E501
 
+    load_description = '\n'.join([
+        "Load a specific skill or level. This command can be used in several ways.",  # noqa: E501
+        "\n",
+        "============Basic Usage============",
+        "\n",
+        "These commands are the simplest commands to load a level on a certain skill, and are identical in functionality:",  # noqa: E501
+        "\n",
+        "   git gud load <skill> <level>",
+        "   git gud load <skill>-<level>",
+        "\n",
+        "<skill> and <level> could either be the name of the skill/level or the number of the skill/level.",  # noqa: E501
+        "Running `git gud levels --all --short` will help you find the number and name associated with each skill/level.",  # noqa: E501
+        "\n",
+        "Here are example uses which load the same level:",
+        "\n",
+        "   git gud load basics-2",
+        "   git gud load 1 branching",
+        "\n",
+        "============Additional Commands============",
+        "\n",
+        "`git gud load` supports additional shortcut commands to ease level navigation.",  # noqa: E501
+        "\n",
+        "======Loading the first level on a skill======",
+        "\n",
+        "This command loads the first level on the specified skill:",
+        "\n",
+        "   git gud load <skill>",
+        "\n",
+        "======Loading a level on the current skill======",
+        "\n",
+        "This command loads the specified level of the current skill.",
+        "NOTE: <level> MUST be a number in order for this command to work.",  # noqa: E501
+        "\n",
+        "   git gud load -<level>",
+        "\n",
+    ])
+
+    load_parser = subparsers.add_parser(
+            'load',
+            help='Load a specific skill or level',
+            description=load_description,
+            formatter_class=argparse.RawDescriptionHelpFormatter)
+    load_parser.add_argument(
+            'skill_name',
+            metavar='skill',
+            help='Skill to load')
+    load_parser.add_argument(
+            'level_name',
+            metavar='level',
+            nargs='?',
+            help='Level to load')
+    load_parser.add_argument('--force', action="store_true")
+
+    @link_command(load_parser)
     def handle_load(self, args):
         self.assert_initialized()
         args.skill_name = args.skill_name.lower()
@@ -458,6 +426,13 @@ class GitGud:
         level = skill[args.level_name]
         self.load_level(level)
 
+    commit_parser = subparsers.add_parser(
+            'commit',
+            help='Quickly create and commit a file',
+            description='Quickly create and commit a file')
+    commit_parser.add_argument('file', nargs='?')
+
+    @link_command(commit_parser)
     def handle_commit(self, args):
         self.assert_initialized()
         file_operator = get_operator()
@@ -478,6 +453,17 @@ class GitGud:
         if int(commit_name) > int(last_commit):
             file_operator.write_last_commit(commit_name)
 
+    show_parser = subparsers.add_parser(
+            'show',
+            description=show_description,
+            formatter_class=argparse.RawDescriptionHelpFormatter)
+    show_parser.add_argument(
+            'cmd',
+            metavar='cmd',
+            help='Command to show information',
+            nargs='?')
+
+    @link_command(show_parser)
     def handle_show(self, args):
         if args.cmd == "tree":
             show_tree()
@@ -487,15 +473,35 @@ class GitGud:
     def handle_show_tree(self, args):
         show_tree()
 
-    def handle_contrib(self, args):
+    contributors_parser = subparsers.add_parser(
+            'contributors',
+            help='Show project contributors webpage',
+            description='Show all the contributors of the project'
+    )
+
+    @link_command(contributors_parser)
+    def handle_contributors(self, args):
         contrib_website = "https://github.com/benthayer/git-gud/graphs/" \
             "contributors"
         webbrowser.open_new(contrib_website)
 
+    issues_parser = subparsers.add_parser(
+            'issues',
+            help='Show project issues webpage',
+            description="Show all the issues for the project"
+    )
+
+    @link_command(issues_parser)
     def handle_issues(self, args):
         issues_website = "https://github.com/benthayer/git-gud/issues"
         webbrowser.open_new(issues_website)
 
+    debug_parser = subparsers.add_parser(
+            'debug',
+            description='Debug git-gud with necessary imports set up.'
+    )
+
+    @link_command(debug_parser)
     def handle_debug(self, args):
         import readline  # noqa: F401
         import code
@@ -512,7 +518,9 @@ class GitGud:
     def parse(self):
         if len(sys.argv) >= 2 and sys.argv[1] in self.aliases:
             sys.argv[1] = self.aliases[sys.argv[1]]
+
         args, _ = self.parser.parse_known_args(sys.argv[1:])
+
         if args.command is None:
             if get_operator() is None:
                 print('Currently in an uninitialized directory.')
@@ -521,7 +529,8 @@ class GitGud:
                 self.parser.print_help()
         else:
             try:
-                self.command_dict[args.command](args)
+                args = self.parser.parse_args()
+                args.func(self, args)
             except InitializationError as error:
                 print(error)
 
