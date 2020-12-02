@@ -78,6 +78,7 @@ skill = Skill(
     'newbasics',
     [
         FirstCommit('First Commit', 'firstcommit', __name__),
-        TwoCommits('Two Commits', 'two', __name__)
+        TwoCommits('Two Commits', 'two', __name__),
+        BasicLevel('Five Commits', 'five', __name__)
     ]
 )
