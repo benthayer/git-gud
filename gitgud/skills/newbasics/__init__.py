@@ -73,12 +73,17 @@ class TwoCommits(BasicLevel):
         return True
 
 
+class FiveCommits(BasicLevel):
+    def _test(self):
+        return True
+
+
 skill = Skill(
     'New Basics',
     'newbasics',
     [
         FirstCommit('First Commit', 'firstcommit', __name__),
         TwoCommits('Two Commits', 'two', __name__),
-        BasicLevel('Five Commits', 'five', __name__)
+        FiveCommits('Five Commits', 'five', __name__)
     ]
 )
