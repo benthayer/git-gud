@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from gitgud import operations
+from gitgud.util import operations
 from gitgud.user_messages import display_tree_content, separated, existence_str
 
 

@@ -1,6 +1,6 @@
 from gitgud.util.level_builder import BasicLevel
 from gitgud.util import Skill
-from gitgud import operations
+from gitgud.util import operations
 from gitgud.user_messages import separated, bool_to_word
 from gitgud.user_messages.stateful import display_repo_files
 

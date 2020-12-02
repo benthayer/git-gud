@@ -19,7 +19,7 @@ from gitgud.user_messages import skill_complete
 from gitgud.user_messages import all_levels_complete
 from gitgud.user_messages import no_solutions_available
 
-from gitgud import operations
+from gitgud.util import operations
 
 
 class Level:

@@ -3,7 +3,7 @@ import pytest
 from git.exc import GitCommandError
 
 from gitgud.skills import all_skills
-from gitgud.operations import get_operator
+from gitgud.util.operations import get_operator
 
 
 @pytest.fixture(autouse=True)

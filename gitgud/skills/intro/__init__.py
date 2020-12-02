@@ -6,7 +6,7 @@ from gitgud.util.level_builder import BasicLevel
 from gitgud.user_messages import simulate_command
 from gitgud.user_messages import default_fail_no_reset
 
-from gitgud import operations
+from gitgud.util import operations
 
 
 class Welcome(BasicLevel):

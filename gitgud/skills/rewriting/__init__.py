@@ -1,7 +1,7 @@
 from gitgud.util.level_builder import BasicLevel
 from gitgud.util import Skill
 
-from gitgud import operations
+from gitgud.util import operations
 from gitgud.user_messages import simulate_command
 
 
