@@ -1,6 +1,6 @@
 import sys
 
-from gitgud.operations import get_operator
+from gitgud.util.operations import get_operator
 
 operator = get_operator()
 

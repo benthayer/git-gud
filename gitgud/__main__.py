@@ -5,7 +5,7 @@ import sys
 import argparse
 
 from gitgud import __version__, InitializationError
-from gitgud.operations import Operator, get_operator
+from gitgud.util.operations import Operator, get_operator
 from gitgud.skills import all_skills
 
 from gitgud.user_messages import force_initializing

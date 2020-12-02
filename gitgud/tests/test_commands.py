@@ -1,7 +1,7 @@
 
 import subprocess
 
-from gitgud import operations
+from gitgud.util import operations
 from gitgud.skills import all_skills
 
 
