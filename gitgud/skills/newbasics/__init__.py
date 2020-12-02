@@ -49,33 +49,32 @@ class TwoCommits(BasicLevel):
         display_repo_files()
 
     def _test(self):
-        # There are two commits
-        # The first commit has one file
-        # The second commit has two files
-        # The file from the first commit is in the second commit
-        # The first file is unchanged
-        # Working Directory, Staging Area and Commit 2 are the same
-
         file_operator = operations.get_operator()
 
+        # There are two commits
         if len(file_operator.get_all_commits()) != 2:
             return False
 
+        # The first commit has one file
         content1 = file_operator.get_commit_content('HEAD~')
         if len(content1.keys()) != 1:
             return False
 
+        # The second commit has two files
         content2 = file_operator.get_commit_content('HEAD')
         if len(content2.keys()) != 2:
             return False
 
+        # The file from the first commit is in the second commit
         file1_name = next(iter(content1.keys()))
         if file1_name not in content2:
             return False
 
+        # The first file is unchanged
         if content1[file1_name] != content2[file1_name]:
             return False
 
+        # Working Directory, Staging Area and Commit 2 are the same
         content_wd = file_operator.get_working_directory_content()
         content_sa = file_operator.get_staging_content()
         if not (content2 == content_wd == content_sa):
