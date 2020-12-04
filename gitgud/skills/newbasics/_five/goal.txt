@@ -1,0 +1,6 @@
+One commit at a time, do the following:
+Add a file
+Add a file
+Modify both files
+Remove the first file
+Move the second file

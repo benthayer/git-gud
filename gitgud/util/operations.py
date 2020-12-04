@@ -225,7 +225,7 @@ class Operator():
         self.repo.index.commit(
                 "Placeholder commit\n\n"
                 "This commit is used when initializing levels."
-                "Something must have gone wrong",
+                "If you see this, something must have gone wrong",
                 parent_commits=[],
                 skip_hooks=True)
         # Detach HEAD so we can delete branches
