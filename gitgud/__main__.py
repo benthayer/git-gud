@@ -524,7 +524,7 @@ class GitGud:
         if args.command is None:
             if get_operator() is None:
                 print('Currently in an uninitialized directory.')
-                print('Get started by running "git gud init" in an empty directory!')  # noqa: E501
+                print('Get started by running "git gud init" (without quotes) in an empty directory!')  # noqa: E501
                 if len(list(Path.cwd().iterdir())) != 0:
                     print('Current directory is not empty.')
                 else:
