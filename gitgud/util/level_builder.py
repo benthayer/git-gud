@@ -1,3 +1,5 @@
+import sys
+
 from importlib_resources import files
 
 import yaml
@@ -141,7 +143,12 @@ class BasicLevel(Level):
         lines = self.file('explanation.txt').read_text().strip().split('>>>')
         for i, line in enumerate(lines):
             print(line.strip())
-            input('>>> ({}/{})'.format(i+1, len(lines)))
+            progress_string = '>>> ({}/{})'.format(i+1, len(lines))
+            if i != len(lines) - 1:
+                input(progress_string + '\n')
+                sys.stdout.write("\033[F") # Cursor up one line
+            else:
+                print(progress_string)
 
     def goal(self):
         self.cat_file("goal.txt")

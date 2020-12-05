@@ -7,16 +7,20 @@ Hitting enter will get you to the next part of the explanation
 Anyways...
 >>>
 A Git repository (repo for short) is where Git stores all of it's information.
-Running "git init" will make a folder in your current directory called ".git".
+Running "git init" will make a hidden folder in your current directory called ".git".
 >>>
-The ".git" folder contains a lot of information that git can use to help you
-manage different versions of your code.
+The ".git" folder contains a lot of information that Git can use to help you
+manage different versions of your code. You don't ever need to do anything with
+the contents of the ".git" folder directly
+>>>
 Managing different versions of your code is why Git is called a "Version Control System"
 >>>
 For now, it's fine to know that you don't need to ever look in the ".git" dirctory.
-What's more important is that you know what git does.
+What's more important is that you know what Git does.
 Among other things, these are some of the things you'll work with throughout the game:
 Commits, branches, remotes, tags, heads, merges and rebases.
 >>>
-For now, type "git init" to make a git repo for this folder
-The output of "git status" will change once you're in a git repo
+For now, type "git init" to make a Git repo for this folder
+You should get output like this:
+    Initialized empty Git repository in ...
+Afterwards, you can run "git gut test" to continue
