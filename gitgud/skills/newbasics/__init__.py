@@ -6,11 +6,6 @@ from gitgud.user_messages.stateful import display_repo_files
 
 
 class FirstCommit(BasicLevel):
-    def _setup(self):
-        file_operator = operations.get_operator()
-        file_operator.destroy_repo()
-        file_operator.use_repo()
-
     @separated
     def status(self):
         created, added, committed = self.get_state()
@@ -37,11 +32,6 @@ class FirstCommit(BasicLevel):
 
 
 class TwoCommits(BasicLevel):
-    def _setup(self):
-        file_operator = operations.get_operator()
-        file_operator.destroy_repo()
-        file_operator.use_repo()
-
     def post_setup(self):
         self.goal()
 

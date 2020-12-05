@@ -249,6 +249,11 @@ class Operator():
 
         self.reset_repo()
 
+        # if head is an orphan branch and there are commits, this method fails
+        if not commits and head:
+            self.repo.git.checkout('--orphan', head)
+            return
+
         commit_objects = {}
         counter = len(commits)
         for name, parents, branches, tags in commits:
