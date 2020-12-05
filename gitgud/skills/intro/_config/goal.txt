@@ -1,5 +1,7 @@
 In this level, we want you to configure your name and email for Git.
 
+You'll be able to see this information later on when you make a commit and run "git log"
+
 Type "git gud status" for more information
 Type "git gud test" when done
 
