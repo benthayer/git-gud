@@ -3,4 +3,4 @@
 Congratulations, you've completed the first level!
 
 Now, to load the next level, type
-    $ git gud load next
+    git gud load next

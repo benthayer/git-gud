@@ -3,4 +3,4 @@ Welcome to the second level!
 In this level, we'll help make sure you have Git set up properly.
 
 To see the goal for this level, type:
-    $ git gud goal
+    git gud goal
