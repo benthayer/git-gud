@@ -68,10 +68,13 @@ class Level:
         raise NotImplementedError
 
     def test(self):
-        if self._test():
+        passed = self._test()
+        if passed:
+            self.mark_complete()
             self.test_passed()
         else:
             self.test_failed()
+        return passed
 
     def test_passed(self):
         if self.next_level is None:
@@ -146,7 +149,7 @@ class BasicLevel(Level):
             progress_string = '>>> ({}/{})'.format(i+1, len(lines))
             if i != len(lines) - 1:
                 input(progress_string + '\n')
-                sys.stdout.write("\033[F") # Cursor up one line
+                sys.stdout.write("\033[F")  # Cursor up one line
             else:
                 print(progress_string)
 
@@ -211,7 +214,6 @@ class BasicLevel(Level):
         return test_ancestry(level_tree, test_tree)
 
     def test_passed(self):
-        self.mark_complete()
         if self.file('passed.txt').exists():
             self.cat_file('passed.txt')
         else:

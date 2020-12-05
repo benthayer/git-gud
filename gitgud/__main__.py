@@ -192,8 +192,7 @@ class GitGud:
     @link_command(test_parser)
     def handle_test(self, args):
         self.assert_initialized()
-        level = get_operator().get_level()
-        level.test()
+        get_operator().get_level().test()
 
     solution_parser = subparsers.add_parser(
             'solution',
@@ -387,6 +386,10 @@ class GitGud:
         if args.level_name:
             args.level_name = args.level_name.lower()
 
+        level = get_operator().get_level()
+        if level:
+            if level._test():
+                level.mark_complete()
         if args.skill_name in {"next", "prev", "previous"}:
             self.load_level_by_direction(args.skill_name, args.force)
             return
