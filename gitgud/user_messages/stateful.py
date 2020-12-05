@@ -10,7 +10,7 @@ def repo_already_initialized():
     file_operator = operations.get_operator()
     print('Repo {} already initialized for Git Gud.'
           .format(file_operator.path))
-    print('Use --force to initialize {}.'.format(Path.cwd()))
+    print('Use "git gud init --force" to delete progress and reinitialize')
     if file_operator.path != Path.cwd():
         print('{} will be left as is.'.format(file_operator.gg_path))  # noqa: E501
 

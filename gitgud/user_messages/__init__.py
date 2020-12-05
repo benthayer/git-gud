@@ -77,7 +77,7 @@ def force_initializing():
 @separated
 def cant_init_repo_not_empty():
     print('Current directory is nonempty. Initializing will delete all files.')  # noqa: E501
-    print('Use --force --prettyplease to force initialize here.')
+    print('Use "git gud init --force --prettyplease" to delete all files and initialize')  # noqa: E501
 
 
 @separated
@@ -129,13 +129,13 @@ def default_fail():
 
 def rerun_with_confirm_for_solution(level):
     print('Are you sure you want to view the solution for "{}": "{}"?'.format(level.name, level.skill.name))  # noqa: E501
-    print('If so, run `git gud solution --confirm`')
+    print('If so, run "git gud solution --confirm"')
 
 
 @separated
 def handle_load_confirm():
     print("You haven't completed this level yet!")
-    print("Run `git gud load next` with --force to load the next level.")
+    print('Run "git gud load next --force" to load the next level.')
 
 
 def no_solutions_available():
