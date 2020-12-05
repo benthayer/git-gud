@@ -74,9 +74,6 @@ class TwoCommits(BasicLevel):
 
 
 class FiveCommits(BasicLevel):
-    def _setup(self):
-        # TODO Start on the master commit
-        pass
     def status(self):
         complete = "✔️"
         incomplete = "✘"
@@ -110,10 +107,16 @@ class FiveCommits(BasicLevel):
     def _test1(self):
         # Test if a single file has been added to the first commit
         file_operator = operations.get_operator()
-        commit1 = file_operator.get_all_commits()[0]
-        content = file_operator.get_commit_content(commit1)
+
+        all_commits = file_operator.get_all_commits()
+
+        if len(all_commits) < 1:
+            return None
+
+        content = file_operator.get_commit_content(all_commits[0])
         if len(content.keys()) != 1:
             return False
+
         return True
 
     def _test2(self):
@@ -122,14 +125,17 @@ class FiveCommits(BasicLevel):
 
         all_commits = file_operator.get_all_commits()
 
+        if len(all_commits) < 2:
+            return None
+
         content1 = file_operator.get_commit_content(all_commits[0])
         content2 = file_operator.get_commit_content(all_commits[1])
 
-        # All files from commit 1 are in commit 2
-        for file in content1:
-            if file not in content2:
+        # All files from commit 1 are unchanged in commit 2
+        for filename in content1:
+            if filename not in content2:
                 return False
-            if content1[file] != content2[file]:
+            if content1[filename] != content2[filename]:
                 return False
 
         # There is only one more file in the second commit
@@ -139,13 +145,26 @@ class FiveCommits(BasicLevel):
         return True
 
     def _test3(self):
-        # Test that both files were renamed in commit three
+        # Test that both files were modified in commit three
 
         file_operator = operations.get_operator()
         all_commits = file_operator.get_all_commits()
-        # Two files
-        # Files both present previously
-        # Files both have different content
+        if len(all_commits) < 3:
+            return None
+
+        content2 = file_operator.get_commit_content(all_commits[1])
+        content3 = file_operator.get_commit_content(all_commits[2])
+
+        # Same number of files
+        if len(content2) != len(content3):
+            return False
+
+        # All files have new content and same name
+        for filename in content2:
+            if filename not in content3:
+                return False
+            if content2[filename] == content3[filename]:
+                return False
 
         return True
 
@@ -153,11 +172,24 @@ class FiveCommits(BasicLevel):
         # Get the file from the original commit
         # File 1 has been removed
         file_operator = operations.get_operator()
+
+        all_commits = file_operator.get_all_commits()
+        if len(all_commits) < 4:
+            return None
+
+        content1 = file_operator.get_commit_content(all_commits[0])
+        content4 = file_operator.get_commit_content(all_commits[3])
+
+        # file1 not in content4
+        # everything else is the same 
         return True
 
     def _test5(self):
         # File 2 has moved
         file_operator = operations.get_operator()
+        all_commits = file_operator.get_all_commits()
+        if len(all_commits) < 5:
+            return None
         return True
 
     def _test(self):
