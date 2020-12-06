@@ -42,7 +42,7 @@ class TwoCommits(BasicLevel):
         file_operator = operations.get_operator()
 
         # There are two commits
-        if len(file_operator.get_all_commits()) != 2:
+        if len(file_operator.get_commits()) != 2:
             return False
 
         # The first commit has one file
@@ -108,12 +108,12 @@ class FiveCommits(BasicLevel):
         # Test if a single file has been added to the first commit
         file_operator = operations.get_operator()
 
-        all_commits = file_operator.get_all_commits()
+        commits = file_operator.get_commits()
 
-        if len(all_commits) < 1:
+        if len(commits) < 1:
             return None
 
-        content = file_operator.get_commit_content(all_commits[0])
+        content = file_operator.get_commit_content(commits[0])
         if len(content.keys()) != 1:
             return False
 
@@ -123,43 +123,44 @@ class FiveCommits(BasicLevel):
         # Test if a single file has been added to the second commit
         file_operator = operations.get_operator()
 
-        all_commits = file_operator.get_all_commits()
+        commits = file_operator.get_commits()
 
-        if len(all_commits) < 2:
+        if len(commits) < 2:
             return None
 
-        content1 = file_operator.get_commit_content(all_commits[0])
-        content2 = file_operator.get_commit_content(all_commits[1])
-
-        # All files from commit 1 are unchanged in commit 2
-        for filename in content1:
-            if filename not in content2:
-                return False
-            if content1[filename] != content2[filename]:
-                return False
+        content1 = file_operator.get_commit_content(commits[0])
+        content2 = file_operator.get_commit_content(commits[1])
 
         # There is only one more file in the second commit
         if len(content1) + 1 != len(content2):
+            return False
+
+        filename1 = next(iter(content1.keys()))
+
+        if filename1 not in content2:
+            return False
+        if content1[filename1] != content2[filename1]:
             return False
 
         return True
 
     def _test3(self):
         # Test that both files were modified in commit three
-
         file_operator = operations.get_operator()
-        all_commits = file_operator.get_all_commits()
-        if len(all_commits) < 3:
+
+        commits = file_operator.get_commits()
+
+        if len(commits) < 3:
             return None
 
-        content2 = file_operator.get_commit_content(all_commits[1])
-        content3 = file_operator.get_commit_content(all_commits[2])
+        content2 = file_operator.get_commit_content(commits[1])
+        content3 = file_operator.get_commit_content(commits[2])
 
         # Same number of files
         if len(content2) != len(content3):
             return False
 
-        # All files have new content and same name
+        # Both files have new content and same name
         for filename in content2:
             if filename not in content3:
                 return False
@@ -169,30 +170,57 @@ class FiveCommits(BasicLevel):
         return True
 
     def _test4(self):
-        # Get the file from the original commit
-        # File 1 has been removed
+        # File 1 was removed in commit 4
         file_operator = operations.get_operator()
 
-        all_commits = file_operator.get_all_commits()
-        if len(all_commits) < 4:
+        commits = file_operator.get_commits()
+
+        if len(commits) < 4:
             return None
 
-        content1 = file_operator.get_commit_content(all_commits[0])
-        content4 = file_operator.get_commit_content(all_commits[3])
+        content1 = file_operator.get_commit_content(commits[0])
+        content3 = file_operator.get_commit_content(commits[2])
+        content4 = file_operator.get_commit_content(commits[3])
 
-        # file1 not in content4
-        # everything else is the same 
-        return True
+        file1 = next(iter(content1.keys()))
+
+        # Construct content4 from content3
+        del content3[file1]
+
+        return content3 == content4
 
     def _test5(self):
-        # File 2 has moved
+        # File 2 was moved in commit 5
         file_operator = operations.get_operator()
-        all_commits = file_operator.get_all_commits()
-        if len(all_commits) < 5:
+
+        commits = file_operator.get_commits()
+
+        if len(commits) < 5:
             return None
+
+        content4 = file_operator.get_commit_content(commits[3])
+        content5 = file_operator.get_commit_content(commits[4])
+
+        filename2_orig = next(iter(content4.keys()))
+        filename2_new = next(iter(content5.keys()))
+
+        if filename2_orig in content5:
+            return False
+
+        if len(content5) != 1:
+            return False
+
+        if content4[filename2_orig] != content5[filename2_new]:
+            return False
+
         return True
 
     def _test(self):
+        file_operator = operations.get_operator()
+
+        if file_operator.branch_has_merges():
+            return False
+
         if not self._test1():
             return False
         if not self._test2():
@@ -202,11 +230,6 @@ class FiveCommits(BasicLevel):
         if not self._test4():
             return False
         if not self._test5():
-            return False
-
-        file_operator = operations.get_operator()
-        # There are two commits
-        if len(file_operator.get_all_commits()) != 5:
             return False
 
         return True
