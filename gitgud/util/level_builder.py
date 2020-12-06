@@ -144,7 +144,8 @@ class BasicLevel(Level):
 
     def explain(self):
         try:
-            lines = self.file('explanation.txt').read_text().strip().split('>>>')
+            lines = self.file(
+                    'explanation.txt').read_text().strip().split('>>>')
             for i, line in enumerate(lines):
                 print(line.strip())
                 progress_string = '>>> ({}/{})'.format(i+1, len(lines))
@@ -154,7 +155,7 @@ class BasicLevel(Level):
                 else:
                     print(progress_string)
         except KeyboardInterrupt:
-            exit() # Handle Traceback for keyboard interrupt
+            exit()  # Handle Traceback for keyboard interrupt
 
     def goal(self):
         self.cat_file("goal.txt")
