@@ -143,15 +143,18 @@ class BasicLevel(Level):
         show_tree()
 
     def explain(self):
-        lines = self.file('explanation.txt').read_text().strip().split('>>>')
-        for i, line in enumerate(lines):
-            print(line.strip())
-            progress_string = '>>> ({}/{})'.format(i+1, len(lines))
-            if i != len(lines) - 1:
-                input(progress_string + '\n')
-                sys.stdout.write("\033[F")  # Cursor up one line
-            else:
-                print(progress_string)
+        try:
+            lines = self.file('explanation.txt').read_text().strip().split('>>>')
+            for i, line in enumerate(lines):
+                print(line.strip())
+                progress_string = '>>> ({}/{})'.format(i+1, len(lines))
+                if i != len(lines) - 1:
+                    input(progress_string + '\n')
+                    sys.stdout.write("\033[F")  # Cursor up one line
+                else:
+                    print(progress_string)
+        except KeyboardInterrupt:
+            exit() # Handle Traceback for keyboard interrupt
 
     def goal(self):
         self.cat_file("goal.txt")
