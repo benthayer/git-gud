@@ -144,8 +144,7 @@ class BasicLevel(Level):
 
     def explain(self):
         try:
-            lines = self.file(
-                    'explanation.txt').read_text().strip().split('>>>')
+            lines = self.file('explanation.txt').read_text().split('\n>>>\n')
             for i, line in enumerate(lines):
                 print(line.strip())
                 progress_string = '>>> ({}/{})'.format(i+1, len(lines))
