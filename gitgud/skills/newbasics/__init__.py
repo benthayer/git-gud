@@ -89,16 +89,21 @@ class FiveCommits(BasicLevel):
 
         failed = False
         for test, user_text in tests:
+            if failed:
+                print(f"{untested} {user_text}")
+                continue
+
             result = test()
+
             if result is None:
                 print(f"{untested} {user_text}")
             elif result:
                 print(f"{complete} {user_text}")
             else:
                 print(f"{incomplete} {user_text}")
+                failed = True
 
         print()
-        print("Note: Fix errors before continuing.")
         print("Try these if you're stuck:")
         print("git gud explain add")
         print("git gud explain modify")
