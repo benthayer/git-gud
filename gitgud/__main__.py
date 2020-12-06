@@ -509,6 +509,11 @@ class GitGud:
         import readline  # noqa: F401
         import code
         variables = globals()
+
+        file_operator = get_operator()
+        variables['file_operator'] = file_operator
+        variables['op'] = file_operator
+
         shell = code.InteractiveConsole(variables)
         shell.interact(
             banner="\n".join([
