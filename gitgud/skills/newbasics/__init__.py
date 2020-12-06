@@ -89,9 +89,10 @@ class FiveCommits(BasicLevel):
 
         failed = False
         for test, user_text in tests:
-            if failed:
+            result = test()
+            if result is None:
                 print(f"{untested} {user_text}")
-            if test():
+            elif result:
                 print(f"{complete} {user_text}")
             else:
                 print(f"{incomplete} {user_text}")
