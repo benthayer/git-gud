@@ -1,5 +1,3 @@
-import sys
-
 import keyboard
 import yaml
 from gitgud.user_messages import (all_levels_complete, cat_file, default_fail,
@@ -136,7 +134,7 @@ class BasicLevel(Level):
             for i, line in enumerate(lines):
                 print(line.strip())
                 print(f'>>>({i+1}/{len(lines)})', end='', flush=True)
-                keyboard.wait('enter',suppress=True)
+                keyboard.wait('enter', suppress=True)
         except KeyboardInterrupt:
             exit()  # Handle Traceback for keyboard interrupt
 
