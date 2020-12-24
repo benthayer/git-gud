@@ -135,6 +135,7 @@ class BasicLevel(Level):
                 print(line.strip())
                 print(f'>>>({i+1}/{len(lines)})', end='', flush=True)
                 keyboard.wait('enter', suppress=True)
+                print()
         except KeyboardInterrupt:
             exit()  # Handle Traceback for keyboard interrupt
 
