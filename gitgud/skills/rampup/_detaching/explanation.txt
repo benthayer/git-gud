@@ -13,6 +13,6 @@ Example: HEAD -> bugFix -> C1   //HEAD points to bugFix.
 >>>
 In comes the concept of detaching HEAD. Simply use "git checkout <commit_hash>" to modify HEAD so that it points to the commit instead of the branch.
 >>>
-The commit hash is a unique identifier for each commit node. Use "git gud show-tree" to see the git commit tree. The hashes look something like: "d6ba740...". Since each commit hash is unique, you only need to type the first four characters of the hash to refer to the commit. (e.g. "git checkout d6ba" will detach the HEAD onto the commit of that hash)
+The commit hash is a unique identifier for each commit node. Use "git gud show tree" to see the git commit tree. The hashes look something like: "d6ba740...". Since each commit hash is unique, you only need to type the first four characters of the hash to refer to the commit. (e.g. "git checkout d6ba" will detach the HEAD onto the commit of that hash)
 >>>
-Congratulations! You've learned how to detach HEADs in git. Try using "git gud show-tree" to see how the HEAD changes before and after a detach. Use what you've learned to move the HEAD from master to commit 4.
+Congratulations! You've learned how to detach HEADs in git. Try using "git gud show tree" to see how the HEAD changes before and after a detach. Use what you've learned to move the HEAD from master to commit 4.
