@@ -10,7 +10,7 @@ Commit once ("git gud commit")
 Go back to master with "git checkout master"
 >>>
 Commit another time, this time on the master branch.
- Use the command "git gud show-tree" to see the commit tree. This command simulates "git log --graph --oneline --all".
+ Use the command "git gud show tree" to see the commit tree. This command simulates "git log --graph --oneline --all".
  Take a note of what it looks like now so you can compare it to what the commit tree looks like after the merge.
 >>>
 Finally, merge the branch bugFix into master with "git merge bugFix".
