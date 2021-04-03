@@ -1,3 +1,29 @@
-Use this file to explain to the users how to use the git feature that this level focuses on.
+The important thing to remember in this level is to commit your changes as you make them.
+
+In general with Git, things go kinda like this:
+  1. Make changes
+  2. Tell Git about those changes
+  3. Commit those changes
+  4. Push your changes to a remote branch
+
+Git Gud hasn't covered remote branches yet, but they're how most people share their code with other people.
+
 >>>
-Separate blocks using ">>>", and be sure to include tips and examples as explanation aids.
+
+This makes sense if you think about it backwards.
+  4. When sharing your code, you may only want to share some of the files you're working on
+  3. You need some way to store a version of your code - that's what a commit is
+  2. For Git to know which version of the code to track, you need to tell it
+  1. Before Git can track any changes, you obviously need to make the changes
+
+>>>
+
+To help understand this, let's break down each step of the process:
+  1.  Add a file  <-- Let's break this down
+  2.  Add another file
+  3.  Modify both files
+  4.  Remove the first file
+  5.  Move the second file
+
+>>>
+This is the first thing you did in Git Gud
