@@ -554,7 +554,7 @@ class Operator():
         try:
             if branch is None:
                 commit = self.repo.head.commit
-            elif instanceof(branch, str):
+            elif isinstance(branch, str):
                 commit = self.repo.commit(branch)
             else:
                 commit = branch.commit
