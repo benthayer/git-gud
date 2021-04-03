@@ -100,7 +100,6 @@ class FiveCommits(BasicLevel):
 
             print(f"{goal_status} {user_text}")
 
-
     def _test1(self):
         # Test if a single file has been added to the first commit
         file_operator = operations.get_operator()
