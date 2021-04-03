@@ -180,7 +180,12 @@ class GitGud:
     @link_command(reset_parser)
     def handle_reset(self, args):
         self.assert_initialized()
-        level = get_operator().get_level()
+
+        file_operator = get_operator()
+
+        file_operator.update_level_completion()
+
+        level = file_operator.get_level()
         self.load_level(level)
 
     test_parser = subparsers.add_parser(
@@ -386,10 +391,8 @@ class GitGud:
         if args.level_name:
             args.level_name = args.level_name.lower()
 
-        level = get_operator().get_level()
-        if level:
-            if level._test():
-                level.mark_complete()
+        get_operator().update_level_completion()
+
         if args.skill_name in {"next", "prev", "previous"}:
             self.load_level_by_direction(args.skill_name, args.force)
             return

@@ -437,6 +437,15 @@ class Operator():
             )
             self.update_progress_file(progress_data)
 
+    def update_level_completion(self):
+        try:
+            level = self.get_level()
+        except InitializationError:
+            # Can't update if the level doesn't exist
+            return
+        if level._test():
+            level.mark_complete()
+
     def read_level_file(self):
         with open(self.level_path) as level_file:
             return level_file.read()
