@@ -89,26 +89,17 @@ class FiveCommits(BasicLevel):
 
         failed = False
         for test, user_text in tests:
-            if failed:
-                print(f"{untested} {user_text}")
-                continue
-
-            result = test()
-
-            if result is None:
-                print(f"{untested} {user_text}")
-            elif result:
-                print(f"{complete} {user_text}")
+            if not failed:
+                if test():
+                    goal_status = complete
+                else:
+                    goal_status = incomplete
+                    failed = True
             else:
-                print(f"{incomplete} {user_text}")
-                failed = True
+                goal_status = untested
 
-        print()
-        print("Try these if you're stuck:")
-        print("git gud explain add")
-        print("git gud explain modify")
-        print("git gud explain remove")
-        print("git gud explain rename")
+            print(f"{goal_status} {user_text}")
+
 
     def _test1(self):
         # Test if a single file has been added to the first commit
