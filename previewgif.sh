@@ -41,7 +41,7 @@ pe "git gud load 1 1"
 
 pe "git gud commit"
 pe "git gud commit"
-pe "git gud show tree"
+pe "git gud show-tree"
 
 pe "git gud test"
 pe "git gud load next"
