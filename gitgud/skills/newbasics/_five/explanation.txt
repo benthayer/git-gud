@@ -54,9 +54,9 @@ Whenever you're looking at "git status", you're looking at the changes you've ma
 
 >>>
 
-So, looking back, when you first created a file, it was the only file in the folder, and it showed up in the staging area. You added it, committed it and it disappeared from the staging area.
+So, looking back, when you first created a file, it was the only file in the working directory, and it showed up when you ran "git status". You added the file, and it still showed up when you ran "git status", but after you committed it, the file no longer appeared when you ran "git status".
 
-When you created the second file, it showed up in the staging area too, and then you added it and committed it, but that time, the first file was still in the folder. The first file didn't show up in the staging area, but Git still knew about it.
+When you created the second file, it showed up in when you ran "git status" too, and then you added it and committed it, but that time, the first file was still in the working directory. The first file doesn't show up when you run "git status", but Git still knows about it.
 
 >>>
 
@@ -67,7 +67,7 @@ Now, let's look at the rest of the steps:
   4.  Remove the first file     <-- Let's look at these
   5.  Move the second file      <-- Let's look at these
 
-You're still making changes, but this time, instead of creating a new file, you're kdoing all the other things you can do with files - Updating, deleting and removing
+You're still making changes, but this time, instead of creating a new file, you're doing all the other things you can do with files - Updating, deleting and removing
 
 >>>
 

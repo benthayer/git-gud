@@ -197,13 +197,13 @@ class FiveCommits(BasicLevel):
         content4 = file_operator.get_commit_content(commits[3])
         content5 = file_operator.get_commit_content(commits[4])
 
+        if len(content5) != 1:
+            return False
+
         filename2_orig = next(iter(content4.keys()))
         filename2_new = next(iter(content5.keys()))
 
         if filename2_orig in content5:
-            return False
-
-        if len(content5) != 1:
             return False
 
         if content4[filename2_orig] != content5[filename2_new]:
