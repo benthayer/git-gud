@@ -34,7 +34,7 @@ Recall back to what you did:
   2. You "git add"-ed the file
   3. You "git commit"-ed the file
 
-You did this twice. In the end, you created two files and ened up with two commits.
+You did this twice. In the end, you created two files and ended up with two commits.
 
 >>>
 
@@ -56,7 +56,7 @@ Whenever you're looking at "git status", you're looking at the changes you've ma
 
 So, looking back, when you first created a file, it was the only file in the working directory, and it showed up when you ran "git status". You added the file, and it still showed up when you ran "git status", but after you committed it, the file no longer appeared when you ran "git status".
 
-When you created the second file, it showed up in when you ran "git status" too, and then you added it and committed it, but that time, the first file was still in the working directory. The first file doesn't show up when you run "git status", but Git still knows about it.
+When you created the second file, it showed up when you ran "git status" too, and then you added it and committed it, but that time, the first file was still in the working directory. The first file doesn't show up when you run "git status", but Git still knows about it.
 
 >>>
 
@@ -76,7 +76,7 @@ You can use "git add" when you want to tell Git to "add" new changes to existing
 You can use "git rm" when you want to tell Git to "remove" files
 You can use "git mv" when you want to tell Git to "move" or rename files
 
-Finally, Git only stores versions of a repo. It dosen't actually store changes, but Git can tell if two files contents are the same. In Git's view, removing a file and then adding a file with the same contents is the same thing as moving it or renaming the file.
+Finally, Git only stores versions of a repo. It doesn't actually store changes, but Git can tell if two files contents are the same. In Git's view, removing a file and then adding a file with the same contents is the same thing as moving it or renaming the file.
 
 >>>
 
