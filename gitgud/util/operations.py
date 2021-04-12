@@ -225,7 +225,7 @@ class Operator():
         self.repo.index.commit(
                 "Placeholder commit\n\n"
                 "This commit is used when initializing levels."
-                "Something must have gone wrong",
+                "If you see this, something must have gone wrong",
                 parent_commits=[],
                 skip_hooks=True)
         # Detach HEAD so we can delete branches
@@ -552,6 +552,34 @@ class Operator():
         if sort_commits:
             all_commits.sort(key=lambda commit: commit.committed_date)
         return all_commits
+
+    def get_commits(self):
+        try:
+            return list(self.repo.iter_commits('HEAD', reverse=True))
+        except GitCommandError:
+            return []
+
+    def branch_has_merges(self, branch=None):
+        try:
+            if branch is None:
+                commit = self.repo.head.commit
+            elif isinstance(branch, str):
+                commit = self.repo.commit(branch)
+            else:
+                commit = branch.commit
+        except ValueError:
+            # Orphan branch
+            return False
+
+        while commit:
+            if len(commit.parents) == 1:
+                commit = commit.parents[0]
+            elif len(commit.parents) == 0:
+                commit = None
+            else:
+                return True
+
+        return False
 
 
 def get_operator():

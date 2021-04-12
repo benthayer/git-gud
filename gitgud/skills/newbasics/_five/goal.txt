@@ -1,0 +1,9 @@
+In a series of commits, make the following changes
+  1.  Add a file
+  2.  Add another file
+  3.  Modify both files
+  4.  Remove the first file
+  5.  Move the second file
+
+Use "git gud status" to check on your progress
+Use "git gud explain" to learn about the relevant git commands

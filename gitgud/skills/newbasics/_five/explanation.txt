@@ -1,0 +1,98 @@
+The important thing to remember in this level is to commit your changes as you make them.
+
+In general with Git, things go kinda like this:
+  1. Make changes
+  2. Tell Git about those changes
+  3. Commit those changes
+  4. Push your changes to a remote branch
+
+Git Gud hasn't covered remote branches yet, but they're how most people share their code with other people.
+
+>>>
+
+This makes sense if you think about it backwards.
+  4. When sharing your code, you may only want to share some of the files you're working on
+  3. You need some way to store a version of your code - that's what a commit is
+  2. For Git to know which version of the code to track, you need to tell it
+  1. Before Git can track any changes, you obviously need to make the changes
+
+>>>
+
+To help understand this, let's break down each step of the process:
+  1.  Add a file            <-- Let's break the first two down first
+  2.  Add another file      <-- Let's break the first two down first
+  3.  Modify both files
+  4.  Remove the first file
+  5.  Move the second file
+
+>>>
+
+The first two steps are pretty simple. They're just the first two levels in this skill that you've already completed.
+
+Recall back to what you did:
+  1. You created a file
+  2. You "git add"-ed the file
+  3. You "git commit"-ed the file
+
+You did this twice. In the end, you created two files and ended up with two commits.
+
+>>>
+
+If you were paying attention to "git gud status", you might have noticed something:
+The fist commit only knew about the first file, but the second commit knew about both files.
+
+If you were also paying attention to "git status", you might have noticed something else:
+The "staging area", which is shown when running "git status", only showed you the newly created file.
+
+Why is that?
+
+>>>
+
+As soon as you make a commit, Git is ready to start tracking another commit. Git knows that in a code base with multiple files, most of the time you'll only be changing a few of them at a time.
+
+Whenever you're looking at "git status", you're looking at the changes you've made. Git still knows about all the other files and will help you figure out what you want to include the next time you commit.
+
+>>>
+
+So, looking back, when you first created a file, it was the only file in the working directory, and it showed up when you ran "git status". You added the file, and it still showed up when you ran "git status", but after you committed it, the file no longer appeared when you ran "git status".
+
+When you created the second file, it showed up when you ran "git status" too, and then you added it and committed it, but that time, the first file was still in the working directory. The first file doesn't show up when you run "git status", but Git still knows about it.
+
+>>>
+
+Now, let's look at the rest of the steps:
+  1.  Add a file
+  2.  Add another file
+  3.  Modify both files         <-- Let's look at these
+  4.  Remove the first file     <-- Let's look at these
+  5.  Move the second file      <-- Let's look at these
+
+You're still making changes, but this time, instead of creating a new file, you're doing all the other things you can do with files - Updating, deleting and removing
+
+>>>
+
+So now, we can learn about a few more commands
+You can use "git add" when you want to tell Git to "add" new changes to existing files
+You can use "git rm" when you want to tell Git to "remove" files
+You can use "git mv" when you want to tell Git to "move" or rename files
+
+Finally, Git only stores versions of a repo. It doesn't actually store changes, but Git can tell if two files contents are the same. In Git's view, removing a file and then adding a file with the same contents is the same thing as moving it or renaming the file.
+
+>>>
+
+To summarize,
+
+- Git tracks all files
+- You have to tell Git when things have changed
+
+
+Use the following commands to complete the level
+ - git add
+ - git rm
+ - git mv
+ - git commit
+
+Use "git gud status" to check on your progress
+
+Good luck!
+

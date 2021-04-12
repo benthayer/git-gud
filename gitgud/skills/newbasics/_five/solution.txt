@@ -1,0 +1,20 @@
+# Examples, change to solution for your level
+echo "Hello world" >> sahan.txt
+git add sahan.txt
+git commit -m "Added Sahan"
+
+echo "Wave my hands" >> ben.txt
+git add ben.txt
+git commit -m "Added Ben"
+
+echo "Hola mundo" > sahan.txt
+echo "Wiggle my toes" > ben.txt
+git add sahan.txt
+git add ben.txt
+git commit -m "Changed file content"
+
+git rm sahan.txt
+git commit -m "Bye Sahan"
+
+git mv ben.txt gud.txt
+git commit -m "Renamed Ben"
