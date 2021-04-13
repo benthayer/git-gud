@@ -368,6 +368,7 @@ class Operator():
             }
 
         for tag in repo.tags:
+            commits.add(tag.commit)
             commit_hash = tag.commit.hexsha
             tree['tags'][tag.name] = {
                 'target': commit_hash,
