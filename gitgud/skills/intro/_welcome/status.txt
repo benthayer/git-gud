@@ -1,6 +1,7 @@
 "git gud status" tells you relevant information about the level.
+It may simulate commands or provide other relevant information.
 
-Below is an example status message, but for now don't worry about it.
+>>> git log
 
 To complete the level, type
     git gud test

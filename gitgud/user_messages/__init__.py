@@ -31,17 +31,28 @@ def end_marker():
 def separated(func):
     def new_func(*args, **kwargs):
         global user_has_seen_messages
-        if user_has_seen_messages:
-            print()
+        if 'separated' in kwargs and not kwargs['separated']:
+            del kwargs['separated']
+            func(*args, **kwargs)
         else:
-            user_has_seen_messages = True
-        func(*args, **kwargs)
+            if user_has_seen_messages:
+                print()
+            else:
+                user_has_seen_messages = True
+            func(*args, **kwargs)
     return new_func
 
 
 @separated
 def cat_file(path):
-    print(path.read_text().strip())
+    text = path.read_text().strip()
+
+    for line in text.split('\n'):
+        if line[:3] == '>>>':
+            command = line[3:].strip()
+            simulate_command(command, separated=False)
+        else:
+            print(line)
 
 
 @separated

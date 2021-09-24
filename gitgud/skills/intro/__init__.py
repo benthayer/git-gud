@@ -14,8 +14,7 @@ class Welcome(BasicLevel):
         self.cat_file("post-setup.txt")
 
     def status(self):
-        self.cat_file("status-1.txt")
-        simulate_command("git log")
+        self.cat_file("status.txt")
 
     def test_failed(self):
         default_fail_no_reset()
