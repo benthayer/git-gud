@@ -23,4 +23,4 @@ Commits, branches, remotes, tags, heads, merges and rebases.
 For now, type "git init" to make a Git repo for this folder
 You should get output like this:
     Initialized empty Git repository in ...
-Afterwards, you can run "git gut test" to continue
+Afterwards, you can run "git gud test" to continue
