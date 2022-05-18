@@ -1,27 +1,13 @@
-import sys
-
+import keyboard
+import yaml
+from gitgud.user_messages import (all_levels_complete, cat_file, default_fail,
+                                  level_complete, no_solutions_available,
+                                  show_level_name, show_tree, skill_complete)
+from gitgud.util import operations
 from importlib_resources import files
 
-import yaml
-
-from .parsing import branches_to_lowercase
-from .parsing import test_ancestry
-from .parsing import level_json
-from .parsing import parse_spec
-from .parsing import name_from_map
-from .parsing import get_non_merges
-from .parsing import name_merges
-
-from gitgud.user_messages import cat_file
-from gitgud.user_messages import show_level_name
-from gitgud.user_messages import show_tree
-from gitgud.user_messages import default_fail
-from gitgud.user_messages import level_complete
-from gitgud.user_messages import skill_complete
-from gitgud.user_messages import all_levels_complete
-from gitgud.user_messages import no_solutions_available
-
-from gitgud.util import operations
+from .parsing import (branches_to_lowercase, get_non_merges, level_json,
+                      name_from_map, name_merges, parse_spec, test_ancestry)
 
 
 class Level:
@@ -147,12 +133,9 @@ class BasicLevel(Level):
             lines = self.file('explanation.txt').read_text().split('\n>>>\n')
             for i, line in enumerate(lines):
                 print(line.strip())
-                progress_string = '>>> ({}/{})'.format(i+1, len(lines))
-                if i != len(lines) - 1:
-                    input(progress_string + '\n')
-                    sys.stdout.write("\033[F")  # Cursor up one line
-                else:
-                    print(progress_string)
+                print(f'>>>({i+1}/{len(lines)})', end='', flush=True)
+                keyboard.wait('enter', suppress=True)
+                print()
         except KeyboardInterrupt:
             exit()  # Handle Traceback for keyboard interrupt
 

@@ -45,6 +45,7 @@ setup(
         'gitpython==3.1.7',
         'importlib_resources',
         'pyyaml',
+        'keyboard',
     ],
     entry_points={
         "console_scripts": [
