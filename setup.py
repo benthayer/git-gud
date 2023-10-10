@@ -42,7 +42,7 @@ setup(
     },
     python_requires='>=3.6',
     install_requires=[
-        'gitpython==3.1.7',
+        'gitpython==3.1.37',
         'importlib_resources',
         'pyyaml',
     ],
