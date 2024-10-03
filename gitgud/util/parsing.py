@@ -210,12 +210,12 @@ def name_from_map(level_tree, mapping):
         if commit_name not in mapping:
             mapping[commit_name] = commit_name
 
-    # Update refernces to merges in branches
+    # Update references to merges in branches
     for branch in level_tree['branches']:
         level_tree['branches'][branch]['target'] = \
                 mapping[level_tree['branches'][branch]['target']]
 
-    # Update refernces to merges in tags
+    # Update references to merges in tags
     for tag in level_tree['tags']:
         level_tree['tags'][tag]['target'] = \
                 mapping[level_tree['tags'][tag]['target']]
