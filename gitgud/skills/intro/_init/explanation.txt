@@ -15,7 +15,7 @@ the contents of the ".git" folder directly
 >>>
 Managing different versions of your code is why Git is called a "Version Control System"
 >>>
-For now, it's fine to know that you don't need to ever look in the ".git" dirctory.
+For now, it's fine to know that you don't need to ever look in the ".git" directory.
 What's more important is that you know what Git does.
 Among other things, these are some of the things you'll work with throughout the game:
 Commits, branches, remotes, tags, heads, merges and rebases.
