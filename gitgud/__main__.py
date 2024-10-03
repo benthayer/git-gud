@@ -110,7 +110,7 @@ class GitGud:
     init_parser = subparsers.add_parser(
             'init',
             help='Init Git Gud and load first level',
-            description='Initialize the direcotry with a git repository and load the first level of Git Gud.'  # noqa: E501
+            description='Initialize the directory with a git repository and load the first level of Git Gud.'  # noqa: E501
     )
     init_parser.add_argument('--force', action='store_true')
     init_parser.add_argument('--prettyplease', action='store_true')
