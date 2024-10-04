@@ -14,7 +14,7 @@ Git sees:
     "master" branch
 >>>
 The "Working Directory" changes immediately when you add, remove or modify files.
-Git knows about the Working Directory, but it doen't do anything with it.
+Git knows about the Working Directory, but it doesn't do anything with it.
 >>>
 The "Staging Area" is what Git sees, and is what eventually turns into a commit when you run "git commit".
 "git add" is just one way to update the Staging Area, and there are several others that you'll get to learn about in upcoming levels.

@@ -1,4 +1,4 @@
-"git gud explain" will help give you more context to the currrent level
+"git gud explain" will help give you more context to the current level
 Hit enter to read more.
 >>>
 As long as you see the ">>>", you are reading the explanation.
