@@ -1,0 +1,109 @@
+-- Roblox GUI Script with draggable GUI, close, minimize, floating circle, and abilities
+-- Place this LocalScript inside StarterPlayerScripts or StarterGui
+
+-- Services
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CustomAbilityGUI"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.DisplayOrder = 999999999 -- Always on top
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Main Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 200)
+frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.Active = true
+frame.Draggable = true
+frame.Parent = screenGui
+
+-- Close Button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+closeBtn.Text = "X"
+closeBtn.Parent = frame
+
+-- Minimize Button
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+minimizeBtn.Position = UDim2.new(1, -70, 0, 5)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+minimizeBtn.Text = "-"
+minimizeBtn.Parent = frame
+
+-- Floating Circle Button
+local floatBtn = Instance.new("TextButton")
+floatBtn.Size = UDim2.new(0, 60, 0, 60)
+floatBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
+floatBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+floatBtn.Text = "Menu"
+floatBtn.Visible = false
+floatBtn.Active = true
+floatBtn.Draggable = true
+floatBtn.Parent = screenGui
+
+-- Button: Speed Boost
+local speedBtn = Instance.new("TextButton")
+speedBtn.Size = UDim2.new(0, 120, 0, 40)
+speedBtn.Position = UDim2.new(0, 20, 0, 60)
+speedBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+speedBtn.Text = "Velocidad"
+speedBtn.Parent = frame
+
+-- Button: High Jump
+local jumpBtn = Instance.new("TextButton")
+jumpBtn.Size = UDim2.new(0, 120, 0, 40)
+jumpBtn.Position = UDim2.new(0, 160, 0, 60)
+jumpBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+jumpBtn.Text = "Salto"
+jumpBtn.Parent = frame
+
+-- Close GUI
+closeBtn.MouseButton1Click:Connect(function()
+    frame.Visible = false
+    floatBtn.Visible = false
+end)
+
+-- Minimize GUI
+minimizeBtn.MouseButton1Click:Connect(function()
+    frame.Visible = false
+    floatBtn.Visible = true
+end)
+
+-- Restore GUI from floating circle
+floatBtn.MouseButton1Click:Connect(function()
+    frame.Visible = true
+    floatBtn.Visible = false
+end)
+
+-- Speed Boost Function
+speedBtn.MouseButton1Click:Connect(function()
+    local char = player.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.WalkSpeed = 50 -- Default is 16
+    end
+end)
+
+-- High Jump Function
+jumpBtn.MouseButton1Click:Connect(function()
+    local char = player.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.JumpPower = 120 -- Default is 50
+    end
+end)
+
+-- Force top layer always
+task.spawn(function()
+    while true do
+        screenGui.DisplayOrder = 999999999
+        task.wait(1)
+    end
+end)
